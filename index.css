@@ -1,0 +1,107 @@
+.main-page {
+    padding: 10px;
+    font-size: 12px !important;
+    max-width: 400px;
+    --primary: rgb(4, 105, 105);
+    --secondary: rgb(133, 0, 0);
+    --third: rgb(87, 186, 87);
+}
+
+.show {
+    display: inline-block;
+}
+
+.hide {
+    display: none;
+}
+
+.aquacolor {
+    color: var(--primary);
+}
+
+.btn.aquacolor {
+    background-color: var(--primary);
+    color: white;
+}
+
+.main-page .login-page input {
+    font-size: 12px !important;
+}
+
+.main-page .login-page .main-login-page {
+    max-width: 400px;
+}
+
+.main-page .login-page .sign-in-tooltip {
+    padding: 5px 5px;
+}
+
+.main-page .title {
+    padding: 10px 5px;
+    font-size: 1.5em;
+    color: var(--primary);
+}
+.main-page .title .content:hover{
+    color: orange;
+    cursor: pointer;
+}
+.main-page .title .extend-tool:hover{
+    color: orange;
+    cursor: pointer;
+}
+
+.main-page .main-action-page{
+    min-width: 400px;
+}
+.main-page .main-action-page .ticket-active .heading{
+    padding: 2px 10px;
+    font-size: 1.5em;
+    color: var(--primary);
+}
+.main-page .main-action-page .ticket-active .active-item-group{
+    padding: 2px 15px;
+    font-size: 1.3em;
+}
+
+.main-page .main-action-page .ticket-active .active-item-group .active-item{
+    display: flex;
+    align-items: center;
+    margin-left: 10px;
+    width: 60%;
+    justify-content: space-between;
+}
+.main-page .main-action-page .ticket-active .active-item-group .active-item .icon{
+    font-size: 1.2em;
+    color: var(--secondary);
+}
+.main-page .main-action-page .ticket-active .active-item-group .active-item .icon.stop{
+    color: var(--secondary)!important;
+}
+
+.main-page .main-action-page .ticket-active .active-item-group .active-item.start .icon{
+    color: var(--third);
+}
+
+.main-page .main-action-page .ticket{
+    padding: 5px 10px;
+}
+
+.main-page .main-action-page .ticket input{
+    font-size: 12px;
+}
+
+.main-page .main-action-page .ticket.search-bar p{
+    margin-bottom: 0px;
+    padding: 2px 10px;
+    cursor: pointer;
+    font-size: 1.1em;
+}
+.main-page .main-action-page .ticket.search-bar p:hover{
+    background-color: var(--primary);
+    color: white;
+}
+.main-page .main-action-page .ticket.search-bar .search-bar-result{
+    position: relative;
+    box-shadow: rgba(100, 100, 111, 0.2) 0px 7px 29px 0px;
+    color: grey;
+}
