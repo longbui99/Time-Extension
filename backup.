@@ -1,0 +1,123 @@
+
+    <!-- <div class="main-page" id="main-page">
+        <div class="title d-flex justify-content-between">
+            <div class="content" id="server-open">
+                <span><i class="fa-solid fa-clock"></i></span> <span>Time Management</span>
+                <p style="color: black;font-size:12px;margin-left: 5px;">
+                    Powered by <a href="https://www.drakebui.ml" target="_blank">Long Bui</a>
+                </p>
+            </div>
+            <div class="extend-tool" id="server-logout">
+                <i class="fa-solid fa-power-off"></i>
+            </div>
+        </div>
+        <div class="process-page" id="process-page">
+
+        </div><div class="login-page hide">
+            <div class="sign-in-tooltip">
+                <div class="text-danger">
+                    <span id="sign-in-tooltip">Authentication Failed</span>
+                </div>
+            </div>
+            <div class="main-login-page">
+                <div class="server-url">
+                    <div class="input-group mb-3">
+                        <input type="text" class="form-control" placeholder="Server URL" id="server-url"
+                            aria-describedby="basic-addon3">
+                    </div>
+                </div>
+                <div class="navigator-username">
+                    <div class="input-group mb-3">
+                        <input type="text" class="form-control" placeholder="Username" aria-label="Username" id="username"
+                            aria-describedby="basic-addon1">
+                    </div>
+                </div>
+                <div class="navigator-password">
+                    <div class="input-group mb-3">
+                        <input type="text" class="form-control" placeholder="Password / Access Token" id="password"
+                            aria-describedby="basic-addon3">
+                    </div>
+                </div>
+                <div class="nagivator-button">
+                    <button type="button" class="btn btn-primary aquacolor" id="action-sign-in">Sign In</button>
+                </div>
+            </div>
+        </div><div class="main-action-page show">
+            <div class="navigator">
+            </div>
+            <div class="ticket search-bar">
+                <div class="input-group">
+                    <input type="text" class="form-control" placeholder="Search Ticket" id="search-bar-ticket">
+                </div>
+                <div class="search-bar-result hide" id="search-bar-result">
+                    <p>NF-126: 3232131</p>
+                    <p>NF-126: 3333231</p>
+                    <p>NF-126: 3322123</p>
+                    <p>NF-126: 4441321</p>
+                </div>
+            </div>
+            <div class="ticket time-log">
+                <div class="duration d-flex justify-content-between align-items-center">
+                    <div class="total-duration">
+                        <span class="avt"><img src="./static/sigma.png"></span> <span id="total-duration">3h 30m</span>
+                    </div>
+                    <div class="active-duration">
+                        <span class="avt"><i class="fa-solid fa-stopwatch"></i></span> <span id="active-duration">3h 30m</span>
+                    </div>
+                </div>
+                <div class="comment">
+                    <input type="text" class="form-control" placeholder="Comment to log step/ log work" id="comment-for-ticket">
+                </div>
+                <div class="time-action d-flex justify-content-between align-items-center">
+                    <div class="manual-log">
+                        <input type="text" class="form-control" placeholder="Text log" id="manual-log-text">
+                    </div>
+                    <div class="action-group d-flex justify-content-between">
+                        <div class="action add" id="action-add">
+                            <i class="fa-solid fa-circle-play"></i>
+                        </div>
+                        <div class="action pause" id="action-pause">
+                            <i class="fa-solid fa-circle-pause"></i>
+                        </div>
+                        <div class="action stop" id="action-stop">
+                            <i class="fa-solid fa-circle-stop"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="ticket-active">
+                <div class="heading">
+                    Related Active
+                </div>
+                <div class="active-item-group">
+                    <div class="active-item">
+                        <div class="icon-group">
+                            <span class="icon">
+                                <i class="fa-solid fa-circle-play"></i>
+                            </span>
+                        </div>
+                        <span class="ticket-key">
+                            NF-12
+                        </span>
+                        <span class="duration">
+                            1034s (31m)
+                        </span>
+                    </div>
+
+                    <div class="active-item">
+                        <div class="icon-group">
+                            <span class="icon">
+                                <i class="fa-solid fa-circle-play"></i>
+                            </span>
+                        </div>
+                        <span class="ticket-key">
+                            SQ-20
+                        </span>
+                        <span class="duration">
+                            1034s (31m)
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div> -->

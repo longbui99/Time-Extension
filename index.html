@@ -4,132 +4,16 @@
 <head>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
         integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
-    <link rel="stylesheet" href="index.css">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/js/all.min.js"></script>
+    <link rel="stylesheet" href="./css/index.css">
+    <script src="./js/fontawesome.js"></script>
+    <!-- <script src="./js/owl.cjs.js"></script> -->
 </head>
-
 <body>
-    <div class="main-page">
-        <div class="title d-flex justify-content-between">
-            <div class="content">
-                <span><i class="fa-solid fa-clock"></i></span> <span>Time Management</span>
-                <p style="color: black;font-size:12px;margin-left: 5px;">
-                    Powered by Long Bui
-                </p>
-            </div>
-            <div class="extend-tool">
-                <i class="fa-solid fa-power-off"></i>
-            </div>
-        </div>
-        <div class="login-page hide">
-            <div class="sign-in-tooltip">
-                <div class="text-danger">
-                    <span id="sign-in-tooltip">Authentication Failed</span>
-                </div>
-            </div>
-            <div class="main-login-page">
-                <div class="server-url">
-                    <div class="input-group mb-3">
-                        <input type="text" class="form-control" placeholder="Server URL" id="basic-url"
-                            aria-describedby="basic-addon3">
-                    </div>
-                </div>
-                <div class="navigator-username">
-                    <div class="input-group mb-3">
-                        <input type="text" class="form-control" placeholder="Username" aria-label="Username"
-                            aria-describedby="basic-addon1">
-                    </div>
-                </div>
-                <div class="navigator-password">
-                    <div class="input-group mb-3">
-                        <input type="text" class="form-control" placeholder="Password / Access Token" id="basic-url"
-                            aria-describedby="basic-addon3">
-                    </div>
-                </div>
-                <div class="nagivator-button">
-                    <button type="button" class="btn btn-primary aquacolor">Sign In</button>
-                </div>
-            </div>
-        </div>
-        <div class="main-action-page show">
-            <div class="navigator">
-            </div>
-            <div class="ticket-active">
-                <div class="heading">
-                    Related Active
-                </div>
-                <div class="active-item-group">
-                    <div class="active-item">
-                        <div class="icon-group">
-                            <span class="icon">
-                                <i class="fa-solid fa-circle-play"></i>
-                            </span>
-                        </div>
-                        <span class="ticket-key">
-                            NF-12
-                        </span>
-                        <span class="duration">
-                            1034s (31m)
-                        </span>
-                    </div>
-
-                    <div class="active-item">
-                        <div class="icon-group">
-                            <span class="icon">
-                                <i class="fa-solid fa-circle-play"></i>
-                            </span>
-                        </div>
-                        <span class="ticket-key">
-                            SQ-20
-                        </span>
-                        <span class="duration">
-                            1034s (31m)
-                        </span>
-                    </div>
-                </div>
-
-            </div>
-            <div class="ticket search-bar">
-                <div class="input-group">
-                    <input type="text" class="form-control" placeholder="Search Ticket" id="basic-url"
-                        aria-describedby="basic-addon3">
-                </div>
-                <div class="search-bar-result" id="search-bar-result">
-                    <p>NF-126: 3232131</p>
-                    <p>NF-126: 3333231</p>
-                    <p>NF-126: 3322123</p>
-                    <p>NF-126: 4441321</p>
-                </div>
-            </div>
-            <div class="ticket time-log">
-                <div class="duration d-flex justify-content-between">
-                    <div class="total-duration">
-                        <span><img src="./static/sigma.png"></i></span><span id="total-duration">3h 30m</span>
-                    </div>
-                    <div class="active-duration">
-                        <span><i class="fa-solid fa-stopwatch"></i></span><span id="total-duration">3h 30m</span>
-                    </div>
-                </div>
-                <div class="comment">
-                    <input type="text" class="form-control" placeholder="Comment to log step/ log work" id="basic-url">
-                </div>
-                <div class="action-group d-flex justify-content-between">
-                    <div id="action add">
-                        <i class="fa-solid fa-circle-play"></i>
-                    </div>
-                    <div id="action pause">
-                        <i class="fa-solid fa-circle-pause"></i>
-                    </div>
-                    <div id="action stop">
-                        <i class="fa-solid fa-circle-stop"></i>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="tooltips">
-        </div>
-    </div>
 </body>
-<script src="index.js"></script>
+<script src="./js/api.js"></script>
+<script src="./js/base.js"></script>
+<script src="./js/login.js"></script>
+<script src="./js/main.js"></script>
+<script src="./js/home.js"></script>
 
 </html>

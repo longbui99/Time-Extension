@@ -1,0 +1,21 @@
+{
+    "name": "Time Management",
+    "description": "Build an Extension!",
+    "version": "1.0",
+    "manifest_version": 3,
+    "permissions": [
+        "storage",
+        "scripting",
+        "activeTab"
+    ],
+    "host_permissions": [
+        "https://*.odoo.com/*",
+        "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/js/all.min.js"
+    ],
+    "action": {
+        "default_popup": "index.html"
+    },
+    "content_security_policy":{
+        "extension_pages": "script-src 'self'; object-src 'self'"
+    }
+}
