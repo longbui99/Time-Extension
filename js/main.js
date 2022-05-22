@@ -12,32 +12,95 @@ class Main extends Component {
 
     constructor() {
         super(...arguments);
-        this.ticketData = {};
+        this.ticketData = this.subEnv.ticketData || null;
         this.loadedData = [];
     }
-    renderTicketData(){
-
+    _getDisplayName(record) {
+        return `${record.key}: ${(record.name.length > 30) ? record.name.substring(0, 40) + "..." : record.name}`;
     }
-    chooseTicket(index){
+    async renderTimeActions() {
+        if (this.ticketData) {
+            if (this.ticketData.timeStatus === "active") {
+                this.actionAddRef.el.style.display = "none";
+                this.actionPauseRef.el.style.display = "inline-block";
+                this.actionStopRef.el.style.display = "inline-block";
+            }
+            else if (this.ticketData.timeStatus === "pause") {
+                this.actionAddRef.el.style.display = "inline-block";
+                this.actionPauseRef.el.style.display = "none";
+                this.actionStopRef.el.style.display = "inline-block";
+            }
+            else {
+                this.actionAddRef.el.style.display = "inline-block";
+                this.actionPauseRef.el.style.display = "none";
+                this.actionStopRef.el.style.display = "none";
+            }
+        }
+        else {
+            this.actionAddRef.el.style.display = "none";
+            this.actionPauseRef.el.style.display = "none";
+            this.actionStopRef.el.style.display = "none";
+        }
+    }
+    async renderTicketData(refresh = false) {
+        if (this.currentInterval) {
+            clearInterval(this.currentInterval)
+        }
+        if (this.ticketData) {
+            if (refresh) {
+                let response = (await fetch(`${this.subEnv.serverURL}/management/ticket/get/${this.ticketData.id}?jwt=${this.subEnv.jwt}`));
+                let result = (await response.json());
+                for (let key of Object.keys(result)){
+                    this.ticketData[key] = result[key];
+                }
+                this.ticketData.displayName = this._getDisplayName(this.ticketData);
+            }
+            let record = this.ticketData;
+            this.searchRef.el.value = this.ticketData.displayName;
+            this.totalDurationRef.el.innerText = secondToString(record.total_duration);
+            this.activedurationRef.el.innerText = secondToString(record.active_duration);
+            if (record.active_duration > 0){
+                this.ticketData.timeStatus = "pause";
+            }
+            if (record.last_start) {
+                let pivotTime = new Date(record.last_start).getTime() - new Date().getTimezoneOffset() * 60000;
+                this.currentInterval = setInterval(() => {
+                    this.activedurationRef.el.innerText = secondToString(parseInt(record.active_duration + (new Date().getTime() - pivotTime) / 1000));
+                }, 500)
+                this.ticketData.timeStatus = "active";
+            }
+        }
+        this.renderTimeActions()
+    }
+    async chooseTicket(index) {
         this.ticketData = this.loadedData[index];
-        this.searchResultRef.el.style.display='none';
-        this.searchRef.el.value = this.ticketData.displayName;
+        this.searchResultRef.el.style.display = 'none';
         this.renderTicketData()
+        if (chrome?.storage) {
+            let data = (await chrome.storage.sync.get([storage]));
+            data.ticketData = this.ticketData;
+            await chrome.storage.sync.set({ 'timeLogStorage': data })
+        }
+        else {
+            let data = JSON.parse(localStorage.getItem(storage) || "{}");
+            data.ticketData = this.ticketData;
+            localStorage.setItem(storage, JSON.stringify(data))
+        }
     }
     loadSearchedTickets(data) {
-        let element = this.searchResultRef.el, record = {}, self=this;
+        let element = this.searchResultRef.el, record = {}, self = this;
         this.searchResultRef.el.innerHTML = '';
         for (let i = 0; i < data.length; i++) {
             record = data[i];
             let p = document.createElement('p');
-            data[i].displayName = `${record.key}: ${(record.name.length > 30) ? record.name.substring(0, 40) + "..." : record.name}`;
+            data[i].displayName = this._getDisplayName(record);
             p.innerHTML = record.displayName;
             p.addEventListener('click', () => {
                 self.chooseTicket(i);
             })
             element.append(p);
         }
-        element.style.display='inline-block';
+        element.style.display = 'inline-block';
     }
     async _searchTicket(text) {
         let result = (await fetch(`${this.subEnv.serverURL}/management/ticket/search/${text}?limitRecord=${10}&jwt=${this.subEnv.jwt}`))
@@ -47,21 +110,82 @@ class Main extends Component {
     _initSearchBar() {
         let self = this;
         this.searchRef.el.addEventListener('change', (event) => {
+            if (this.searchRef.el.value.length > 0) {
+                self._searchTicket(this.searchRef.el.value)
+            }
+        })
+    }
+    async _pauseWorkLog() {
+        let params = {
+            "id": this.ticketData.id,
+            "jwt": this.subEnv.jwt,
+            "payload": JSON.stringify({
+                'description': this.commentRef.el.value,
+                'source': 'extension'
+            })
+        }
+        let result = (await fetch(`${this.subEnv.serverURL}/management/ticket/work-log/pause?${new URLSearchParams(params)}`))
+        this.renderTicketData(true)
+    }
+    _initPause() {
+        let self = this;
+        this.actionPauseRef.el.addEventListener('click', (event) => {
+            if (self.ticketData.timeStatus === "active") {
+                self.ticketData.timeStatus = "pause";
+                self._pauseWorkLog()
+            }
+        })
+    }
+    async _addWorkLog() {
+        let params = {
+            "id": this.ticketData.id,
+            "jwt": this.subEnv.jwt,
+            "payload": JSON.stringify({
+                'source': 'extension'
+            })
+        }
+        let result = (await fetch(`${this.subEnv.serverURL}/management/ticket/work-log/add?${new URLSearchParams(params)}`))
+        this.renderTicketData(true)
+    }
+    _initAddWorkLog() {
+        let self = this;
+        this.actionAddRef.el.addEventListener('click', (event) => {
+            if (self.ticketData.timeStatus !== "active") {
+                self.ticketData.timeStatus = "active";
+                self._addWorkLog()
+            }
+        })
+    }
 
-            self._searchTicket(this.searchRef.el.value)
-            // debounce(()=>{
-            //     self._searchTicket(this.searchRef.el.value)
-            // })
+    async _doneWorkLog() {
+        let params = {
+            "id": this.ticketData.id,
+            "jwt": this.subEnv.jwt,
+            "payload": JSON.stringify({
+                'source': 'extension',
+                'description': this.commentRef.el.value,
+            })
+        }
+        let result = (await fetch(`${this.subEnv.serverURL}/management/ticket/work-log/done?${new URLSearchParams(params)}`))
+        this.renderTicketData(true)
+    }
+    _initDoneWorkLog() {
+        let self = this;
+        this.actionStopRef.el.addEventListener('click', (event) => {
+            self.ticketData.timeStatus = false;
+            self._doneWorkLog()
         })
     }
     initEvent() {
-        this._initSearchBar()
-
+        this._initSearchBar();
+        this._initPause();
+        this._initAddWorkLog();
+        this._initDoneWorkLog();
     }
     mounted() {
         let res = super.mounted();
         this.initEvent();
-
+        this.renderTicketData(true);
         return res;
     }
     template = `<div class="main-action-page show">
@@ -91,14 +215,20 @@ class Main extends Component {
                     <input type="text" class="form-control" placeholder="Text log" l-ref="manual-log-text"/>
                 </div>
                 <div class="action-group d-flex justify-content-between">
-                    <div class="action add" l-ref="action-add">
-                        <i class="fa-solid fa-circle-play"></i>
+                    <div>
+                        <div class="action add" l-ref="action-add">
+                            <i class="fa-solid fa-circle-play"></i>
+                        </div>
                     </div>
-                    <div class="action pause" l-ref="action-pause">
-                        <i class="fa-solid fa-circle-pause"></i>
+                    <div>
+                        <div class="action pause" l-ref="action-pause">
+                            <i class="fa-solid fa-circle-pause"></i>
+                        </div>
                     </div>
-                    <div class="action stop" l-ref="action-stop">
-                        <i class="fa-solid fa-circle-stop"></i>
+                    <div>
+                        <div class="action stop" l-ref="action-stop">
+                            <i class="fa-solid fa-circle-stop"></i>
+                        </div>
                     </div>
                 </div>
             </div>
