@@ -27,7 +27,7 @@ class Login extends Component {
         const response = await fetch(serverURL + "/web/login/jwt?" + new URLSearchParams(payload));
         const data = await response.json();
         this.trigger_up('authentication', {
-            'jwt': data,
+            'jwt': data.data,
             'serverURL': serverURL
         })
     }

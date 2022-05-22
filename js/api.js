@@ -1,6 +1,13 @@
 const storage = "TimeLogStorage"
+function debounce(func, timeout = 500) {
+    let timer;
+    return (...args) => {
+        clearTimeout(timer);
+        timer = setTimeout(() => { func.apply(this, args); }, timeout);
+    };
+}
 
-function parseJSONRequest(jsonData){
+function parseJSONRequest(jsonData) {
     return {
         "jsonrpc": "2.0",
         "method": "call",
@@ -8,19 +15,19 @@ function parseJSONRequest(jsonData){
         "id": null
     }
 }
-function _mapParams(jsonData){
+function _mapParams(jsonData) {
     let params = false;
     let keys = []
-    for (let key in jsonData){
+    for (let key in jsonData) {
         keys.push(`${key}=${jsonData[key]}`)
     }
     if (keys.length)
         params = keys.join("\&")
     return params
 }
-function _pushParams(serverURL, jsonData){
+function _pushParams(serverURL, jsonData) {
     params = _mapParams(jsonData)
-    if (params){
+    if (params) {
         serverURL += "?" + params
     }
     return serverURL
