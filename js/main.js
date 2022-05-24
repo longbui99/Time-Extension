@@ -63,6 +63,14 @@ class Main extends Component {
                 </div>`
         }
         this.relatedActiveRef.el.innerHTML = template;
+        let elements = this.relatedActiveRef.el.querySelectorAll('.push-relative-ticket')
+        let self = this;
+        for (let index = 0; index < elements.length; index++){
+            elements[index].addEventListener('click', event=>{
+                self.ticketData = self.relatedActiveTickets[index];
+                self.storeAndRenderTicket(true)
+            })
+        }
     }
     async renderTicketData(refresh = false) {
         if (this.currentInterval) {
@@ -114,10 +122,8 @@ class Main extends Component {
         });
         this.renderTimeActions()
     }
-    async chooseTicket(index) {
-        this.ticketData = this.loadedData[index];
-        this.searchResultRef.el.style.display = 'none';
-        this.renderTicketData()
+    storeAndRenderTicket(refresh=false){
+        this.renderTicketData(refresh)
         // if (chrome?.storage) {
         //     let data = (await chrome.storage.sync.get([storage]));
         //     data.ticketData = this.ticketData;
@@ -128,6 +134,11 @@ class Main extends Component {
             data.ticketData = this.ticketData;
             localStorage.setItem(storage, JSON.stringify(data))
         // }
+    }
+    async chooseTicket(index) {
+        this.ticketData = this.loadedData[index];
+        this.searchResultRef.el.style.display = 'none';
+        this.storeAndRenderTicket()
     }
     loadSearchedTickets(data) {
         let element = this.searchResultRef.el, record = {}, self = this;
