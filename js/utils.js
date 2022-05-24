@@ -1,4 +1,4 @@
-const storage = "TimeLogStorage"
+const storage = "timeLogStorage"
 function debounce(func, timeout = 500) {
     let timer;
     return (...args) => {

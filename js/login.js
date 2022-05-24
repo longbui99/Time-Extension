@@ -24,12 +24,22 @@ class Login extends Component {
     async actionSignIn(event) {
         let payload = this._prepareValues();
         let serverURL = this._prepareServerAPI();
-        const response = await fetch(serverURL + "/web/login/jwt?" + new URLSearchParams(payload));
-        const data = await response.json();
-        this.trigger_up('authentication', {
-            'jwt': data.data,
-            'serverURL': serverURL
-        })
+        this.trigger_up('loading', true);
+        try {
+            const response = await fetch(serverURL + "/web/login/jwt?" + new URLSearchParams(payload));
+            const data = await response.json();
+            this.popupRef.el.style.display = "none";
+            this.trigger_up('authentication', {
+                'jwt': data.data,
+                'serverURL': serverURL
+            })
+        }
+        catch (error){
+            this.popupRef.el.style.display = "inline-block";
+            throw error
+        } finally{
+            this.trigger_up('loading', false);
+        }
     }
 
     mounted(){
