@@ -160,6 +160,19 @@ body {
 .main-page .main-action-page .ticket input {
     font-size: 12px;
 }
+.main-page .main-action-page .ticket .input-group .ticket-navigation{
+    font-size: 2em;
+    width: 15%;
+    padding: 0px 5px;
+    color: var(--primary);
+    display: none;
+}
+.main-page .main-action-page .ticket .input-group .ticket-navigation span{
+    cursor: pointer;
+}
+.main-page .main-action-page .ticket .input-group .ticket-navigation span:hover{
+    color: orange;
+}
 
 .main-page .main-action-page .ticket.search-bar p {
     margin-bottom: 0px;

@@ -31,7 +31,7 @@ class Login extends Component {
             this.popupRef.el.style.display = "none";
             this.trigger_up('authentication', {
                 'jwt': data.data,
-                'serverURL': serverURL
+                'serverURL': serverURL.trim('/')
             })
         }
         catch (error){

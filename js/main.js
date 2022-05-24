@@ -11,6 +11,11 @@ class Main extends Component {
     actionPauseRef = this.useRef('action-pause')
     actionStopRef = this.useRef('action-stop')
     relatedActiveRef = this.useRef("related-active")
+    pointRef = this.useRef("point-ref")
+    statusRef = this.useRef("status-ref")
+    assingneeRef = this.useRef("assignee-ref")
+    openTicketref = this.useRef("open-ticket")
+    reloadTicketRef = this.useRef("reload-ticket")
 
     constructor() {
         super(...arguments);
@@ -72,6 +77,17 @@ class Main extends Component {
             })
         }
     }
+    ticketNavigator(){
+        let self = this;
+        this.openTicketref.el.addEventListener('click', (event)=>{
+            window.open(self.ticketData.url, '_blank')
+        })
+        this.reloadTicketRef.el.addEventListener('click', (event)=>{
+            fetch(`${this.subEnv.serverURL}/management/ticket/fetch/${this.ticketData.id}?jwt=${this.subEnv.jwt}`).then(()=>{
+                self.renderTicketData(true);
+            });
+        })
+    }
     async renderTicketData(refresh = false) {
         if (this.currentInterval) {
             clearInterval(this.currentInterval)
@@ -97,6 +113,9 @@ class Main extends Component {
             this.totalDurationRef.el.innerText = secondToString(record.total_duration);
             this.myTotalDurationRef.el.innerText = secondToString(record.my_total_duration);
             this.activeDurationRef.el.innerText = secondToString(record.active_duration);
+            this.pointRef.el.innerText = record.point;
+            this.statusRef.el.innerText = record.status || '';
+            this.assingneeRef.el.innerText = record.assignee || '';
             if (record.active_duration > 0){
                 this.ticketData.timeStatus = "pause";   
             }
@@ -108,6 +127,11 @@ class Main extends Component {
                 this.ticketData.timeStatus = "active";
             }
             except_id.push(this.ticketData.id)
+            this.el.querySelector('.ticket-navigation').style.display="inline-block";
+            this.ticketNavigator();
+        }
+        else{
+            this.el.querySelector('.ticket-navigation').style.display="none";
         }
         let params = JSON.stringify({
             "except": except_id,
@@ -276,7 +300,8 @@ class Main extends Component {
     }
     _initManualChange(){
         let self = this;
-        this.manualLogref.el.addEventListener('change', event => {
+        this.manualLogref.el.addEventListener('keyup', event => {
+            (10 != event.keyCode && 13 != event.keyCode) || !event.ctrlKey || self._doneWorkLog();
             if (!['pause', 'active'].includes(self.ticketData.timeStatus)) {
                 self.ticketData.timeStatus = "pause";
             }
@@ -300,13 +325,24 @@ class Main extends Component {
         <div class="navigator">
         </div>
         <div class="ticket search-bar">
-            <div class="input-group">
+            <div class="input-group d-flex justify-content-between">
                 <input type="text" class="form-control" placeholder="Search Ticket" l-ref="search-bar-ticket"/>
+                <div class="ticket-navigation">
+                    <div class="d-flex justify-content-between"> 
+                        <span l-ref="open-ticket"><i class="fa-solid fa-square-arrow-up-right"></i></span>
+                        <span l-ref="reload-ticket"><i class="fa-solid fa-arrow-rotate-right"></i></span>
+                    </div>  
+                </div>
             </div>
             <div class="search-bar-result" l-ref="search-bar-result">
             </div>
         </div>
         <div class="ticket time-log">
+            <div class="ticket-content d-flex justify-content-between align-items-center p-1">
+                <div><i class="fa-solid fa-arrow-right"></i> <b l-ref="assignee-ref"></b></div>
+                <div><b l-ref="status-ref"></b></div>
+                <div><b>Point: </b><span l-ref="point-ref">Unset</span></div>
+            </div>
             <div class="duration d-flex justify-content-between align-items-center">
                 <div class="total-duration">
                     <p><span class="avt"><img src="./static/sigma.png"/></span> <span l-ref="my-total-duration">0m</span></p> /
