@@ -157,7 +157,8 @@ body {
     padding: 5px 10px;
 }
 
-.main-page .main-action-page .ticket input {
+.main-page .main-action-page .ticket input,
+.main-page .main-action-page .ticket textarea {
     font-size: 12px;
 }
 .main-page .main-action-page .ticket .input-group .ticket-navigation{

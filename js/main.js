@@ -116,6 +116,8 @@ class Main extends Component {
             this.pointRef.el.innerText = record.point;
             this.statusRef.el.innerText = record.status || '';
             this.assingneeRef.el.innerText = record.assignee || '';
+            this.commentRef.el.innerText = record.comment || '';
+            this.commentRef.el.setAttribute("rows", ((record.comment !== "" && record.comment) ? record.comment.split("\n").length : 1));
             if (record.active_duration > 0){
                 this.ticketData.timeStatus = "pause";   
             }
@@ -138,7 +140,7 @@ class Main extends Component {
             "limit": 4,
             "source": "Extension"
         }), self = this;
-        fetch(`${this.subEnv.serverURL}/management/ticket/my-active?jwt=${this.subEnv.jwt}&payload=${params}`).then((response)=>{
+        fetch(`${this.subEnv.serverURL}/management/ticket/my-active?jwt=${this.subEnv.jwt}`).then((response)=>{
             response.json().then(result=>{
                 self.relatedActiveTickets = result;
                 self.renderRelatedActiveData()
@@ -308,12 +310,30 @@ class Main extends Component {
             self.renderTicketData(false)
         })
     }
+    resetRows(){
+
+    }
+    _initCommentEvent(){
+        let self = this;
+        this.commentRef.el.addEventListener("keyup", (event)=>{
+            if (event.keyCode == 13){
+                self.commentRef.el.setAttribute("rows", parseInt(self.commentRef.el.getAttribute("rows")) + 1)
+            }
+            else{
+                let value = self.commentRef.el.value;
+                self.commentRef.el.setAttribute("rows", ((value !== "") ? value.split("\n").length : 1));
+                // self.ticketData.comment = value;
+                // localStorage.setItem(storage, JSON.stringify(self.ticketData))
+            }
+        })
+    }
     initEvent() {
         this._initSearchBar();
         this._initPause();
         this._initAddWorkLog();
         this._initDoneWorkLog();
         this._initManualChange();
+        this._initCommentEvent();
     }
     mounted() {
         let res = super.mounted();
@@ -353,7 +373,7 @@ class Main extends Component {
                 </div>
             </div>
             <div class="comment">
-                <input type="text" class="form-control" placeholder="Comment to log step/ log work" l-ref="comment-for-ticket"/>
+                <textarea rows="1" type="text" class="form-control" placeholder="Comment to log step/ log work" l-ref="comment-for-ticket"></textarea>
             </div>
             <div class="time-action d-flex justify-content-between align-items-center">
                 <div class="manual-log">
