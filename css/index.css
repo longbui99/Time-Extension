@@ -220,6 +220,7 @@ body {
     color: grey;
     max-height: 68%;
     overflow-y: auto;
+    z-index: 10;
 }
 
 .main-page .main-action-page .ticket.time-log .duration {
