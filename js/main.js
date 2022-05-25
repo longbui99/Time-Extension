@@ -168,7 +168,6 @@ class Main extends Component {
     }
     loadSearchedTickets(data) {
         let element = this.searchResultRef.el, record = {}, self = this;
-        this.searchResultRef.el.innerHTML = '';
         for (let i = 0; i < data.length; i++) {
             record = data[i];
             let p = document.createElement('p');
@@ -197,6 +196,7 @@ class Main extends Component {
     _initSearchBar() {
         let self = this;
         this.searchRef.el.addEventListener('change', (event) => {
+            this.searchResultRef.el.innerHTML = '';
             if (this.searchRef.el.value.length > 0) {
                 self._searchTicket(this.searchRef.el.value)
             }
