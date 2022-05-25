@@ -127,15 +127,34 @@ body {
 }
 
 .main-page .main-action-page .ticket-active .active-item-group {
-    padding: 2px 15px;
+    padding: 2px;
     font-size: 1.3em;
 }
-
+.main-page .main-action-page .ticket-active .active-item-group .active-item .icon-group{
+    width: 10%;
+}
+.main-page .main-action-page .ticket-active .active-item-group .active-item .icon-group .icon svg{
+    transform: rotate(30deg);
+    border-radius: 50%;
+    width: 20px;
+    height: 20px;
+    border-top: solid 4px var(--secondary);
+    border-left: solid 4px var(--secondary);
+}
+.main-page .main-action-page .ticket-active .active-item-group .active-item .ticket-key{
+    width: 65%;
+}
+.main-page .main-action-page .ticket-active .active-item-group .active-item .duration{
+    width: 25%;
+    overflow-x: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
 .main-page .main-action-page .ticket-active .active-item-group .active-item {
     display: flex;
     align-items: center;
     margin-left: 10px;
-    width: 90%;
+    width: 100%;
     justify-content: space-between;
 }
 
@@ -143,6 +162,12 @@ body {
     cursor: pointer;
     font-size: 1.2em;
     color: var(--secondary);
+}
+
+.main-page .main-action-page .ticket-active .active-item-group .active-item .icon svg:hover{
+    color: orange;
+    border-top: solid 4px orange;
+    border-left: solid 4px orange;
 }
 
 .main-page .main-action-page .ticket-active .active-item-group .active-item .icon.stop {
@@ -215,7 +240,7 @@ body {
     height: 50px;
 }
 
-.main-page .main-action-page .ticket.time-log .duration .active-duration {
+.main-page .main-action-page .ticket.time-log .90duration .active-duration {
     font-style: italic;
 }
 

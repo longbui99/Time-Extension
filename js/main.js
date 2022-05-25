@@ -59,8 +59,8 @@ class Main extends Component {
                             <i class="fa-solid fa-map-pin"></i>
                         </span>
                     </div>
-                    <span class="ticket-key">
-                        ${this._getDisplayName(record, 20)}
+                    <span class="ticket-key" title="${this._getDisplayName(record, 40)}">
+                        ${this._getDisplayName(record, 22)}
                     </span>
                     <span class="duration">
                         ${secondToString(record.my_total_duration)}
@@ -137,10 +137,10 @@ class Main extends Component {
         }
         let params = JSON.stringify({
             "except": except_id,
-            "limit": 4,
+            "limit": 6,
             "source": "Extension"
         }), self = this;
-        fetch(`${this.subEnv.serverURL}/management/ticket/my-active?jwt=${this.subEnv.jwt}`).then((response)=>{
+        fetch(`${this.subEnv.serverURL}/management/ticket/my-active?jwt=${this.subEnv.jwt}&payload=${params}`).then((response)=>{
             response.json().then(result=>{
                 self.relatedActiveTickets = result;
                 self.renderRelatedActiveData()
