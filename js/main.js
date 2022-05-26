@@ -63,7 +63,7 @@ class Main extends Component {
                         ${this._getDisplayName(record, 22)}
                     </span>
                     <span class="duration">
-                        ${secondToString(record.my_total_duration)}
+                        ${secondToString(record.my_total_duration + record.active_duration)}
                     </span>
                 </div>`
         }
@@ -72,6 +72,7 @@ class Main extends Component {
         let self = this;
         for (let index = 0; index < elements.length; index++){
             elements[index].addEventListener('click', event=>{
+                self._pauseWorkLog(this.ticketData.id, false);
                 self.ticketData = self.relatedActiveTickets[index];
                 self.storeAndRenderTicket(true)
             })
@@ -122,7 +123,7 @@ class Main extends Component {
                 this.ticketData.timeStatus = "pause";   
             }
             if (record.last_start) {
-                let pivotTime = new Date(record.last_start).getTime() - new Date().getTimezoneOffset() * 60000;
+                let pivotTime = new Date().getTime();
                 this.currentInterval = setInterval(() => {
                     this.activeDurationRef.el.innerText = secondToString(parseInt(record.active_duration + (new Date().getTime() - pivotTime) / 1000));
                 }, 500)
@@ -162,6 +163,7 @@ class Main extends Component {
         // }
     }
     async chooseTicket(index) {
+        if (this.ticketData) this._pauseWorkLog(this.ticketData.id, false);
         this.ticketData = this.loadedData[index];
         this.searchResultRef.el.style.display = 'none';
         this.storeAndRenderTicket()
@@ -202,9 +204,9 @@ class Main extends Component {
             }
         })
     }
-    async _pauseWorkLog() {
+    async _pauseWorkLog(id=false, refresh=true) {
         let params = {
-            "id": this.ticketData.id,
+            "id": id || this.ticketData.id,
             "jwt": this.subEnv.jwt,
             "payload": JSON.stringify({
                 'description': this.commentRef.el.value,
@@ -214,7 +216,8 @@ class Main extends Component {
         try {
             this.trigger_up('loading', true);
             let result = (await fetch(`${this.subEnv.serverURL}/management/ticket/work-log/pause?${new URLSearchParams(params)}`));
-            this.renderTicketData(true);
+            if (refresh)
+                this.renderTicketData(true);
         }
         catch (error){
             throw error
