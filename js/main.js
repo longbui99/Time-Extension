@@ -72,7 +72,7 @@ class Main extends Component {
         let self = this;
         for (let index = 0; index < elements.length; index++){
             elements[index].addEventListener('click', event=>{
-                self._pauseWorkLog(this.ticketData.id, false);
+                if (self.ticketData) self._pauseWorkLog(this.ticketData.id, false);
                 self.ticketData = self.relatedActiveTickets[index];
                 self.storeAndRenderTicket(true)
             })
@@ -270,7 +270,6 @@ class Main extends Component {
             if (!['pause', 'active'].includes(self.ticketData.timeStatus)) {
                 self.ticketData.timeStatus = "pause";
             }
-            self.renderTicketData(false)
         })
     }
     resetRows(){
