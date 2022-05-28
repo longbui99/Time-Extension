@@ -40,7 +40,7 @@ body {
     --third: rgb(18, 155, 18);
 }
 
-.main-page .loading-layer {
+.main-page .loading-layer{
     position: fixed;
     opacity: 0.6;
     background-color: lightgrey;
@@ -62,7 +62,9 @@ body {
     /* Safari */
     animation: spin 2s linear infinite;
 }
-
+.main-page .error-layer .error{
+    color: red;
+}
 
 .show {
     display: inline-block;

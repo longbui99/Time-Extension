@@ -18,31 +18,27 @@ class Login extends Component {
         return data
     }
     _prepareServerAPI() {
-        return this.serverURLRef.el.value 
+        return this.serverURLRef.el.value
     }
 
     async actionSignIn(event) {
         let payload = this._prepareValues();
         let serverURL = this._prepareServerAPI();
-        this.trigger_up('loading', true);
         try {
-            const response = await fetch(serverURL + "/web/login/jwt?" + new URLSearchParams(payload));
+            const response = await this.do_request(serverURL + "/web/login/jwt?" + new URLSearchParams(payload));
             const data = await response.json();
             this.popupRef.el.style.display = "none";
             this.trigger_up('authentication', {
                 'jwt': data.data,
+                'loggedName': data.name,
                 'serverURL': serverURL.trim('/')
             })
         }
-        catch (error){
+        catch (errors) {
             this.popupRef.el.style.display = "inline-block";
-            throw error
-        } finally{
-            this.trigger_up('loading', false);
         }
     }
-
-    mounted(){
+    mounted() {
         let res = super.mounted();
         this.serverURLRef.el.value = this.subEnv.serverURL;
         this.signInRef.el.addEventListener('click', this.actionSignIn)

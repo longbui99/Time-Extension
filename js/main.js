@@ -84,7 +84,7 @@ class Main extends Component {
             window.open(self.ticketData.url, '_blank')
         })
         this.reloadTicketRef.el.addEventListener('click', (event)=>{
-            fetch(`${this.subEnv.serverURL}/management/ticket/fetch/${this.ticketData.id}?jwt=${this.subEnv.jwt}`).then(()=>{
+            self.do_request(`${this.subEnv.serverURL}/management/ticket/fetch/${this.ticketData.id}?jwt=${this.subEnv.jwt}`).then(()=>{
                 self.renderTicketData(true);
             });
         })
@@ -96,18 +96,10 @@ class Main extends Component {
         let except_id = []
         if (this.ticketData) {
             if (refresh) {
-                try {
-                    this.trigger_up('loading', true);
-                    let response = (await fetch(`${this.subEnv.serverURL}/management/ticket/get/${this.ticketData.id}?jwt=${this.subEnv.jwt}`));
-                    let result = (await response.json());
-                    for (let key of Object.keys(result)){this.ticketData[key] = result[key];}
-                    this.ticketData.displayName = this._getDisplayName(this.ticketData);
-                }
-                catch (error){
-                    throw error
-                } finally{
-                    this.trigger_up('loading', false);
-                }
+                let response = (await this.do_request(`${this.subEnv.serverURL}/management/ticket/get/${this.ticketData.id}?jwt=${this.subEnv.jwt}`));
+                let result = (await response.json());
+                for (let key of Object.keys(result)){this.ticketData[key] = result[key];}
+                this.ticketData.displayName = this._getDisplayName(this.ticketData);
             }
             let record = this.ticketData;
             this.searchRef.el.value = this.ticketData.displayName;
@@ -141,7 +133,7 @@ class Main extends Component {
             "limit": 6,
             "source": "Extension"
         }), self = this;
-        fetch(`${this.subEnv.serverURL}/management/ticket/my-active?jwt=${this.subEnv.jwt}&payload=${params}`).then((response)=>{
+        this.do_request(`${this.subEnv.serverURL}/management/ticket/my-active?jwt=${this.subEnv.jwt}&payload=${params}`).then((response)=>{
             response.json().then(result=>{
                 self.relatedActiveTickets = result;
                 self.renderRelatedActiveData()
@@ -183,17 +175,9 @@ class Main extends Component {
         element.style.display = 'inline-block';
     }
     async _searchTicket(text) {
-        try {
-            this.trigger_up('loading', true);
-            let result = (await fetch(`${this.subEnv.serverURL}/management/ticket/search/${text}?limitRecord=${11}&jwt=${this.subEnv.jwt}`));
-            this.loadedData = (await result.json());
-            this.loadSearchedTickets(this.loadedData);
-        }
-        catch (error){
-            throw error
-        } finally{
-            this.trigger_up('loading', false);
-        }
+        let result = (await this.do_request(`${this.subEnv.serverURL}/management/ticket/search/${text}?limitRecord=${11}&jwt=${this.subEnv.jwt}`));
+        this.loadedData = (await result.json());
+        this.loadSearchedTickets(this.loadedData);
     }
     _initSearchBar() {
         let self = this;
@@ -213,17 +197,9 @@ class Main extends Component {
                 'source': 'Extension'
             })
         }
-        try {
-            this.trigger_up('loading', true);
-            let result = (await fetch(`${this.subEnv.serverURL}/management/ticket/work-log/pause?${new URLSearchParams(params)}`));
-            if (refresh)
-                this.renderTicketData(true);
-        }
-        catch (error){
-            throw error
-        } finally{
-            this.trigger_up('loading', false);
-        }
+        let result = (await this.do_request(`${this.subEnv.serverURL}/management/ticket/work-log/pause?${new URLSearchParams(params)}`));
+        if (refresh)
+            this.renderTicketData(true);
     }
     _initPause() {
         let self = this;
@@ -242,16 +218,8 @@ class Main extends Component {
                 'source': 'Extension'
             })
         }
-        try {
-            this.trigger_up('loading', true);
-            let result = (await fetch(`${this.subEnv.serverURL}/management/ticket/work-log/add?${new URLSearchParams(params)}`));
-            this.renderTicketData(true);
-        }
-        catch (error){
-            throw error
-        } finally{
-            this.trigger_up('loading', false);
-        }
+        let result = (await this.do_request(`${this.subEnv.serverURL}/management/ticket/work-log/add?${new URLSearchParams(params)}`));
+        this.renderTicketData(true);
     }
     _initAddWorkLog() {
         let self = this;
@@ -279,23 +247,15 @@ class Main extends Component {
             "payload": JSON.stringify(payload)
         }
 
-        try {
-            this.trigger_up('loading', true);
-            if (triggerServer){
-                this.ticketData.timeStatus = false;
-                (await fetch(`${this.subEnv.serverURL}/management/ticket/work-log/done?${new URLSearchParams(params)}`));
-            }
-            else{
-                (await fetch(`${this.subEnv.serverURL}/management/ticket/work-log/manual?${new URLSearchParams(params)}`));
-                this.manualLogref.el.value = '';
-            }
-            this.renderTicketData(true)
+        if (triggerServer){
+            this.ticketData.timeStatus = false;
+            (await this.do_request(`${this.subEnv.serverURL}/management/ticket/work-log/done?${new URLSearchParams(params)}`));
         }
-        catch (error){
-            throw error
-        } finally{
-            this.trigger_up('loading', false);
+        else{
+            (await this.do_request(`${this.subEnv.serverURL}/management/ticket/work-log/manual?${new URLSearchParams(params)}`));
+            this.manualLogref.el.value = '';
         }
+        this.renderTicketData(true)
     }
     _initDoneWorkLog() {
         let self = this;

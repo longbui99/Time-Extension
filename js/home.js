@@ -4,11 +4,15 @@ class Home extends Component {
   serverLogoutRef = this.useRef('server-logout')
   processMainRef = this.useRef('process-page')
   loadingBannerRef = this.useRef('loading-banner')
+  loggedNameRef = this.useRef('logged-name')
+  errorRef = this.useRef('error')
 
   custom_events = {
     'authentication': this.onAuthentication,
     'authentication-failed': this.onAuthenticationFailed,
-    'loading': this.onLoading
+    'loading': this.onLoading,
+    'error': this.onError,
+    'session_errors': this.onSessionError
   }
   constructor() {
     super(...arguments);
@@ -19,11 +23,7 @@ class Home extends Component {
   async loadAuthentication() {
     let self = this;
     let result = {};
-    // if (chrome && chrome.storage) {
-    //   result = (await chrome.storage.sync.get(["timeLogStorage"]))
-    // } else {
     result = JSON.parse(localStorage.getItem("timeLogStorage") || "{}")
-    // }
     self.payload = result;
     self.subEnv = this.payload;
   }
@@ -76,6 +76,18 @@ class Home extends Component {
   onLoading(display=true){
     this.loadingBannerRef.el.style.display = (display?"inline-block": "none");
   }
+  onError(data){
+    if (data.error){
+      this.errorRef.el.innerHTML = data.error
+      this.errorRef.el.style.display = 'inline-block';
+    }
+    else{
+      this.errorRef.el.style.display = 'none';
+    }
+  }
+  onSessionError(){
+    this.onAuthentication(this.payload,   false);
+  }
   template = `
   <div class="main-page">
       <div l-ref="loading-banner" class="loading-layer"><div class="loader"></div></div>
@@ -87,9 +99,11 @@ class Home extends Component {
               </p>
           </div>
           <div class="extend-tool" l-ref="server-logout">
+              <span l-ref="logged-name"></span>
               <i class="fa-solid fa-power-off"></i>
           </div>
       </div>
+      <div class="error-layer"><div class="error" l-ref="error"></div></div>
       <div class="process-page" l-ref="process-page">
           <t t-if="state.authentication">
             <Main/>

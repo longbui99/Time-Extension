@@ -4,12 +4,12 @@ class Component {
     ref = []
     refs = {}
     template = null
-    constructor(parent, params={}) {
+    constructor(parent, params = {}) {
         this.parent = parent;
         this.params = params;
         this.childrens = [];
         this.subEnv = {};
-        if (this.parent){
+        if (this.parent) {
             this.parent.childrens.push(this);
             this.subEnv = this.parent.subEnv;
         }
@@ -23,30 +23,30 @@ class Component {
             },
         };
     }
-    mount(element){
+    mount(element) {
         let self = this;
         this.willStart().then(self.render(element).then(self.mounted()));
     }
     willStart() {
-        return new Promise(()=>{});
+        return new Promise(() => { });
     }
     render(element) {
-        if (!this.template){
-            throw Error("Cannot find template: " + this.template) ;
+        if (!this.template) {
+            throw Error("Cannot find template: " + this.template);
         }
         this.baseHTML = new DOMParser().parseFromString(this.template, 'text/html');
         this.el = this.baseHTML.body.firstChild;
         element.append(this.el);
-        return new Promise(()=>{});
+        return new Promise(() => { });
     }
     mounted() {
         this.initObject()
-        return new Promise(()=>{});
+        return new Promise(() => { });
     }
     initObject() {
-        for (let ref of this.ref){
+        for (let ref of this.ref) {
             let element = this.el.querySelector(`[l-ref="${ref}"]`);
-            if (element){
+            if (element) {
                 this.refs[ref] = element;
             }
         }
@@ -65,8 +65,31 @@ class Component {
             this.parent.event(event, data)
         }
     }
+    async do_request(url) {
+        try {
+            this.trigger_up('error', {})
+            this.trigger_up('loading', true);
+            let res = (await fetch(url));
+            if (res.ok){
+                return res
+            }
+            else{
+                this.trigger_up('error', {
+                    'error': (await res.text())
+                })
+            }
+        }
+        catch (erros) {
+            this.trigger_up('session_errors', {
+                'error': erros.message
+            })
+        }
+        finally {
+            this.trigger_up('loading', false);
+        }
+    }
 }
 
-function mount(object, element){
+function mount(object, element) {
     new object(null, {}).mount(element)
 }
