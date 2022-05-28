@@ -42,6 +42,7 @@ class Home extends Component {
       this.component = new Main(this);
       this.mountServerAction();
       this.el.classList.add('logged');
+      this.loggedNameRef.el.innerText=  this.payload.loggedName || '';
     }
     else {
       this.component = new Login(this, {});

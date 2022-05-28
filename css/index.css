@@ -40,7 +40,7 @@ body {
     --third: rgb(18, 155, 18);
 }
 
-.main-page .loading-layer{
+.main-page .loading-layer {
     position: fixed;
     opacity: 0.6;
     background-color: lightgrey;
@@ -62,7 +62,8 @@ body {
     /* Safari */
     animation: spin 2s linear infinite;
 }
-.main-page .error-layer .error{
+
+.main-page .error-layer .error {
     color: red;
 }
 
@@ -132,10 +133,12 @@ body {
     padding: 2px;
     font-size: 1.3em;
 }
-.main-page .main-action-page .ticket-active .active-item-group .active-item .icon-group{
+
+.main-page .main-action-page .ticket-active .active-item-group .active-item .icon-group {
     width: 10%;
 }
-.main-page .main-action-page .ticket-active .active-item-group .active-item .icon-group .icon svg{
+
+.main-page .main-action-page .ticket-active .active-item-group .active-item .icon-group .icon svg {
     transform: rotate(30deg);
     border-radius: 50%;
     width: 20px;
@@ -143,15 +146,18 @@ body {
     border-top: solid 4px var(--secondary);
     border-left: solid 4px var(--secondary);
 }
-.main-page .main-action-page .ticket-active .active-item-group .active-item .ticket-key{
+
+.main-page .main-action-page .ticket-active .active-item-group .active-item .ticket-key {
     width: 65%;
 }
-.main-page .main-action-page .ticket-active .active-item-group .active-item .duration{
+
+.main-page .main-action-page .ticket-active .active-item-group .active-item .duration {
     width: 25%;
     overflow-x: hidden;
     white-space: nowrap;
     text-overflow: ellipsis;
 }
+
 .main-page .main-action-page .ticket-active .active-item-group .active-item {
     display: flex;
     align-items: center;
@@ -166,7 +172,7 @@ body {
     color: var(--secondary);
 }
 
-.main-page .main-action-page .ticket-active .active-item-group .active-item .icon svg:hover{
+.main-page .main-action-page .ticket-active .active-item-group .active-item .icon svg:hover {
     color: orange;
     border-top: solid 4px orange;
     border-left: solid 4px orange;
@@ -188,17 +194,20 @@ body {
 .main-page .main-action-page .ticket textarea {
     font-size: 12px;
 }
-.main-page .main-action-page .ticket .input-group .ticket-navigation{
+
+.main-page .main-action-page .ticket .input-group .ticket-navigation {
     font-size: 2em;
     width: 15%;
     padding: 0px 5px;
     color: var(--primary);
     display: none;
 }
-.main-page .main-action-page .ticket .input-group .ticket-navigation span{
+
+.main-page .main-action-page .ticket .input-group .ticket-navigation span {
     cursor: pointer;
 }
-.main-page .main-action-page .ticket .input-group .ticket-navigation span:hover{
+
+.main-page .main-action-page .ticket .input-group .ticket-navigation span:hover {
     color: orange;
 }
 
@@ -243,7 +252,7 @@ body {
     height: 50px;
 }
 
-.main-page .main-action-page .ticket.time-log .90duration .active-duration {
+.main-page .main-action-page .ticket.time-log .duration .active-duration {
     font-style: italic;
 }
 
@@ -272,4 +281,18 @@ body {
 .main-page .main-action-page .ticket.time-log .time-action .action-group .action:hover {
     cursor: pointer;
     color: orange;
+}
+
+.main-page .main-action-page .ticket.time-log .time-action .start-date-label {
+    color: var(--primary);
+    cursor: pointer;
+    position: relative;
+    left: -25px;
+    margin: 1px 1px;
+    font-size: 1.2em;
+}
+
+.main-page .main-action-page .ticket.time-log .time-action .start-date {
+    display: none;
+    font-size: 0.5em;
 }

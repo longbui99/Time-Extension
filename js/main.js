@@ -16,13 +16,14 @@ class Main extends Component {
     assingneeRef = this.useRef("assignee-ref")
     openTicketref = this.useRef("open-ticket")
     reloadTicketRef = this.useRef("reload-ticket")
+    loggedDate = this.useRef("start-date")
 
     constructor() {
         super(...arguments);
         this.ticketData = this.subEnv.ticketData || null;
         this.loadedData = [];
     }
-    _getDisplayName(record, length= 40) {
+    _getDisplayName(record, length = 40) {
         return `${record.key}: ${(record.name.length > length) ? record.name.substring(0, length) + "..." : record.name}`;
     }
     async renderTimeActions() {
@@ -49,9 +50,9 @@ class Main extends Component {
             this.actionStopRef.el.style.display = "none";
         }
     }
-    renderRelatedActiveData(){
+    renderRelatedActiveData() {
         let template = ""
-        for( let record of this.relatedActiveTickets){
+        for (let record of this.relatedActiveTickets) {
             template += `
                 <div class="active-item">
                     <div class="icon-group push-relative-ticket">
@@ -70,21 +71,21 @@ class Main extends Component {
         this.relatedActiveRef.el.innerHTML = template;
         let elements = this.relatedActiveRef.el.querySelectorAll('.push-relative-ticket')
         let self = this;
-        for (let index = 0; index < elements.length; index++){
-            elements[index].addEventListener('click', event=>{
+        for (let index = 0; index < elements.length; index++) {
+            elements[index].addEventListener('click', event => {
                 if (self.ticketData) self._pauseWorkLog(this.ticketData.id, false);
                 self.ticketData = self.relatedActiveTickets[index];
                 self.storeAndRenderTicket(true)
             })
         }
     }
-    ticketNavigator(){
+    ticketNavigator() {
         let self = this;
-        this.openTicketref.el.addEventListener('click', (event)=>{
+        this.openTicketref.el.addEventListener('click', (event) => {
             window.open(self.ticketData.url, '_blank')
         })
-        this.reloadTicketRef.el.addEventListener('click', (event)=>{
-            self.do_request(`${this.subEnv.serverURL}/management/ticket/fetch/${this.ticketData.id}?jwt=${this.subEnv.jwt}`).then(()=>{
+        this.reloadTicketRef.el.addEventListener('click', (event) => {
+            self.do_request(`${this.subEnv.serverURL}/management/ticket/fetch/${this.ticketData.id}?jwt=${this.subEnv.jwt}`).then(() => {
                 self.renderTicketData(true);
             });
         })
@@ -98,7 +99,7 @@ class Main extends Component {
             if (refresh) {
                 let response = (await this.do_request(`${this.subEnv.serverURL}/management/ticket/get/${this.ticketData.id}?jwt=${this.subEnv.jwt}`));
                 let result = (await response.json());
-                for (let key of Object.keys(result)){this.ticketData[key] = result[key];}
+                for (let key of Object.keys(result)) { this.ticketData[key] = result[key]; }
                 this.ticketData.displayName = this._getDisplayName(this.ticketData);
             }
             let record = this.ticketData;
@@ -111,8 +112,8 @@ class Main extends Component {
             this.assingneeRef.el.innerText = record.assignee || '';
             this.commentRef.el.innerText = record.comment || '';
             this.commentRef.el.setAttribute("rows", ((record.comment !== "" && record.comment) ? record.comment.split("\n").length : 1));
-            if (record.active_duration > 0){
-                this.ticketData.timeStatus = "pause";   
+            if (record.active_duration > 0) {
+                this.ticketData.timeStatus = "pause";
             }
             if (record.last_start) {
                 let pivotTime = new Date().getTime();
@@ -122,26 +123,26 @@ class Main extends Component {
                 this.ticketData.timeStatus = "active";
             }
             except_id.push(this.ticketData.id)
-            this.el.querySelector('.ticket-navigation').style.display="inline-block";
+            this.el.querySelector('.ticket-navigation').style.display = "inline-block";
             this.ticketNavigator();
         }
-        else{
-            this.el.querySelector('.ticket-navigation').style.display="none";
+        else {
+            this.el.querySelector('.ticket-navigation').style.display = "none";
         }
         let params = JSON.stringify({
             "except": except_id,
             "limit": 6,
             "source": "Extension"
         }), self = this;
-        this.do_request(`${this.subEnv.serverURL}/management/ticket/my-active?jwt=${this.subEnv.jwt}&payload=${params}`).then((response)=>{
-            response.json().then(result=>{
+        this.do_request(`${this.subEnv.serverURL}/management/ticket/my-active?jwt=${this.subEnv.jwt}&payload=${params}`).then((response) => {
+            response.json().then(result => {
                 self.relatedActiveTickets = result;
                 self.renderRelatedActiveData()
             })
         });
         this.renderTimeActions()
     }
-    storeAndRenderTicket(refresh=false){
+    storeAndRenderTicket(refresh = false) {
         this.renderTicketData(refresh)
         // if (chrome?.storage) {
         //     let data = (await chrome.storage.sync.get([storage]));
@@ -149,9 +150,9 @@ class Main extends Component {
         //     await chrome.storage.sync.set({ 'timeLogStorage': data })
         // }
         // else {
-            let data = JSON.parse(localStorage.getItem(storage) || "{}");
-            data.ticketData = this.ticketData;
-            localStorage.setItem(storage, JSON.stringify(data))
+        let data = JSON.parse(localStorage.getItem(storage) || "{}");
+        data.ticketData = this.ticketData;
+        localStorage.setItem(storage, JSON.stringify(data))
         // }
     }
     async chooseTicket(index) {
@@ -188,7 +189,7 @@ class Main extends Component {
             }
         })
     }
-    async _pauseWorkLog(id=false, refresh=true) {
+    async _pauseWorkLog(id = false, refresh = true) {
         let params = {
             "id": id || this.ticketData.id,
             "jwt": this.subEnv.jwt,
@@ -230,14 +231,23 @@ class Main extends Component {
             }
         })
     }
+    _getTimezoneOffset(){
+        let offset = String(-new Date().getTimezoneOffset()/60)
+        if (offset.length === 1){
+            offset = "+" + offset
+        }
+        offset = offset[0] + offset[1].padStart(2, '0')
+        return offset
+    }
 
     async _doneWorkLog() {
         let payload = {
             'source': 'Extension',
             'description': this.commentRef.el.value,
+            'start_date': `${this.loggedDate.el.value}${"T12:00:00"}${this._getTimezoneOffset()}00`
         }
         let triggerServer = true;
-        if (this.manualLogref.el.value.length > 0){
+        if (this.manualLogref.el.value.length > 0) {
             triggerServer = false;
             payload['time'] = this.manualLogref.el.value;
         }
@@ -247,11 +257,11 @@ class Main extends Component {
             "payload": JSON.stringify(payload)
         }
 
-        if (triggerServer){
+        if (triggerServer) {
             this.ticketData.timeStatus = false;
             (await this.do_request(`${this.subEnv.serverURL}/management/ticket/work-log/done?${new URLSearchParams(params)}`));
         }
-        else{
+        else {
             (await this.do_request(`${this.subEnv.serverURL}/management/ticket/work-log/manual?${new URLSearchParams(params)}`));
             this.manualLogref.el.value = '';
         }
@@ -263,29 +273,28 @@ class Main extends Component {
             self._doneWorkLog()
         })
     }
-    _initManualChange(){
+    _initManualChange() {
         let self = this;
         this.manualLogref.el.addEventListener('keyup', event => {
             (10 != event.keyCode && 13 != event.keyCode) || !event.ctrlKey || self._doneWorkLog();
-            if (!['pause', 'active'].includes(self.ticketData.timeStatus)) {
+            if (!['pause', 'active'].includes(self.ticketData?.timeStatus)) {
                 self.ticketData.timeStatus = "pause";
+                self.renderTimeActions();
             }
         })
     }
-    resetRows(){
+    resetRows() {
 
     }
-    _initCommentEvent(){
+    _initCommentEvent() {
         let self = this;
-        this.commentRef.el.addEventListener("keyup", (event)=>{
-            if (event.keyCode == 13){
+        this.commentRef.el.addEventListener("keyup", (event) => {
+            if (event.keyCode == 13) {
                 self.commentRef.el.setAttribute("rows", parseInt(self.commentRef.el.getAttribute("rows")) + 1)
             }
-            else{
+            else {
                 let value = self.commentRef.el.value;
                 self.commentRef.el.setAttribute("rows", ((value !== "") ? value.split("\n").length : 1));
-                // self.ticketData.comment = value;
-                // localStorage.setItem(storage, JSON.stringify(self.ticketData))
             }
         })
     }
@@ -296,6 +305,7 @@ class Main extends Component {
         this._initDoneWorkLog();
         this._initManualChange();
         this._initCommentEvent();
+        flatpickr(this.loggedDate.el,{defaultDate: new Date(),dateFormat: 'Y-m-d'});
     }
     mounted() {
         let res = super.mounted();
@@ -338,8 +348,10 @@ class Main extends Component {
                 <textarea rows="1" type="text" class="form-control" placeholder="Comment to log step/ log work" l-ref="comment-for-ticket"></textarea>
             </div>
             <div class="time-action d-flex justify-content-between align-items-center">
-                <div class="manual-log">
+                <div class="manual-log d-flex">
                     <input type="text" class="form-control" placeholder="Text log" l-ref="manual-log-text"/>
+                    <label for="start-date-selection" class="start-date-label"><i class="fa-regular fa-calendar"></i></label>
+                    <input id="start-date-selection" type="text" class="form-control start-date" l-ref="start-date">
                 </div>
                 <div class="action-group d-flex justify-content-between">
                     <div>
