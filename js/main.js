@@ -5,6 +5,7 @@ class Main extends Component {
     totalDurationRef = this.useRef('total-duration')
     myTotalDurationRef = this.useRef('my-total-duration')
     activeDurationRef = this.useRef('active-duration')
+    activeDurationIconRef = this.useRef('active-duration-icon')
     commentRef = this.useRef('comment-for-ticket')
     manualLogref = this.useRef('manual-log-text')
     actionAddRef = this.useRef('action-add')
@@ -298,6 +299,24 @@ class Main extends Component {
             }
         })
     }
+    async _initIconRef(){
+        let self = this;
+        this.activeDurationIconRef.el.addEventListener("click", async (event)=>{
+            if (window.event.ctrlKey && window.event.shiftKey) {
+                self.ticketData.timeStatus = null;
+                let payload = {
+                    'source': 'Extension'
+                }
+                let params = {
+                    "id": self.ticketData.id,
+                    "jwt": self.subEnv.jwt,
+                    "payload": JSON.stringify(payload)
+                }
+                await self.do_request(`${self.subEnv.serverURL}/management/ticket/work-log/cancel?${new URLSearchParams(params)}`);
+                self.renderTicketData(true);
+            }
+        })
+    }
     initEvent() {
         this._initSearchBar();
         this._initPause();
@@ -305,6 +324,7 @@ class Main extends Component {
         this._initDoneWorkLog();
         this._initManualChange();
         this._initCommentEvent();
+        this._initIconRef();
         flatpickr(this.loggedDate.el,{defaultDate: new Date(),dateFormat: 'Y-m-d'});
     }
     mounted() {
@@ -341,7 +361,7 @@ class Main extends Component {
                     <small l-ref="total-duration">0m</small>
                 </div>
                 <div class="active-duration">
-                    <span class="avt"><i class="fa-solid fa-stopwatch"></i></span> <span l-ref="active-duration">0m</span>
+                    <span l-ref="active-duration-icon" class="avt"><i class="fa-solid fa-stopwatch"></i></span> <span l-ref="active-duration">0m</span>
                 </div>
             </div>
             <div class="comment">

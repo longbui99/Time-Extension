@@ -255,6 +255,9 @@ body {
 .main-page .main-action-page .ticket.time-log .duration .active-duration {
     font-style: italic;
 }
+.main-page .main-action-page .ticket.time-log .duration .active-duration .avt:hover{
+    color:orange;
+}
 
 .main-page .main-action-page .ticket.time-log .duration span {
     font-size: 1.7em;
@@ -264,6 +267,7 @@ body {
     font-size: 2.5em;
     color: var(--primary);
     padding-right: 5px;
+    cursor: pointer;
 }
 
 .main-page .main-action-page .ticket.time-log .time-action {
