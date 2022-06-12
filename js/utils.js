@@ -33,22 +33,24 @@ function _pushParams(serverURL, jsonData) {
     return serverURL
 }
 
-function secondToString(time) {
-    let data = [{ 'key': 'w', 'duration': 604800 },
-    { 'key': 'd', 'duration': 86400 },
-    { 'key': 'h', 'duration': 3600 },
-    { 'key': 'm', 'duration': 60 },
-    { 'key': 's', 'duration': 1 }]
-    let response = ""
-    for (let segment of data) {
-        let duration = segment['duration'];
-        if (time >= duration) {
-            response += `${parseInt(time / duration)}${segment['key']} `
-            time -= (parseInt(time / duration) * duration)
+function parseSecondToString(hpd=8, dpw=5){
+    return function secondToString(time) {
+        let data = [{ 'key': 'w', 'duration': dpw*hpd*3600 },
+        { 'key': 'd', 'duration': hpd*3600 },
+        { 'key': 'h', 'duration': 3600 },
+        { 'key': 'm', 'duration': 60 },
+        { 'key': 's', 'duration': 1 }]
+        let response = ""
+        for (let segment of data) {
+            let duration = segment['duration'];
+            if (time >= duration) {
+                response += `${parseInt(time / duration)}${segment['key']} `
+                time -= (parseInt(time / duration) * duration)
+            }
         }
+        if (!response.length){
+            response = "0s"
+        }
+        return response
     }
-    if (!response.length){
-        response = "0s"
-    }
-    return response
 }

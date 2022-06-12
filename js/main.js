@@ -24,8 +24,9 @@ class Main extends Component {
         super(...arguments);
         this.ticketData = this.subEnv.ticketData || null;
         this.loadedData = [];
+        this.secondToString = parseSecondToString(this.subEnv.resource.hrs_per_day, this.subEnv.resource.days_per_week)
     }
-    _getDisplayName(record, length = 40) {
+    _getDisplayName(record, length = 40000) {
         return `${record.key}: ${(record.name.length > length) ? record.name.substring(0, length) + "..." : record.name}`;
     }
     _minifyString(string, length){
@@ -72,7 +73,7 @@ class Main extends Component {
                         ${this._getDisplayName(record, 22)}
                     </span>
                     <span class="duration">
-                        ${secondToString(record.my_total_duration + record.active_duration)}
+                        ${this.secondToString(record.my_total_duration + record.active_duration)}
                     </span>
                 </div>`
         }
@@ -112,9 +113,9 @@ class Main extends Component {
             }
             let record = this.ticketData;
             this.searchRef.el.value = this.ticketData.displayName;
-            this.totalDurationRef.el.innerText = secondToString(record.total_duration);
-            this.myTotalDurationRef.el.innerText = secondToString(record.my_total_duration);
-            this.activeDurationRef.el.innerText = secondToString(record.active_duration);
+            this.totalDurationRef.el.innerText =this.secondToString(record.total_duration);
+            this.myTotalDurationRef.el.innerText =this.secondToString(record.my_total_duration);
+            this.activeDurationRef.el.innerText =this.secondToString(record.active_duration);
             this.pointRef.el.innerText = record.point;
             this.typeRef.el.innerHTML = `<img src="${record.type_url}"/>`
             this.statusRef.el.innerText = record.status || '';
@@ -127,7 +128,7 @@ class Main extends Component {
             if (record.last_start) {
                 let pivotTime = new Date().getTime();
                 this.currentInterval = setInterval(() => {
-                    this.activeDurationRef.el.innerText = secondToString(parseInt(record.active_duration + (new Date().getTime() - pivotTime) / 1000));
+                    this.activeDurationRef.el.innerText =this.secondToString(parseInt(record.active_duration + (new Date().getTime() - pivotTime) / 1000));
                 }, 500)
                 this.ticketData.timeStatus = "active";
             }
@@ -175,7 +176,7 @@ class Main extends Component {
         for (let i = 0; i < data.length; i++) {
             record = data[i];
             let p = document.createElement('p');
-            data[i].displayName = this._getDisplayName(record, 35);
+            data[i].displayName = this._getDisplayName(record);
             let statusSpan = document.createElement('em')
             statusSpan.innerText = this._minifyString(record.status, 11)
             let typeImg = document.createElement('img')

@@ -241,13 +241,18 @@ body {
 .main-page .main-action-page .ticket.search-bar .search-bar-result p img{
     margin-right: 3px;
 }
+.main-page .main-action-page .ticket.search-bar .search-bar-result p span{
+    max-width: 270px;
+    overflow-x: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
 .main-page .main-action-page .ticket.search-bar .search-bar-result p em{
     margin-left: auto;
     max-width: 60px;
     overflow-x: hidden;
     white-space: nowrap;
     text-overflow: ellipsis;
-    border-radius: 3px;
 }
 
 .main-page .main-action-page .ticket.time-log .duration {
@@ -278,6 +283,26 @@ body {
 .main-page .main-action-page .ticket.time-log .duration span {
     font-size: 1.7em;
 }
+.main-page .main-action-page .ticket.time-log .duration .total-duration{
+    width: max-content;
+}
+.main-page .main-action-page .ticket.time-log .duration .active-duration{
+    width: max-content;
+    margin-left: 5px;
+}
+/* .main-page .main-action-page .ticket.time-log .duration .total-duration p{
+    width: 75%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.main-page .main-action-page .ticket.time-log .duration .total-duration small{
+    max-width: 25%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+} */
 
 .main-page .main-action-page .ticket.time-log .duration .avt {
     font-size: 2.5em;

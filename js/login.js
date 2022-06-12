@@ -31,6 +31,7 @@ class Login extends Component {
             this.trigger_up('authentication', {
                 'jwt': data.data,
                 'loggedName': data.name,
+                "resource": data.resource,
                 'serverURL': serverURL.trim('/')
             })
         }
