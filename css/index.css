@@ -234,6 +234,22 @@ body {
     z-index: 10;
 }
 
+.main-page .main-action-page .ticket.search-bar .search-bar-result p {
+    display: flex;
+    align-items: center;
+}
+.main-page .main-action-page .ticket.search-bar .search-bar-result p img{
+    margin-right: 3px;
+}
+.main-page .main-action-page .ticket.search-bar .search-bar-result p em{
+    margin-left: auto;
+    max-width: 60px;
+    overflow-x: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    border-radius: 3px;
+}
+
 .main-page .main-action-page .ticket.time-log .duration {
     padding: 10px 10px;
 }

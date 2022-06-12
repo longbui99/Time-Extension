@@ -13,6 +13,7 @@ class Main extends Component {
     actionStopRef = this.useRef('action-stop')
     relatedActiveRef = this.useRef("related-active")
     pointRef = this.useRef("point-ref")
+    typeRef = this.useRef("type-ref")
     statusRef = this.useRef("status-ref")
     assingneeRef = this.useRef("assignee-ref")
     openTicketref = this.useRef("open-ticket")
@@ -26,6 +27,12 @@ class Main extends Component {
     }
     _getDisplayName(record, length = 40) {
         return `${record.key}: ${(record.name.length > length) ? record.name.substring(0, length) + "..." : record.name}`;
+    }
+    _minifyString(string, length){
+        if (string.length >= length){
+            string = string.split(" ").map(e => e[0].toUpperCase()).join("")
+        }
+        return string
     }
     async renderTimeActions() {
         if (this.ticketData) {
@@ -109,6 +116,7 @@ class Main extends Component {
             this.myTotalDurationRef.el.innerText = secondToString(record.my_total_duration);
             this.activeDurationRef.el.innerText = secondToString(record.active_duration);
             this.pointRef.el.innerText = record.point;
+            this.typeRef.el.innerHTML = `<img src="${record.type_url}"/>`
             this.statusRef.el.innerText = record.status || '';
             this.assingneeRef.el.innerText = record.assignee || '';
             this.commentRef.el.innerText = record.comment || '';
@@ -167,8 +175,16 @@ class Main extends Component {
         for (let i = 0; i < data.length; i++) {
             record = data[i];
             let p = document.createElement('p');
-            data[i].displayName = this._getDisplayName(record);
-            p.innerHTML = record.displayName;
+            data[i].displayName = this._getDisplayName(record, 35);
+            let statusSpan = document.createElement('em')
+            statusSpan.innerText = this._minifyString(record.status, 11)
+            let typeImg = document.createElement('img')
+            typeImg.setAttribute('src', record.type_url)
+            let textSpan = document.createElement('span')
+            textSpan.innerText = record.displayName
+            p.append(typeImg)
+            p.append(textSpan)
+            p.append(statusSpan)
             p.addEventListener('click', () => {
                 self.chooseTicket(i);
             })
@@ -352,7 +368,7 @@ class Main extends Component {
         <div class="ticket time-log">
             <div class="ticket-content d-flex justify-content-between align-items-center p-1">
                 <div><i class="fa-solid fa-arrow-right"></i> <b l-ref="assignee-ref"></b></div>
-                <div><b l-ref="status-ref"></b></div>
+                <div class="d-flex align-items-center"><span style="margin-right:5px" l-ref="type-ref"></span> <b l-ref="status-ref"></b></div>
                 <div><b>Point: </b><span l-ref="point-ref">Unset</span></div>
             </div>
             <div class="duration d-flex justify-content-between align-items-center">
