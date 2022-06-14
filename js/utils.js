@@ -7,6 +7,10 @@ function debounce(func, timeout = 500) {
     };
 }
 
+function uniqueID(key=""){
+    return '_' + Math.random().toString(36).substring(2, 9) + key;
+}
+
 function parseJSONRequest(jsonData) {
     return {
         "jsonrpc": "2.0",
@@ -53,4 +57,55 @@ function parseSecondToString(hpd=8, dpw=5){
         }
         return response
     }
+}
+
+let ac_rules = {
+    '**': ['<b>', '</b>'],
+    '*': ['<em>', '</em>'],
+}
+let replace_rule = {
+    '\n\n': '<br>',
+    '\n': '<br>'
+}
+
+function parseAC(text){
+    for( let rule in replace_rule)
+        text = text.replace(rule, replace_rule[rule])
+    let pivot = 0, index = 0, final = [''], final_key = 0;
+    let length = text.length;
+    let res = "";
+    while (index < length){
+        for (let key in ac_rules){
+            if (index + key.length <= length){
+                if (text.substring(index, index+key.length) === key){
+                    if (final[final_key].length > 0){
+                        if (key.length <= final[final_key].length){
+                            let substring = text.substring(pivot, index)
+                            if (substring.length){
+                                res = `${ac_rules[key][0]}${substring}${ac_rules[key][1]}`
+                            } else{
+                                res = key + key
+                            }
+                            final.push(res)
+                            final[final_key] = final[final_key].substring(0, final[final_key].length - key.length)
+                        } else {
+                            final[final_key] += key
+                        }
+                    } else {
+                        final.push(text.substring(pivot, index))
+                        final.push(key)
+                        final_key = final.length-1
+                    }
+                    index += key.length - 1
+                    pivot = index + 1
+                    break
+                }
+            }
+        }
+        index++
+    }
+    if (pivot !== index){
+        final.push(text.substring(pivot, index))
+    }
+    return final.join("")
 }

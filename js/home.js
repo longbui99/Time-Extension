@@ -8,6 +8,7 @@ class Home extends Component {
   errorRef = this.useRef('error')
 
   custom_events = {
+    'set-env': this.setEnv,
     'authentication': this.onAuthentication,
     'authentication-failed': this.onAuthenticationFailed,
     'loading': this.onLoading,
@@ -60,6 +61,9 @@ class Home extends Component {
     let res = super.mounted();
     this.loadUI()
     return res
+  }
+  setEnv(data){
+    localStorage.setItem(storage, JSON.stringify(data))
   }
   async onAuthentication(data, authenticated = true) {
     if (data.jwt) {

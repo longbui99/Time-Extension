@@ -88,6 +88,24 @@ class Component {
             this.trigger_up('loading', false);
         }
     }
+    async do_invisible_request(url) {
+        try {
+            let res = (await fetch(url));
+            if (res.ok){
+                return res
+            }
+            else{
+                this.trigger_up('error', {
+                    'error': (await res.text())
+                })
+            }
+        }
+        catch (erros) {
+            this.trigger_up('session_errors', {
+                'error': erros.message
+            })
+        }
+    }
 }
 
 function mount(object, element) {

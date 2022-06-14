@@ -31,6 +31,17 @@ body {
     background: #555;
 }
 
+.open .open, .close .close{
+    display: none;
+}
+
+.open .close, .close .open{
+    display: inline-block;
+}
+.space-segment{
+    width: 100%;
+}
+
 .main-page {
     padding: 10px;
     font-size: 12px !important;
@@ -185,6 +196,85 @@ body {
 .main-page .main-action-page .ticket-active .active-item-group .active-item.start .icon {
     color: var(--primary);
 }
+.main-page .main-action-page .acceptance-criteria {
+    min-width: 500px;
+    padding: 5px 10px;
+}
+
+.main-page .main-action-page .acceptance-criteria.open .space-segment{
+    display: inline-block;
+}
+
+.main-page .main-action-page .acceptance-criteria .space-segment{
+    display: none;
+}
+
+.main-page .main-action-page .acceptance-criteria .heading {
+    padding: 2px 5px;
+    font-size: 1.5em;
+    color: var(--primary);
+    cursor: pointer;
+}
+
+.main-page .main-action-page .acceptance-criteria .ac-content {
+    display: flex;
+    align-items: center;
+    margin-left: 10px;
+    width: 100%;
+    flex-flow: column;
+    justify-content: space-between;
+}
+
+.main-page .main-action-page .acceptance-criteria .ac-content .ac-container{
+    width:100%;
+    padding-top: 3px;
+    padding-bottom: 5px;box-shadow: rgba(0, 0, 0, 0.05) 0px 1px 2px 0px;
+}
+
+.main-page .main-action-page .acceptance-criteria .ac-content .ac-container .ac-segment{
+    width:100%;
+}
+
+.main-page .main-action-page .acceptance-criteria .ac-content .ac-container .ac-segment .form-check{
+    width: 100%;
+    font-size: 1.2em;
+    display: flex;
+    align-items: flex-start;
+}
+
+.main-page .main-action-page .acceptance-criteria .ac-content .ac-container .ac-segment .form-check-input{
+    margin-right: 5px;
+    margin-left: -1em;
+    min-width: 20px;
+    height: 20px;
+    cursor: pointer;
+}
+
+.main-page .main-action-page .acceptance-criteria .ac-content .ac-container .ac-segment .form-check-input:checked{
+    background-color: var(--primary);
+    border-color: var(--primary);
+}
+
+.main-page .main-action-page .acceptance-criteria .ac-content .ac-container .ac-segment .form-check-label{
+    margin-left: 10px;
+    cursor: pointer;
+}
+
+.main-page .main-action-page .acceptance-criteria .ac-content .ac-container.header .ac-segment .form-check{
+    width: 100%;
+    font-size: 1.3em;
+    display: flex;
+    align-items: center;
+    justify-items: left;
+    padding-left: 0px;
+    font-weight: 500;
+}
+
+.main-page .main-action-page .acceptance-criteria .ac-content .ac-container.header .ac-segment .form-check-input{
+    display: none;
+
+}
+
 
 .main-page .main-action-page .ticket {
     padding: 5px 10px;
@@ -253,6 +343,24 @@ body {
     overflow-x: hidden;
     white-space: nowrap;
     text-overflow: ellipsis;
+}
+.main-page .main-action-page .ticket.time-log{
+    width: 100%;
+}
+
+.main-page .main-action-page .ticket.time-log.open .space-segment{
+    display: inline-block;
+}
+
+.main-page .main-action-page .ticket.time-log .space-segment{
+    display: none;
+}
+
+.main-page .main-action-page .ticket.time-log .heading{
+    padding: 2px 5px;
+    font-size: 1.5em;
+    color: var(--primary);
+    cursor: pointer;
 }
 
 .main-page .main-action-page .ticket.time-log .duration {

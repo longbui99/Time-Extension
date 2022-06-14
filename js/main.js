@@ -19,6 +19,9 @@ class Main extends Component {
     openTicketref = this.useRef("open-ticket")
     reloadTicketRef = this.useRef("reload-ticket")
     loggedDate = this.useRef("start-date")
+    acContainerRef = this.useRef("ac-content")
+    timeLogHeadingRef = this.useRef('time-log-heading')
+    acHeadingRef = this.useRef('ac-heading')
 
     constructor() {
         super(...arguments);
@@ -144,7 +147,7 @@ class Main extends Component {
             "limit": 6,
             "source": "Extension"
         }), self = this;
-        this.do_request(`${this.subEnv.serverURL}/management/ticket/my-active?jwt=${this.subEnv.jwt}&payload=${params}`).then((response) => {
+        this.do_invisible_request(`${this.subEnv.serverURL}/management/ticket/my-active?jwt=${this.subEnv.jwt}&payload=${params}`).then((response) => {
             response.json().then(result => {
                 self.relatedActiveTickets = result;
                 self.renderRelatedActiveData()
@@ -153,7 +156,7 @@ class Main extends Component {
         this.renderTimeActions()
     }
     storeAndRenderTicket(refresh = false) {
-        this.renderTicketData(refresh)
+        this.renderContent()
         // if (chrome?.storage) {
         //     let data = (await chrome.storage.sync.get([storage]));
         //     data.ticketData = this.ticketData;
@@ -335,7 +338,6 @@ class Main extends Component {
         })
     }
     initEvent() {
-        this._initSearchBar();
         this._initPause();
         this._initAddWorkLog();
         this._initDoneWorkLog();
@@ -344,10 +346,100 @@ class Main extends Component {
         this._initIconRef();
         flatpickr(this.loggedDate.el,{defaultDate: new Date(),dateFormat: 'Y-m-d'});
     }
+    async initACs(){
+        let element = this.acContainerRef.el;
+        element.innerHTML = "";
+        if (this.ticketData){
+            let payload = {
+                'source': 'Extension'
+            }
+            let params = {
+                "id": this.ticketData.id,
+                "jwt": this.subEnv.jwt,
+                "payload": JSON.stringify(payload)
+            }
+            let result = (await this.do_invisible_request(`${this.subEnv.serverURL}/management/ticket/ac?${new URLSearchParams(params)}`));
+            result = (await result.json())
+            if (result.length){
+                let string = ""
+                for (let ac of result){
+                    let _id = uniqueID(ac.id)
+                    let parsedData = parseAC(ac.content)
+                    string += `
+                    <div class="ac-container ${(ac.is_header?'header': '')}">
+                        <div class="ac-segment d-flex justify-content-between">
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" value="${ac.id}" id="${_id}" ${ac.checked?'checked': ''}>
+                            <label class="form-check-label" for="${_id}">
+                                ${parsedData}
+                            </label>
+                            </div>
+                        </div>
+                    </div>
+                    `
+                }
+                element.innerHTML = string
+            }
+        }
+    }
+    initContentState(){
+        if (this.subEnv.contentState){
+            if (this.subEnv.contentState.showLog){
+                this.timeLogHeadingRef.el.classList.remove('close')
+                this.timeLogHeadingRef.el.classList.add('open')
+            } else{
+                this.timeLogHeadingRef.el.classList.remove('open')
+                this.timeLogHeadingRef.el.classList.add('close')
+            }
+            if (this.subEnv.contentState.showAC){
+                this.acHeadingRef.el.classList.remove('close')
+                this.acHeadingRef.el.classList.add('open')
+            } else{
+                this.acHeadingRef.el.classList.remove('open')
+                this.acHeadingRef.el.classList.add('close')
+            }
+        } else{
+            this.subEnv.contentState = {
+                showLog: true,
+                showAC: false
+            }
+            this.trigger_up('set-env', this.subEnv)
+        }
+    }
+    initContentEvent(){
+        let self = this;
+        this.timeLogHeadingRef.el.children[0].addEventListener('click', ()=>{
+            self.subEnv.contentState.showLog = !self.subEnv.contentState.showLog;
+            self.initContentState();
+            if (self.subEnv.contentState.showLog){
+                self.renderTicketData(true);
+            }
+            self.trigger_up('set-env', self.subEnv)
+        })
+        this.acHeadingRef.el.children[0].addEventListener('click', ()=>{
+            self.subEnv.contentState.showAC = !self.subEnv.contentState.showAC;
+            self.initContentState();
+            if (self.subEnv.contentState.showAC){
+                self.initACs();
+            }
+            self.trigger_up('set-env', self.subEnv)
+        })
+    }
+    renderContent(){
+        if (this.subEnv.contentState.showLog){
+            this.renderTicketData(true);
+        } 
+        if (this.subEnv.contentState.showAC) {
+            this.initACs();
+        }
+    }
     mounted() {
         let res = super.mounted();
+        this.initContentState();
+        this.initContentEvent();
+        this._initSearchBar();
         this.initEvent();
-        this.renderTicketData(true);
+        this.renderContent();
         return res;
     }
     template = `<div class="main-action-page show">
@@ -366,54 +458,68 @@ class Main extends Component {
             <div class="search-bar-result" l-ref="search-bar-result">
             </div>
         </div>
-        <div class="ticket time-log">
-            <div class="ticket-content d-flex justify-content-between align-items-center p-1">
-                <div><i class="fa-solid fa-arrow-right"></i> <b l-ref="assignee-ref"></b></div>
-                <div class="d-flex align-items-center"><span style="margin-right:5px" l-ref="type-ref"></span> <b l-ref="status-ref"></b></div>
-                <div><b>Point: </b><span l-ref="point-ref">Unset</span></div>
+        <div l-ref="time-log-heading" class="ticket time-log open">
+            <div class="heading d-flex justify-content-between">
+                <span>Time Management</span>
+                <b><i class="fas fa-angle-double-down open"></i><i class="fas fa-angle-double-left close"></i></b>
             </div>
-            <div class="duration d-flex justify-content-between align-items-center">
-                <div class="total-duration">
-                    <p><span class="avt"><img src="./static/sigma.png"/></span> <span l-ref="my-total-duration">0m</span></p> /
-                    <small l-ref="total-duration">0m</small>
+            <div class="space-segment">
+                <div class="ticket-content d-flex justify-content-between align-items-center p-1">
+                    <div><i class="fa-solid fa-arrow-right"></i> <b l-ref="assignee-ref"></b></div>
+                    <div class="d-flex align-items-center"><span style="margin-right:5px" l-ref="type-ref"></span> <b l-ref="status-ref"></b></div>
+                    <div><b>Point: </b><span l-ref="point-ref">Unset</span></div>
                 </div>
-                <div class="active-duration">
-                    <span l-ref="active-duration-icon" class="avt"><i class="fa-solid fa-stopwatch"></i></span> <span l-ref="active-duration">0m</span>
-                </div>
-            </div>
-            <div class="comment">
-                <textarea rows="1" type="text" class="form-control" placeholder="Comment to log step/ log work" l-ref="comment-for-ticket"></textarea>
-            </div>
-            <div class="time-action d-flex justify-content-between align-items-center">
-                <div class="manual-log d-flex">
-                    <input type="text" class="form-control" placeholder="Text log" l-ref="manual-log-text"/>
-                    <label for="start-date-selection" class="start-date-label"><i class="fa-regular fa-calendar"></i></label>
-                    <input id="start-date-selection" type="text" class="form-control start-date" l-ref="start-date">
-                </div>
-                <div class="action-group d-flex justify-content-between">
-                    <div>
-                        <div class="action add" l-ref="action-add">
-                            <i class="fa-solid fa-circle-play"></i>
-                        </div>
+                <div class="duration d-flex justify-content-between align-items-center">
+                    <div class="total-duration">
+                        <p><span class="avt"><img src="./static/sigma.png"/></span> <span l-ref="my-total-duration">0m</span></p> /
+                        <small l-ref="total-duration">0m</small>
                     </div>
-                    <div>
-                        <div class="action pause" l-ref="action-pause">
-                            <i class="fa-solid fa-circle-pause"></i>
-                        </div>
+                    <div class="active-duration">
+                        <span l-ref="active-duration-icon" class="avt"><i class="fa-solid fa-stopwatch"></i></span> <span l-ref="active-duration">0m</span>
                     </div>
-                    <div>
-                        <div class="action stop" l-ref="action-stop">
-                            <i class="fa-solid fa-circle-stop"></i>
+                </div>
+                <div class="comment">
+                    <textarea rows="1" type="text" class="form-control" placeholder="Comment to log step/ log work" l-ref="comment-for-ticket"></textarea>
+                </div>
+                <div class="time-action d-flex justify-content-between align-items-center">
+                    <div class="manual-log d-flex">
+                        <input type="text" class="form-control" placeholder="Text log" l-ref="manual-log-text"/>
+                        <label for="start-date-selection" class="start-date-label"><i class="fa-regular fa-calendar"></i></label>
+                        <input id="start-date-selection" type="text" class="form-control start-date" l-ref="start-date">
+                    </div>
+                    <div class="action-group d-flex justify-content-between">
+                        <div>
+                            <div class="action add" l-ref="action-add">
+                                <i class="fa-solid fa-circle-play"></i>
+                            </div>
+                        </div>
+                        <div>
+                            <div class="action pause" l-ref="action-pause">
+                                <i class="fa-solid fa-circle-pause"></i>
+                            </div>
+                        </div>
+                        <div>
+                            <div class="action stop" l-ref="action-stop">
+                                <i class="fa-solid fa-circle-stop"></i>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
         <div class="ticket-active">
-            <div class="heading">
-                Related Active
-            </div>
             <div class="active-item-group" l-ref="related-active">
+            </div>
+        </div>
+        <div l-ref="ac-heading" class="acceptance-criteria close">
+            <div  class="heading d-flex justify-content-between">
+                <span>Acceptance Criteria</span>
+                <b><i class="fas fa-angle-double-down open"></i><i class="fas fa-angle-double-left close"></i></b>
+            </div>
+            <div class="space-segment">
+                <div l-ref="ac-content" class="ac-content">
+                    
+                </div>
             </div>
         </div>
     </div>`
