@@ -115,7 +115,6 @@ class Main extends Component {
                 this.ticketData.displayName = this._getDisplayName(this.ticketData);
             }
             let record = this.ticketData;
-            this.searchRef.el.value = this.ticketData.displayName;
             this.totalDurationRef.el.innerText =this.secondToString(record.total_duration);
             this.myTotalDurationRef.el.innerText =this.secondToString(record.my_total_duration);
             this.activeDurationRef.el.innerText =this.secondToString(record.active_duration);
@@ -426,6 +425,7 @@ class Main extends Component {
         })
     }
     renderContent(){
+        this.searchRef.el.value = this.ticketData.displayName;
         if (this.subEnv.contentState.showLog){
             this.renderTicketData(true);
         } 

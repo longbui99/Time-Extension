@@ -197,7 +197,7 @@ body {
     color: var(--primary);
 }
 .main-page .main-action-page .acceptance-criteria {
-    min-width: 500px;
+    min-width: 450px;
     padding: 5px 10px;
 }
 
@@ -316,7 +316,7 @@ body {
 .main-page .main-action-page .ticket.search-bar .search-bar-result {
     position: absolute;
     background-color: white;
-    width: 380px;
+    width: 85%;
     box-shadow: rgba(100, 100, 111, 0.2) 0px 7px 29px 0px;
     color: grey;
     max-height: 68%;
@@ -332,7 +332,7 @@ body {
     margin-right: 3px;
 }
 .main-page .main-action-page .ticket.search-bar .search-bar-result p span{
-    max-width: 270px;
+    max-width: 75%;
     overflow-x: hidden;
     white-space: nowrap;
     text-overflow: ellipsis;
