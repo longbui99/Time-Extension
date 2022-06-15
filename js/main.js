@@ -106,13 +106,11 @@ class Main extends Component {
         if (this.currentInterval) {
             clearInterval(this.currentInterval)
         }
-        let except_id = []
         if (this.ticketData) {
             if (refresh) {
                 let response = (await this.do_request(`${this.subEnv.serverURL}/management/ticket/get/${this.ticketData.id}?jwt=${this.subEnv.jwt}`));
                 let result = (await response.json());
                 for (let key of Object.keys(result)) { this.ticketData[key] = result[key]; }
-                this.ticketData.displayName = this._getDisplayName(this.ticketData);
             }
             let record = this.ticketData;
             this.totalDurationRef.el.innerText =this.secondToString(record.total_duration);
@@ -134,24 +132,12 @@ class Main extends Component {
                 }, 500)
                 this.ticketData.timeStatus = "active";
             }
-            except_id.push(this.ticketData.id)
             this.el.querySelector('.ticket-navigation').style.display = "inline-block";
             this.ticketNavigator();
         }
         else {
             this.el.querySelector('.ticket-navigation').style.display = "none";
         }
-        let params = JSON.stringify({
-            "except": except_id,
-            "limit": 6,
-            "source": "Extension"
-        }), self = this;
-        this.do_invisible_request(`${this.subEnv.serverURL}/management/ticket/my-active?jwt=${this.subEnv.jwt}&payload=${params}`).then((response) => {
-            response.json().then(result => {
-                self.relatedActiveTickets = result;
-                self.renderRelatedActiveData()
-            })
-        });
         this.renderTimeActions()
     }
     storeAndRenderTicket(refresh = false) {
@@ -378,6 +364,15 @@ class Main extends Component {
                     `
                 }
                 element.innerHTML = string
+                for(let el of element.querySelectorAll('.form-check-input')){
+                    el.addEventListener('change', event=>{
+                        payload = JSON.parse(params.payload)
+                        payload.checked = el.checked
+                        params.id = parseInt(el.value)
+                        params.payload = JSON.stringify(payload)
+                        this.do_invisible_request(`${this.subEnv.serverURL}/management/ac?${new URLSearchParams(params)}`)
+                    })
+                }
             }
         }
     }
@@ -425,12 +420,26 @@ class Main extends Component {
         })
     }
     renderContent(){
-        this.searchRef.el.value = this.ticketData.displayName;
         if (this.subEnv.contentState.showLog){
             this.renderTicketData(true);
         } 
         if (this.subEnv.contentState.showAC) {
             this.initACs();
+        }
+        if (this.ticketData){
+            this.ticketData.displayName = this._getDisplayName(this.ticketData);
+            this.searchRef.el.value = this.ticketData.displayName;
+            let params = JSON.stringify({
+                "except": this.ticketData.id,
+                "limit": 6,
+                "source": "Extension"
+            }), self = this;
+            this.do_invisible_request(`${this.subEnv.serverURL}/management/ticket/my-active?jwt=${this.subEnv.jwt}&payload=${params}`).then((response) => {
+                response.json().then(result => {
+                    self.relatedActiveTickets = result;
+                    self.renderRelatedActiveData()
+                })
+            });
         }
     }
     mounted() {
