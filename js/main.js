@@ -97,9 +97,7 @@ class Main extends Component {
             window.open(self.ticketData.url, '_blank')
         })
         this.reloadTicketRef.el.addEventListener('click', (event) => {
-            self.do_request(`${this.subEnv.serverURL}/management/ticket/fetch/${this.ticketData.id}?jwt=${this.subEnv.jwt}`).then(() => {
-                self.renderTicketData(true);
-            });
+            self.renderContent();
         })
     }
     async renderTicketData(refresh = false) {
@@ -132,11 +130,6 @@ class Main extends Component {
                 }, 500)
                 this.ticketData.timeStatus = "active";
             }
-            this.el.querySelector('.ticket-navigation').style.display = "inline-block";
-            this.ticketNavigator();
-        }
-        else {
-            this.el.querySelector('.ticket-navigation').style.display = "none";
         }
         this.renderTimeActions()
     }
@@ -440,6 +433,10 @@ class Main extends Component {
                     self.renderRelatedActiveData()
                 })
             });
+            this.el.querySelector('.ticket-navigation').style.display = "inline-block";
+            this.ticketNavigator();
+        } else {
+            this.el.querySelector('.ticket-navigation').style.display = "none";
         }
     }
     mounted() {
