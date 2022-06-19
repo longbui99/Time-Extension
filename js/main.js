@@ -28,6 +28,7 @@ class Main extends Component {
         this.ticketData = this.subEnv.ticketData || null;
         this.loadedData = [];
         this.secondToString = parseSecondToString(this.subEnv.resource.hrs_per_day, this.subEnv.resource.days_per_week)
+        this.openTicketNaviagor = this.openTicketNaviagor.bind(this);
     }
     _getDisplayName(record, length = 40000) {
         return `${record.key}: ${(record.name.length > length) ? record.name.substring(0, length) + "..." : record.name}`;
@@ -91,13 +92,36 @@ class Main extends Component {
             })
         }
     }
+    async fetchTicketFromServer(){
+        let response = (await this.do_request(`${this.subEnv.serverURL}/management/ticket/fetch/${this.ticketData.id}?jwt=${this.subEnv.jwt}`));
+        this.renderContent()
+    }
+    async openTicketNaviagor(event){
+        if (window.event.ctrlKey && window.event.shiftKey && this.ticketData) {
+            this.ticketData.timeStatus = null;
+            let payload = {
+                'source': 'Extension',
+                'mode': {
+                    'worklog': this.subEnv.contentState.showLog,
+                    'ac': this.subEnv.contentState.showAC
+                }
+            }
+            let params = {
+                "id": this.ticketData.id,
+                "jwt": this.subEnv.jwt,
+                "payload": JSON.stringify(payload)
+            }
+            await this.do_invisible_request(`${this.subEnv.serverURL}/management/ticket/export?${new URLSearchParams(params)}`);
+        } 
+        else {
+            window.open(this.ticketData.url, '_blank')
+        }
+    }
     ticketNavigator() {
         let self = this;
-        this.openTicketref.el.addEventListener('click', (event) => {
-            window.open(self.ticketData.url, '_blank')
-        })
+        this.openTicketref.el.addEventListener('click', this.openTicketNaviagor)
         this.reloadTicketRef.el.addEventListener('click', (event) => {
-            self.renderContent();
+            self.fetchTicketFromServer();
         })
     }
     async renderTicketData(refresh = false) {
@@ -336,7 +360,13 @@ class Main extends Component {
                 "jwt": this.subEnv.jwt,
                 "payload": JSON.stringify(payload)
             }
-            let result = (await this.do_invisible_request(`${this.subEnv.serverURL}/management/ticket/ac?${new URLSearchParams(params)}`));
+            let result = "";
+            // if (this.subEnv.contentState.showLog && this.subEnv.contentState.showAC){
+                result = (await this.do_invisible_request(`${this.subEnv.serverURL}/management/ticket/ac?${new URLSearchParams(params)}`));
+            // }
+            // else {
+            //     result = (await this.do_request(`${this.subEnv.serverURL}/management/ticket/ac?${new URLSearchParams(params)}`));
+            // }
             result = (await result.json())
             if (result.length){
                 let string = ""
