@@ -348,8 +348,88 @@ class Main extends Component {
         this._initIconRef();
         flatpickr(this.loggedDate.el,{defaultDate: new Date(),dateFormat: 'Y-m-d'});
     }
-    async initACs(){
-        let element = this.acContainerRef.el;
+    makeACComponent(_id, ac, content){
+        return `<div class="ac-container ${(ac.is_header?'header': '')} ${(ac.initial?'initial': '')}" sequence=${ac.sequence} header=${ac.is_header}>
+            <div class="ac-segment d-flex justify-content-between">
+            <div class="form-check">
+                <input class="form-check-input" type="checkbox" value="${ac.id}" id="${_id}" ${ac.checked?'checked': ''}>
+                <label class="form-check-label" contenteditable="true">${content}</label>
+                </div>
+            </div>
+        </div>`
+    }
+    async pushAC(el, params, parent){
+        if (el.innerText !== ""){
+            let payload = {};
+            let element = parent.querySelector('.form-check-label');
+            payload.checked = element.checked || false;
+            payload.name = el.innerHTML;
+            payload.is_header = parent.getAttribute('header') == "true";
+            payload.sequence = parent.previousElementSibling?.getAttribute('sequence');
+            if (payload.sequence === "undefined") payload.sequence = 0;
+            payload.ticket_id = this.ticketData.id;
+            params.id = parseInt(element.previousElementSibling.value) || 0
+            params.payload = JSON.stringify(payload)
+            let res = (await this.do_invisible_request(`${this.subEnv.serverURL}/management/ac?${new URLSearchParams(params)}`));
+            let result = (await res.json());
+            element.previousElementSibling.value = result;
+        }
+    }
+    initEditACEvent(element, params){
+        let self = this;
+        let baseParent = element
+        while (!baseParent.classList.contains('ac-container')) baseParent = baseParent.parentNode;
+        element.previousElementSibling.addEventListener('change', event=>{
+            self.pushAC(element, params, baseParent)
+        })
+        element.addEventListener('click', (event) => {
+            window.selectedElement = element;
+            self.acContainerRef.el.querySelector('.editing')?.classList.remove('editing')
+            element.classList.add('editing')
+            event.stopPropagation();
+        })
+        element.addEventListener('keydown', (event) => {
+            if (event.keyCode === 8 && element.innerText.trim() === "" && window.event.ctrlKey) {
+                (baseParent.previousElementSibling || baseParent.nextSibling).querySelector('.form-check-label').focus();
+                baseParent.remove();
+                if (parseInt(element.previousElementSibling.value)){
+                    self.do_invisible_request(`${self.subEnv.serverURL}/management/ac/delete/${parseInt(element.previousElementSibling.value)}?jwt=${self.subEnv.jwt}`)
+                }
+            }
+            if (event.keyCode === 13 && !window.event.shiftKey) {
+                element.classList.remove('editing')
+                let newAC = new DOMParser().parseFromString(self.makeACComponent('', {'sequence': baseParent.previousElementSibling.getAttribute('sequence')}, ''), 'text/html').body.firstChild;
+                let content = ""
+                if (baseParent.classList.contains('initial')) {
+                    baseParent.parentNode.insertBefore(newAC, baseParent);
+                    content = element.innerHTML;
+                    setTimeout(() => {
+                        element.innerHTML = ""
+                    }, 1)
+                    element.focus();
+                    let HandlingElement = baseParent.previousElementSibling;
+                    self.pushAC(element, params, HandlingElement)
+                } else {
+                    baseParent.parentNode.insertBefore(newAC, baseParent.nextSibling);
+                    newAC.querySelector('.form-check-label').focus();
+                    self.pushAC(element, params, baseParent)
+                }
+                self.initEditACEvent(newAC.querySelector('.form-check-label'), params);
+                event.stopPropagation();
+                setTimeout(() => {
+                    newAC.querySelector('.form-check-label').innerHTML = content
+                }, 1)
+            }
+            if (window.event.ctrlKey && event.keyCode === 191){
+                let isHeader = !(baseParent.getAttribute("header", false) == "true");
+                baseParent.setAttribute("header", isHeader);
+                baseParent.classList.remove('header');
+                isHeader && baseParent.classList.add(isHeader?'header':'');
+            }
+        })
+    }
+    async initACs() {
+        let element = this.acContainerRef.el, self = this;
         element.innerHTML = "";
         if (this.ticketData){
             let payload = {
@@ -361,42 +441,37 @@ class Main extends Component {
                 "payload": JSON.stringify(payload)
             }
             let result = "";
-            // if (this.subEnv.contentState.showLog && this.subEnv.contentState.showAC){
-                result = (await this.do_invisible_request(`${this.subEnv.serverURL}/management/ticket/ac?${new URLSearchParams(params)}`));
-            // }
-            // else {
-            //     result = (await this.do_request(`${this.subEnv.serverURL}/management/ticket/ac?${new URLSearchParams(params)}`));
-            // }
+            result = (await this.do_invisible_request(`${this.subEnv.serverURL}/management/ticket/ac?${new URLSearchParams(params)}`));
+            let default_data = {
+                'id':false,
+                'content': '',
+                'is_header': true,
+                'initial': true,
+            }
             result = (await result.json())
+            this.acs = result;
+            result.push(default_data)
             if (result.length){
                 let string = ""
                 for (let ac of result){
                     let _id = uniqueID(ac.id)
                     let parsedData = parseAC(ac.content)
-                    string += `
-                    <div class="ac-container ${(ac.is_header?'header': '')}">
-                        <div class="ac-segment d-flex justify-content-between">
-                        <div class="form-check">
-                            <input class="form-check-input" type="checkbox" value="${ac.id}" id="${_id}" ${ac.checked?'checked': ''}>
-                            <label class="form-check-label" for="${_id}">
-                                ${parsedData}
-                            </label>
-                            </div>
-                        </div>
-                    </div>
-                    `
+                    string += this.makeACComponent(_id, ac, parsedData)
                 }
                 element.innerHTML = string
-                for(let el of element.querySelectorAll('.form-check-input')){
-                    el.addEventListener('change', event=>{
-                        payload = JSON.parse(params.payload)
-                        payload.checked = el.checked
-                        params.id = parseInt(el.value)
-                        params.payload = JSON.stringify(payload)
-                        this.do_invisible_request(`${this.subEnv.serverURL}/management/ac?${new URLSearchParams(params)}`)
-                    })
+                for (let ac of element.querySelectorAll('.form-check-label')){
+                    this.initEditACEvent(ac, params)
                 }
             }
+            window.addEventListener('click', event=>{
+                let selectedElement = element.querySelector('.editing')
+                if (selectedElement){
+                    selectedElement.classList.remove('editing');
+                    let baseParent = selectedElement
+                    while (!baseParent.classList.contains('ac-container')) baseParent = baseParent.parentNode;
+                    self.pushAC(selectedElement, params, baseParent)
+                }
+            })
         }
     }
     initContentState(){
