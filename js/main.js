@@ -324,7 +324,7 @@ class Main extends Component {
     async _initIconRef(){
         let self = this;
         this.activeDurationIconRef.el.addEventListener("click", async (event)=>{
-            if (window.event.ctrlKey && window.event.shiftKey) {
+            if (window.event.ctrlKey && window.event.altKey) {
                 self.ticketData.timeStatus = null;
                 let payload = {
                     'source': 'Extension'
