@@ -97,7 +97,7 @@ class Main extends Component {
         this.renderContent()
     }
     async openTicketNaviagor(event){
-        if (window.event.ctrlKey && window.event.shiftKey && this.ticketData) {
+        if (window.event.ctrlKey && window.event.altKey && this.ticketData) {
             this.ticketData.timeStatus = null;
             let payload = {
                 'source': 'Extension',
