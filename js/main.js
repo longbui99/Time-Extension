@@ -459,14 +459,20 @@ class Main extends Component {
                 isHeader && baseParent.classList.add(isHeader?'header':'');
             }
             if (event.keyCode === 38){
-                let el = baseParent.previousElementSibling.querySelector('.form-check-label');
-                placeCaretAtEnd(el)
-                el.click();
+                let el = baseParent.previousElementSibling?.querySelector('.form-check-label');
+                if (el){
+                    el.click();
+                    placeCaretAtEnd(el);
+                }
+                event.stopPropagation();
             }
             if (event.keyCode === 40){
-                let el = baseParent.nextElementSibling.querySelector('.form-check-label');
-                el.click();
-                el.focus();
+                let el = baseParent.nextElementSibling?.querySelector('.form-check-label');
+                if (el){
+                    el.click();
+                    el.focus();
+                }
+                event.stopPropagation();
             }
         })
     }
