@@ -197,6 +197,22 @@ class Main extends Component {
             p.addEventListener('click', () => {
                 self.chooseTicket(i);
             })
+            p.addEventListener('keydown', event=>{
+                if (event.keyCode === 38){
+                    let el = p.previousElementSibling;
+                    if (el){
+                        el.focus();
+                    }
+                    event.stopPropagation();
+                }
+                if (event.keyCode === 40){
+                    let el = p.nextElementSibling;
+                    if (el){
+                        el.focus();
+                    }
+                    event.stopPropagation();
+                }
+            })
             element.append(p);
         }
         element.style.display = 'inline-block';
@@ -340,20 +356,6 @@ class Main extends Component {
                 }
                 await self.do_request(`${self.subEnv.serverURL}/management/ticket/work-log/cancel?${new URLSearchParams(params)}`);
                 self.renderTicketData(true);
-            }
-        })
-    }
-    initEvent() {
-        this._initPause();
-        this._initAddWorkLog();
-        this._initDoneWorkLog();
-        this._initManualChange();
-        this._initCommentEvent();
-        this._initIconRef();
-        flatpickr(this.loggedDate.el,{defaultDate: new Date(),dateFormat: 'Y-m-d'});
-        window.addEventListener('keydown', event=>{
-            if (event.keyCode === 13){
-                document.activeElement.click()               
             }
         })
     }
@@ -591,6 +593,25 @@ class Main extends Component {
         } else {
             this.el.querySelector('.ticket-navigation').style.display = "none";
         }
+    }
+    initEvent() {
+        let self = this;
+        this._initPause();
+        this._initAddWorkLog();
+        this._initDoneWorkLog();
+        this._initManualChange();
+        this._initCommentEvent();
+        this._initIconRef();
+        flatpickr(this.loggedDate.el,{defaultDate: new Date(),dateFormat: 'Y-m-d'});
+        window.addEventListener('keydown', event=>{
+            if (event.keyCode === 13){
+                document.activeElement.click()               
+            }
+            if (event.keyCode === 70 && window.event.ctrlKey && window.event.shiftKey){
+                self.searchRef.el.click();
+                self.searchRef.el.focus();
+            }
+        })
     }
     mounted() {
         let res = super.mounted();
