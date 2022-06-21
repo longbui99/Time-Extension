@@ -373,11 +373,13 @@ class Main extends Component {
         if (el.innerText !== ""){
             let payload = {};
             let element = parent.querySelector('.form-check-label');
-            payload.checked = element.checked || false;
+            payload.checked = element.previousElementSibling.checked || false;
             payload.name = el.innerHTML;
             payload.is_header = parent.getAttribute('header') == "true";
-            payload.sequence = parent.previousElementSibling?.getAttribute('sequence');
-            if (payload.sequence === "undefined") payload.sequence = 0;
+            if (parseInt(element.getAttribute('id')) !== NaN){
+                payload.sequence = parent.previousElementSibling?.getAttribute('sequence');
+                if (payload.sequence === "undefined") payload.sequence = 0;
+            }
             payload.ticket_id = this.ticketData.id;
             params.id = parseInt(element.previousElementSibling.value) || 0
             params.payload = JSON.stringify(payload)
@@ -417,7 +419,7 @@ class Main extends Component {
             event.stopPropagation();
         })
         element.addEventListener('keydown', (event) => {
-            if (event.keyCode === 8 && element.innerText.trim() === "" && window.event.ctrlKey && !baseParent.classList.contains('header')) {
+            if (event.keyCode === 8 && element.innerText.trim() === "" && window.event.ctrlKey && !baseParent.classList.contains('initial')) {
                 (baseParent.previousElementSibling || baseParent.nextElementSibling).querySelector('.form-check-label').focus();
                 baseParent.remove();
                 if (parseInt(element.previousElementSibling.value)){
@@ -425,14 +427,16 @@ class Main extends Component {
                 }
             }
             if (event.keyCode === 13 && !window.event.shiftKey) {
-                element.classList.remove('editing')
-                let newAC = new DOMParser().parseFromString(self.makeACComponent('', {'sequence': baseParent.previousElementSibling.getAttribute('sequence')}, ''), 'text/html').body.firstChild;
+                element.classList.remove('editing');
+                let data = {
+                    'sequence': baseParent.previousElementSibling?.getAttribute('sequence') || 0,
+                    'is_header': (baseParent.getAttribute('header') === "true")
+                }
+                let newAC = new DOMParser().parseFromString(self.makeACComponent('', data, ''), 'text/html').body.firstChild;
                 let content = ""
                 if (baseParent.classList.contains('initial')) {
-                    if (!window.event.ctrlKey){
-                        baseParent.parentNode.insertBefore(newAC, baseParent);
-                        content = element.innerHTML;
-                    }
+                    baseParent.parentNode.insertBefore(newAC, baseParent);
+                    content = element.innerHTML;
                     setTimeout(() => {
                         element.innerHTML = ""
                     }, 1)
@@ -446,7 +450,7 @@ class Main extends Component {
                     }
                     self.pushAC(element, params, baseParent)
                 }
-                if (!window.event.ctrlKey){
+                if (!window.event.ctrlKey || baseParent.classList.contains('initial')){
                     self.initEditACEvent(newAC.querySelector('.form-check-label'), params);
                     setTimeout(() => {
                         newAC.querySelector('.form-check-label').innerHTML = content
@@ -611,10 +615,11 @@ class Main extends Component {
                 self.searchRef.el.click();
                 self.searchRef.el.focus();
             }
-            if (event.keyCode === 77 && window.event.ctrlKey){
+            if (event.keyCode === 49 && window.event.ctrlKey && window.event.shiftKey){
                 self.timeLogHeadingRef.el.children[0].click();
+                event.stopImmediatePropagation();
             }
-            if (event.keyCode === 67 && window.event.ctrlKey){
+            if (event.keyCode === 50 && window.event.ctrlKey && window.event.shiftKey){
                 self.acHeadingRef.el.children[0].click();
             }
         })
