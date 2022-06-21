@@ -100,7 +100,7 @@ class Home extends Component {
           <div class="content" l-ref="server-open">
               <span><i class="fa-solid fa-clock"></i></span> <span>LB/TM</span>
               <p style="color: black;font-size:12px;margin-left: 5px;">
-                  Powered by <a href="https://www.drakebui.ml" target="_blank">Long Bui</a>
+                  Powered by <a href="https://www.drakebui.ml" target="_blank" tabindex="-1">Long Bui</a>
               </p>
           </div>
           <div class="extend-tool" l-ref="server-logout">

@@ -65,11 +65,12 @@ class Main extends Component {
     }
     renderRelatedActiveData() {
         let template = ""
+        let i = 0;
         for (let record of this.relatedActiveTickets) {
             template += `
                 <div class="active-item">
                     <div class="icon-group push-relative-ticket">
-                        <span class="icon">
+                        <span class="icon" tabindex="${1100+i}">
                             <i class="fa-solid fa-map-pin"></i>
                         </span>
                     </div>
@@ -80,6 +81,7 @@ class Main extends Component {
                         ${this.secondToString(record.my_total_duration + record.active_duration)}
                     </span>
                 </div>`
+            i++;
         }
         this.relatedActiveRef.el.innerHTML = template;
         let elements = this.relatedActiveRef.el.querySelectorAll('.push-relative-ticket')
@@ -191,6 +193,7 @@ class Main extends Component {
             p.append(typeImg)
             p.append(textSpan)
             p.append(statusSpan)
+            p.setAttribute('tabindex', 10+i)
             p.addEventListener('click', () => {
                 self.chooseTicket(i);
             })
@@ -299,7 +302,7 @@ class Main extends Component {
     _initManualChange() {
         let self = this;
         this.manualLogref.el.addEventListener('keyup', event => {
-            (10 != event.keyCode && 13 != event.keyCode) || !event.ctrlKey || self._doneWorkLog();
+            (10 != event.keyCode && 13 != event.keyCode) || !event.ctrlKey || self._doneWorkLog() || event.stopPropagation();
             if (!['pause', 'active'].includes(self.ticketData?.timeStatus)) {
                 self.ticketData.timeStatus = "pause";
                 self.renderTimeActions();
@@ -314,6 +317,7 @@ class Main extends Component {
         this.commentRef.el.addEventListener("keyup", (event) => {
             if (event.keyCode == 13) {
                 self.commentRef.el.setAttribute("rows", parseInt(self.commentRef.el.getAttribute("rows")) + 1)
+                event.stopPropagation()
             }
             else {
                 let value = self.commentRef.el.value;
@@ -347,6 +351,11 @@ class Main extends Component {
         this._initCommentEvent();
         this._initIconRef();
         flatpickr(this.loggedDate.el,{defaultDate: new Date(),dateFormat: 'Y-m-d'});
+        window.addEventListener('keydown', event=>{
+            if (event.keyCode === 13){
+                document.activeElement.click()               
+            }
+        })
     }
     makeACComponent(_id, ac, content){
         return `<div class="ac-container ${(ac.is_header?'header': '')} ${(ac.initial?'initial': '')}" sequence=${ac.sequence} header=${ac.is_header}>
@@ -376,6 +385,23 @@ class Main extends Component {
         }
     }
     initEditACEvent(element, params){
+        function placeCaretAtEnd(el) {
+            el.focus();
+            if (typeof window.getSelection != "undefined"
+                    && typeof document.createRange != "undefined") {
+                var range = document.createRange();
+                range.selectNodeContents(el);
+                range.collapse(false);
+                var sel = window.getSelection();
+                sel.removeAllRanges();
+                sel.addRange(range);
+            } else if (typeof document.body.createTextRange != "undefined") {
+                var textRange = document.body.createTextRange();
+                textRange.moveToElementText(el);
+                textRange.collapse(false);
+                textRange.select();
+            }
+        }
         let self = this;
         let baseParent = element
         while (!baseParent.classList.contains('ac-container')) baseParent = baseParent.parentNode;
@@ -389,8 +415,8 @@ class Main extends Component {
             event.stopPropagation();
         })
         element.addEventListener('keydown', (event) => {
-            if (event.keyCode === 8 && element.innerText.trim() === "" && window.event.ctrlKey) {
-                (baseParent.previousElementSibling || baseParent.nextSibling).querySelector('.form-check-label').focus();
+            if (event.keyCode === 8 && element.innerText.trim() === "" && window.event.ctrlKey && !baseParent.classList.contains('header')) {
+                (baseParent.previousElementSibling || baseParent.nextElementSibling).querySelector('.form-check-label').focus();
                 baseParent.remove();
                 if (parseInt(element.previousElementSibling.value)){
                     self.do_invisible_request(`${self.subEnv.serverURL}/management/ac/delete/${parseInt(element.previousElementSibling.value)}?jwt=${self.subEnv.jwt}`)
@@ -401,8 +427,10 @@ class Main extends Component {
                 let newAC = new DOMParser().parseFromString(self.makeACComponent('', {'sequence': baseParent.previousElementSibling.getAttribute('sequence')}, ''), 'text/html').body.firstChild;
                 let content = ""
                 if (baseParent.classList.contains('initial')) {
-                    baseParent.parentNode.insertBefore(newAC, baseParent);
-                    content = element.innerHTML;
+                    if (!window.event.ctrlKey){
+                        baseParent.parentNode.insertBefore(newAC, baseParent);
+                        content = element.innerHTML;
+                    }
                     setTimeout(() => {
                         element.innerHTML = ""
                     }, 1)
@@ -410,21 +438,35 @@ class Main extends Component {
                     let HandlingElement = baseParent.previousElementSibling;
                     self.pushAC(element, params, HandlingElement)
                 } else {
-                    baseParent.parentNode.insertBefore(newAC, baseParent.nextSibling);
-                    newAC.querySelector('.form-check-label').focus();
+                    if (!window.event.ctrlKey){
+                        baseParent.parentNode.insertBefore(newAC, baseParent.nextSibling);
+                        newAC.querySelector('.form-check-label').focus();
+                    }
                     self.pushAC(element, params, baseParent)
                 }
-                self.initEditACEvent(newAC.querySelector('.form-check-label'), params);
+                if (!window.event.ctrlKey){
+                    self.initEditACEvent(newAC.querySelector('.form-check-label'), params);
+                    setTimeout(() => {
+                        newAC.querySelector('.form-check-label').innerHTML = content
+                    }, 1)
+                }
                 event.stopPropagation();
-                setTimeout(() => {
-                    newAC.querySelector('.form-check-label').innerHTML = content
-                }, 1)
             }
             if (window.event.ctrlKey && event.keyCode === 191){
                 let isHeader = !(baseParent.getAttribute("header", false) == "true");
                 baseParent.setAttribute("header", isHeader);
                 baseParent.classList.remove('header');
                 isHeader && baseParent.classList.add(isHeader?'header':'');
+            }
+            if (event.keyCode === 38){
+                let el = baseParent.previousElementSibling.querySelector('.form-check-label');
+                placeCaretAtEnd(el)
+                el.click();
+            }
+            if (event.keyCode === 40){
+                let el = baseParent.nextElementSibling.querySelector('.form-check-label');
+                el.click();
+                el.focus();
             }
         })
     }
@@ -558,11 +600,11 @@ class Main extends Component {
         </div>
         <div class="ticket search-bar">
             <div class="input-group d-flex justify-content-between">
-                <input type="text" class="form-control" placeholder="Search Ticket" l-ref="search-bar-ticket"/>
+                <input type="text" class="form-control" placeholder="Search Ticket" l-ref="search-bar-ticket" tabindex="1"/>
                 <div class="ticket-navigation">
                     <div class="d-flex justify-content-between"> 
-                        <span l-ref="open-ticket"><i class="fa-solid fa-square-arrow-up-right"></i></span>
-                        <span l-ref="reload-ticket"><i class="fa-solid fa-arrow-rotate-right"></i></span>
+                        <span l-ref="open-ticket" tabindex="998"><i class="fa-solid fa-square-arrow-up-right"></i></span>
+                        <span l-ref="reload-ticket" tabindex="999"><i class="fa-solid fa-arrow-rotate-right"></i></span>
                     </div>  
                 </div>
             </div>
@@ -590,27 +632,27 @@ class Main extends Component {
                     </div>
                 </div>
                 <div class="comment">
-                    <textarea rows="1" type="text" class="form-control" placeholder="Comment to log step/ log work" l-ref="comment-for-ticket"></textarea>
+                    <textarea rows="1" type="text" class="form-control" placeholder="Comment to log step/ log work" l-ref="comment-for-ticket" tabindex="1000"></textarea>
                 </div>
                 <div class="time-action d-flex justify-content-between align-items-center">
                     <div class="manual-log d-flex">
-                        <input type="text" class="form-control" placeholder="Text log" l-ref="manual-log-text"/>
+                        <input type="text" class="form-control" placeholder="Text log" l-ref="manual-log-text" tabindex="1001"/>
                         <label for="start-date-selection" class="start-date-label"><i class="fa-regular fa-calendar"></i></label>
                         <input id="start-date-selection" type="text" class="form-control start-date" l-ref="start-date">
                     </div>
                     <div class="action-group d-flex justify-content-between">
                         <div>
-                            <div class="action add" l-ref="action-add">
+                            <div class="action add" l-ref="action-add" tabindex="1002">
                                 <i class="fa-solid fa-circle-play"></i>
                             </div>
                         </div>
                         <div>
-                            <div class="action pause" l-ref="action-pause">
+                            <div class="action pause" l-ref="action-pause" tabindex="1003">
                                 <i class="fa-solid fa-circle-pause"></i>
                             </div>
                         </div>
                         <div>
-                            <div class="action stop" l-ref="action-stop">
+                            <div class="action stop" l-ref="action-stop" tabindex="1004">
                                 <i class="fa-solid fa-circle-stop"></i>
                             </div>
                         </div>

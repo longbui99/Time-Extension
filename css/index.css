@@ -323,7 +323,8 @@ body {
     font-size: 1.1em;
 }
 
-.main-page .main-action-page .ticket.search-bar p:hover {
+.main-page .main-action-page .ticket.search-bar p:hover,
+.main-page .main-action-page .ticket.search-bar p:focus-visible {
     background-color: var(--primary);
     color: white;
 }
