@@ -611,6 +611,12 @@ class Main extends Component {
                 self.searchRef.el.click();
                 self.searchRef.el.focus();
             }
+            if (event.keyCode === 77 && window.event.ctrlKey){
+                self.timeLogHeadingRef.el.children[0].click();
+            }
+            if (event.keyCode === 67 && window.event.ctrlKey){
+                self.acHeadingRef.el.children[0].click();
+            }
         })
     }
     mounted() {
