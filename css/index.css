@@ -197,7 +197,7 @@ body {
     color: var(--primary);
 }
 .main-page .main-action-page .acceptance-criteria {
-    min-width: 450px;
+    min-width: 475px;
     padding: 5px 10px;
 }
 
@@ -282,13 +282,13 @@ body {
 }
 
 .main-page .main-action-page .acceptance-criteria .ac-content .ac-container.initial .ac-segment .form-check-label{
-    display: flex;
-    align-items: center;
-    justify-items: left;
     padding-left: 10px;
     font-weight: 400;
     border-bottom: solid 1px lightgray;
     outline: none;
+}
+.main-page .main-action-page .acceptance-criteria .ac-content .ac-container.initial .ac-segment .form-check-label *{
+    display: inline-block;
 }
 
 .main-page .main-action-page .ticket {
