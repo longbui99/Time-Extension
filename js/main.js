@@ -360,7 +360,7 @@ class Main extends Component {
         })
     }
     makeACComponent(_id, ac, content){
-        return `<div class="ac-container ${(ac.is_header?'header': '')} ${(ac.initial?'initial': '')}" sequence=${ac.sequence} header=${ac.is_header}>
+        return `<div class="ac-container ${(ac.is_header?'header': '')} ${(ac.initial?'initial': '')}" sequence=${ac.sequence} header=${ac.is_header} float_sequence=${ac.float_sequence}>
             <div class="ac-segment d-flex justify-content-between">
             <div class="form-check">
                 <input class="form-check-input" type="checkbox" value="${ac.id}" id="${_id}" ${ac.checked?'checked': ''}>
@@ -376,9 +376,8 @@ class Main extends Component {
             payload.checked = element.previousElementSibling.checked || false;
             payload.name = el.innerHTML;
             payload.is_header = parent.getAttribute('header') == "true";
-            if (parseInt(element.getAttribute('id')) !== NaN){
-                payload.sequence = parent.previousElementSibling?.getAttribute('sequence');
-                if (payload.sequence === "undefined") payload.sequence = 0;
+            if (parent.getAttribute("sequence") === "undefined"){
+                payload.float_sequence = parseFloat(parent.getAttribute("float_sequence")) || 0;
             }
             payload.ticket_id = this.ticketData.id;
             params.id = parseInt(element.previousElementSibling.value) || 0
@@ -419,7 +418,7 @@ class Main extends Component {
             event.stopPropagation();
         })
         element.addEventListener('keydown', (event) => {
-            if (event.keyCode === 8 && element.innerText.trim() === "" && window.event.ctrlKey && !baseParent.classList.contains('initial')) {
+            if ((event.keyCode === 8 && window.event.ctrlKey) && !baseParent.classList.contains('initial')) {
                 (baseParent.previousElementSibling || baseParent.nextElementSibling).querySelector('.form-check-label').focus();
                 baseParent.remove();
                 if (parseInt(element.previousElementSibling.value)){
@@ -429,31 +428,41 @@ class Main extends Component {
             if (event.keyCode === 13 && !window.event.shiftKey) {
                 element.classList.remove('editing');
                 let data = {
-                    'sequence': baseParent.previousElementSibling?.getAttribute('sequence') || 0,
                     'is_header': (baseParent.getAttribute('header') === "true")
                 }
+                let fromInitial =  baseParent.classList.contains('initial');
+                let sequencePivot = (fromInitial?baseParent.previousElementSibling: baseParent)
+                if (sequencePivot.getAttribute("sequence") === "undefined"){
+                    data.float_sequence = parseInt(sequencePivot.getAttribute("float_sequence")) || 0
+                }
+                else{
+                    data.float_sequence = parseInt(sequencePivot.getAttribute("sequence")) || 0
+                }
+                data.float_sequence += 0.01
                 let newAC = new DOMParser().parseFromString(self.makeACComponent('', data, ''), 'text/html').body.firstChild;
                 let content = ""
-                if (baseParent.classList.contains('initial')) {
+                if (fromInitial) {
                     baseParent.parentNode.insertBefore(newAC, baseParent);
                     content = element.innerHTML;
                     setTimeout(() => {
                         element.innerHTML = ""
                     }, 1)
                     element.focus();
+                    element.classList.add('editing');
                     let HandlingElement = baseParent.previousElementSibling;
                     self.pushAC(element, params, HandlingElement)
                 } else {
                     if (!window.event.ctrlKey){
                         baseParent.parentNode.insertBefore(newAC, baseParent.nextSibling);
                         newAC.querySelector('.form-check-label').focus();
+                        newAC.querySelector('.form-check-label').classList.add('editing');
                     }
                     self.pushAC(element, params, baseParent)
                 }
                 if (!window.event.ctrlKey || baseParent.classList.contains('initial')){
                     self.initEditACEvent(newAC.querySelector('.form-check-label'), params);
                     setTimeout(() => {
-                        newAC.querySelector('.form-check-label').innerHTML = content
+                        newAC.querySelector('.form-check-label').innerHTML = content;
                     }, 1)
                 }
                 event.stopPropagation();
