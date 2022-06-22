@@ -636,7 +636,6 @@ class Main extends Component {
                 event.srcElement.classList.contains('drag-icon') || 
                 event.srcElement.nodeName === "path"){
                     this.initDragEventRoot(element, event)
-                    event.oreventDefault();
                 }
             })
         }
