@@ -78,21 +78,37 @@ class Main extends Component {
                         ${this._getDisplayName(record, 22)}
                     </span>
                     <span class="duration">
-                        ${this.secondToString(record.my_total_duration + record.active_duration)}
+                        ${this.secondToString(record.active_duration)}
                     </span>
                 </div>`
             i++;
-        }
+        }   
         this.relatedActiveRef.el.innerHTML = template;
         let elements = this.relatedActiveRef.el.querySelectorAll('.push-relative-ticket')
         let self = this;
+        let progressLog = []
         for (let index = 0; index < elements.length; index++) {
             elements[index].addEventListener('click', event => {
                 if (self.ticketData) self._pauseWorkLog(this.ticketData.id, false);
                 self.ticketData = self.relatedActiveTickets[index];
                 self.storeAndRenderTicket(true)
             })
+            if (self.relatedActiveTickets[index].last_start){
+                progressLog.push({el:elements[index].parentNode.querySelector('.duration'), active_duration: self.relatedActiveTickets[index].active_duration})
+            }
         }
+        if (progressLog){
+            if (this.relatedCurrentInterval){
+                clearInterval(this.relatedCurrentInterval)
+            }
+            let pivotTime = new Date().getTime();
+            this.relatedCurrentInterval = setInterval(() => {
+                for (let progress of progressLog){
+                    progress.el.innerText =this.secondToString(parseInt(progress.active_duration + (new Date().getTime() - pivotTime) / 1000));
+                }
+            }, 500)
+        }
+
     }
     async fetchTicketFromServer(){
         let response = (await this.do_request(`${this.subEnv.serverURL}/management/ticket/fetch/${this.ticketData.id}?jwt=${this.subEnv.jwt}`));
@@ -161,19 +177,12 @@ class Main extends Component {
     }
     storeAndRenderTicket(refresh = false) {
         this.renderContent()
-        // if (chrome?.storage) {
-        //     let data = (await chrome.storage.sync.get([storage]));
-        //     data.ticketData = this.ticketData;
-        //     await chrome.storage.sync.set({ 'timeLogStorage': data })
-        // }
-        // else {
         let data = JSON.parse(localStorage.getItem(storage) || "{}");
         data.ticketData = this.ticketData;
         localStorage.setItem(storage, JSON.stringify(data))
-        // }
     }
     async chooseTicket(index) {
-        if (this.ticketData) this._pauseWorkLog(this.ticketData.id, false);
+        // if (this.ticketData) this._pauseWorkLog(this.ticketData.id, false);
         this.ticketData = this.loadedData[index];
         this.searchResultRef.el.style.display = 'none';
         this.storeAndRenderTicket()
@@ -360,7 +369,7 @@ class Main extends Component {
         })
     }
     makeACComponent(_id, ac, content){
-        return `<div class="ac-container ${(ac.is_header?'header': '')} ${(ac.initial?'initial': '')}" sequence=${ac.sequence} header=${ac.is_header} float_sequence=${ac.float_sequence}>
+        return `<div class="ac-container ${(ac.is_header?'header': '')} ${(ac.initial?'initial': '')}" sequence=${ac.sequence} header=${ac.is_header}>
             <div class="ac-segment d-flex justify-content-between">
             <div class="form-check">
                 <input class="form-check-input" type="checkbox" value="${ac.id}" id="${_id}" ${ac.checked?'checked': ''}>
@@ -376,9 +385,7 @@ class Main extends Component {
             payload.checked = element.previousElementSibling.checked || false;
             payload.name = el.innerHTML;
             payload.is_header = parent.getAttribute('header') == "true";
-            if (parent.getAttribute("sequence") === "undefined"){
-                payload.float_sequence = parseFloat(parent.getAttribute("float_sequence")) || 0;
-            }
+            payload.sequence = parseInt(parent.getAttribute("sequence")) || 0;
             payload.ticket_id = this.ticketData.id;
             params.id = parseInt(element.previousElementSibling.value) || 0
             params.payload = JSON.stringify(payload)
@@ -432,13 +439,7 @@ class Main extends Component {
                 }
                 let fromInitial =  baseParent.classList.contains('initial');
                 let sequencePivot = (fromInitial?baseParent.previousElementSibling: baseParent)
-                if (sequencePivot.getAttribute("sequence") === "undefined"){
-                    data.float_sequence = parseInt(sequencePivot.getAttribute("float_sequence")) || 0
-                }
-                else{
-                    data.float_sequence = parseInt(sequencePivot.getAttribute("sequence")) || 0
-                }
-                data.float_sequence += 0.01
+                data.sequence = parseInt(sequencePivot.getAttribute("sequence")) + 1;
                 let newAC = new DOMParser().parseFromString(self.makeACComponent('', data, ''), 'text/html').body.firstChild;
                 let content = ""
                 if (fromInitial) {
@@ -463,6 +464,10 @@ class Main extends Component {
                     self.initEditACEvent(newAC.querySelector('.form-check-label'), params);
                     setTimeout(() => {
                         newAC.querySelector('.form-check-label').innerHTML = content;
+                        while (newAC.nextElementSibling){
+                            newAC = newAC.nextElementSibling;
+                            newAC.setAttribute("sequence", parseInt(newAC.getAttribute("sequence")) + 1)
+                        }
                     }, 1)
                 }
                 event.stopPropagation();
