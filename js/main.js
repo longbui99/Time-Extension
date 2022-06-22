@@ -371,6 +371,7 @@ class Main extends Component {
     makeACComponent(_id, ac, content){
         return `<div class="ac-container ${(ac.is_header?'header': '')} ${(ac.initial?'initial': '')}" sequence=${ac.sequence} header=${ac.is_header}>
             <div class="ac-segment d-flex justify-content-between">
+            ${(ac.initial?'': '<span class="drag-object"><i class="drag-icon fas fa-sort"></i></span>')}
             <div class="form-check">
                 <input class="form-check-input" type="checkbox" value="${ac.id}" id="${_id}" ${ac.checked?'checked': ''}>
                 <label class="form-check-label" contenteditable="true">${content}</label>
@@ -496,6 +497,98 @@ class Main extends Component {
             }
         })
     }
+    
+    initDragEvent(parentElement, element, event){
+        let acElement = element, self = this;
+        while (!acElement.classList.contains('ac-container')) acElement = acElement.parentNode;
+        let clonedElement = acElement.cloneNode();
+        // Get boundary
+        var rect = acElement.getBoundingClientRect();
+        // Set drag element object
+        acElement.classList.add('dragging')
+        acElement.style.top = rect.top.toFixed(2) + "px";
+        acElement.style.left = rect.left.toFixed(2) + "px";
+        acElement.style.height = rect.height.toFixed(2) + "px";
+        acElement.style.width = rect.width.toFixed(2) + "px";
+        // Clone the object and set it to base parent
+        clonedElement.style.height = rect.height.toFixed(2) + "px";
+        parentElement.insertBefore(clonedElement, acElement);
+        // Move element with the position of mouse
+        let mouseY = event.pageY;
+        let areaRect = parentElement.getBoundingClientRect();
+        // Fetch all visible tags
+        function getBoundary(element, res){
+            let boundary = element.getBoundingClientRect();
+            res.center = boundary.top + boundary.height/2;
+            res.top = boundary.top;
+            res.bottom = boundary.bottom;
+        }
+        let clientTags = [], currentPosition = -1, index = 0;
+        for (let el of acElement.parentNode.childNodes){
+            if (el != acElement){
+                let res = {el: el}
+                clientTags.push(res);
+                getBoundary(el, res);
+                if (el == clonedElement){
+                    currentPosition = index;
+                }
+            } 
+            index++
+        }
+        function swap(i, j){
+            let res1 = clientTags[i], res2 = clientTags[j];
+            clientTags[i] = res2;
+            clientTags[j] = res1;
+            if (i > j){
+                res2.el.parentNode.insertBefore(res1.el, res2.el);
+            } else {
+                res2.el.parentNode.insertBefore(res1.el, res2.el.nextElementSibling);
+            }
+            getBoundary(res1.el, res1);
+            getBoundary(res2.el, res2);
+        }
+        function mouseMoveEvent(event){
+            if (event.pageY <= areaRect.bottom && event.pageY >= areaRect.top){
+                let position = (rect.top + event.pageY - mouseY)
+                acElement.style.top = position.toFixed(2) + "px";
+                if (currentPosition > 0 && position < clientTags[currentPosition-1].center && position < clientTags[currentPosition].center){
+                    swap(currentPosition, currentPosition-1)
+                    currentPosition--;
+                } else 
+                if (currentPosition < clientTags.length && position > clientTags[currentPosition+1].top && position > clientTags[currentPosition].top){
+                    swap(currentPosition, currentPosition+1)
+                    currentPosition++;
+                }
+            }
+        }
+        function mouseUpEvent(event){
+            element.removeEventListener("mousedown", self.initDragEventRoot);
+            window.removeEventListener("mousemove", mouseMoveEvent);
+            window.removeEventListener("mouseup", mouseUpEvent);
+            acElement.classList.remove("dragging");
+            acElement.parentNode.insertBefore(acElement, clientTags[currentPosition].el);
+            clientTags[currentPosition].el.remove();
+            clientTags[currentPosition].el = acElement;
+            let params = {
+                "id": self.ticketData.id,
+                "jwt": self.subEnv.jwt
+            }
+            let payload = {};
+            payload.sequence = parseInt(clientTags[currentPosition-1]?.el.getAttribute("sequence")) || -1;
+            payload.float_sequence = 1;
+            params.id = parseInt(acElement.querySelector('.form-check-input').value) || 0
+            params.payload = JSON.stringify(payload)
+            self.do_invisible_request(`${self.subEnv.serverURL}/management/ac?${new URLSearchParams(params)}`);
+            for (let index = 0; index < clientTags.length; index++){
+                clientTags[index].el.setAttribute("sequence", index)
+            }
+        }
+        window.addEventListener("mousemove", mouseMoveEvent)
+        window.addEventListener("mouseup", mouseUpEvent)
+    }
+    initDragEventRoot(element, event){
+        this.initDragEvent(element, event.srcElement, event)
+    }
     async initACs() {
         let element = this.acContainerRef.el, self = this;
         element.innerHTML = "";
@@ -519,17 +612,15 @@ class Main extends Component {
             result = (await result.json())
             this.acs = result;
             result.push(default_data)
-            if (result.length){
-                let string = ""
-                for (let ac of result){
-                    let _id = uniqueID(ac.id)
-                    let parsedData = parseAC(ac.content)
-                    string += this.makeACComponent(_id, ac, parsedData)
-                }
-                element.innerHTML = string
-                for (let ac of element.querySelectorAll('.form-check-label')){
-                    this.initEditACEvent(ac, params)
-                }
+            let string = ""
+            for (let ac of result){
+                let _id = uniqueID(ac.id)
+                let parsedData = parseAC(ac.content)
+                string += this.makeACComponent(_id, ac, parsedData)
+            }
+            element.innerHTML = string
+            for (let ac of element.querySelectorAll('.form-check-label')){
+                this.initEditACEvent(ac, params)
             }
             window.addEventListener('click', event=>{
                 let selectedElement = element.querySelector('.editing')
@@ -538,6 +629,14 @@ class Main extends Component {
                     let baseParent = selectedElement
                     while (!baseParent.classList.contains('ac-container')) baseParent = baseParent.parentNode;
                     self.pushAC(selectedElement, params, baseParent)
+                }
+            })
+            element.addEventListener('mousedown', event=>{
+                if (event.srcElement.classList.contains('drag-object') || 
+                event.srcElement.classList.contains('drag-icon') || 
+                event.srcElement.nodeName === "path"){
+                    this.initDragEventRoot(element, event)
+                    event.oreventDefault();
                 }
             })
         }
