@@ -386,7 +386,8 @@ class Main extends Component {
             payload.checked = element.previousElementSibling.checked || false;
             payload.name = el.innerHTML;
             payload.is_header = parent.getAttribute('header') == "true";
-            payload.sequence = parseInt(parent.getAttribute("sequence")) || 0;
+            payload.sequence = parseInt(parent.previousElementSibling.getAttribute("sequence")) || 0;
+            payload.float_sequence = 1;
             payload.ticket_id = this.ticketData.id;
             params.id = parseInt(element.previousElementSibling.value) || 0
             params.payload = JSON.stringify(payload)
@@ -416,18 +417,28 @@ class Main extends Component {
         let self = this;
         let baseParent = element
         while (!baseParent.classList.contains('ac-container')) baseParent = baseParent.parentNode;
+        function resetSequence(){
+            for (let index = 0; index < baseParent.parentNode.childNodes.length; index++){
+                baseParent.parentNode.childNodes[index].setAttribute("sequence", index)
+            }
+        }
         element.previousElementSibling.addEventListener('change', event=>{
             self.pushAC(element, params, baseParent)
         })
         element.addEventListener('click', (event) => {
-            window.selectedElement = element;
-            self.acContainerRef.el.querySelector('.editing')?.classList.remove('editing')
-            element.classList.add('editing')
+            if (element != window.selectedElement){
+                let clickedElement = self.acContainerRef.el.querySelector('.editing');
+                clickedElement?.classList.remove('editing');
+                element.classList.add('editing');
+                window.selectedElement = element;
+            }
             event.stopPropagation();
         })
         element.addEventListener('keydown', (event) => {
             if ((event.keyCode === 8 && window.event.ctrlKey) && !baseParent.classList.contains('initial')) {
-                (baseParent.previousElementSibling || baseParent.nextElementSibling).querySelector('.form-check-label').focus();
+                let el = (baseParent.previousElementSibling || baseParent.nextElementSibling).querySelector('.form-check-label')
+                el.focus();
+                window.selectedElement = el;
                 baseParent.remove();
                 if (parseInt(element.previousElementSibling.value)){
                     self.do_invisible_request(`${self.subEnv.serverURL}/management/ac/delete/${parseInt(element.previousElementSibling.value)}?jwt=${self.subEnv.jwt}`)
@@ -442,6 +453,7 @@ class Main extends Component {
                 let sequencePivot = (fromInitial?baseParent.previousElementSibling: baseParent)
                 data.sequence = parseInt(sequencePivot.getAttribute("sequence")) + 1;
                 let newAC = new DOMParser().parseFromString(self.makeACComponent('', data, ''), 'text/html').body.firstChild;
+                
                 let content = ""
                 if (fromInitial) {
                     baseParent.parentNode.insertBefore(newAC, baseParent);
@@ -452,14 +464,17 @@ class Main extends Component {
                     element.focus();
                     element.classList.add('editing');
                     let HandlingElement = baseParent.previousElementSibling;
-                    self.pushAC(element, params, HandlingElement)
+                    self.pushAC(element, params, HandlingElement);
+                    resetSequence();
                 } else {
                     if (!window.event.ctrlKey){
                         baseParent.parentNode.insertBefore(newAC, baseParent.nextSibling);
                         newAC.querySelector('.form-check-label').focus();
                         newAC.querySelector('.form-check-label').classList.add('editing');
+                        window.selectedElement = newAC.querySelector('.form-check-label');
                     }
-                    self.pushAC(element, params, baseParent)
+                    self.pushAC(element, params, baseParent);
+                    resetSequence();
                 }
                 if (!window.event.ctrlKey || baseParent.classList.contains('initial')){
                     self.initEditACEvent(newAC.querySelector('.form-check-label'), params);
@@ -576,7 +591,6 @@ class Main extends Component {
             }
         }
         function mouseUpEvent(event){
-            element.removeEventListener("mousedown", self.initDragEventRoot);
             window.removeEventListener("mousemove", mouseMoveEvent);
             window.removeEventListener("mouseup", mouseUpEvent);
             acElement.classList.remove("dragging");
@@ -601,6 +615,7 @@ class Main extends Component {
         window.addEventListener("mouseup", mouseUpEvent)
     }
     initDragEventRoot(element, event){
+        element.removeEventListener("mousedown", self.initDragEventRoot);
         this.initDragEvent(element, event.srcElement, event)
     }
     async initACs() {
@@ -650,6 +665,7 @@ class Main extends Component {
                 event.srcElement.classList.contains('drag-icon') || 
                 event.srcElement.nodeName === "path"){
                     this.initDragEventRoot(element, event)
+                    event.stopImmediatePropagation();
                 }
             })
         }
