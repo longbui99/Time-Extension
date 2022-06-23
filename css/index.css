@@ -272,6 +272,10 @@ body {
     color: var(--primary)!important;
 }
 
+.clone-drag {
+    border: dashed 2px var(--primary);
+}
+
 .main-page .main-action-page .acceptance-criteria .ac-content .ac-container .ac-segment .form-check-input:checked{
     background-color: var(--primary);
     border-color: var(--primary);

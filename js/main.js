@@ -511,10 +511,11 @@ class Main extends Component {
         acElement.style.height = rect.height.toFixed(2) + "px";
         acElement.style.width = rect.width.toFixed(2) + "px";
         // Clone the object and set it to base parent
-        clonedElement.style.height = rect.height.toFixed(2) + "px";
+        clonedElement.style.height = (rect.height).toFixed(2) + "px";
+        clonedElement.classList.add('clone-drag')
         parentElement.insertBefore(clonedElement, acElement);
         // Move element with the position of mouse
-        let mouseY = event.pageY;
+        let mouseX = event.pageX, mouseY = event.pageY;
         // Fetch all visible tags
         function getBoundary(element, res){
             let boundary = element.getBoundingClientRect();
@@ -563,6 +564,7 @@ class Main extends Component {
                 let position = (rect.top + event.pageY - mouseY)
                 // console.log(position.toFixed(2), clientTags[currentPosition-1].center.toFixed(2), (clientTags[currentPosition].center).toFixed(2), clientTags[currentPosition+1].top.toFixed(2))
                 acElement.style.top = (position + startScroll - window.scrollY).toFixed(2) + "px";
+                acElement.style.left = (rect.left + event.pageX - mouseX).toFixed(2) + "px";
                 if (currentPosition > 0 && position < clientTags[currentPosition-1].center && (position < clientTags[currentPosition].center)){
                     swap(currentPosition, currentPosition-1)
                     currentPosition--;
