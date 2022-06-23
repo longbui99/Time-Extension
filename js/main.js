@@ -394,6 +394,7 @@ class Main extends Component {
             let res = (await this.do_invisible_request(`${this.subEnv.serverURL}/management/ac?${new URLSearchParams(params)}`));
             let result = (await res.json());
             element.previousElementSibling.value = result;
+            parent.classList.remove("unsaved");
         }
     }
     initEditACEvent(element, params){
@@ -430,6 +431,11 @@ class Main extends Component {
                 let clickedElement = self.acContainerRef.el.querySelector('.editing');
                 clickedElement?.classList.remove('editing');
                 element.classList.add('editing');
+                if (window.selectedElement){
+                    let basePushElement = window.selectedElement;
+                    while (!basePushElement.classList.contains('ac-container')) basePushElement = basePushElement.parentNode;
+                    self.pushAC(window.selectedElement, params, basePushElement)
+                }
                 window.selectedElement = element;
             }
             event.stopPropagation();
@@ -444,16 +450,16 @@ class Main extends Component {
                     self.do_invisible_request(`${self.subEnv.serverURL}/management/ac/delete/${parseInt(element.previousElementSibling.value)}?jwt=${self.subEnv.jwt}`)
                 }
             }
-            if (event.keyCode === 13 && !window.event.shiftKey) {
+            else if (event.keyCode === 13 && !window.event.shiftKey) {
                 element.classList.remove('editing');
                 let data = {
                     'is_header': (baseParent.getAttribute('header') === "true")
                 }
                 let fromInitial =  baseParent.classList.contains('initial');
                 let sequencePivot = (fromInitial?baseParent.previousElementSibling: baseParent)
-                data.sequence = parseInt(sequencePivot.getAttribute("sequence")) + 1;
+                data.sequence = (parseInt(sequencePivot?.getAttribute("sequence")) + 1) || 0;
                 let newAC = new DOMParser().parseFromString(self.makeACComponent('', data, ''), 'text/html').body.firstChild;
-                
+                newAC.classList.add("unsaved");
                 let content = ""
                 if (fromInitial) {
                     baseParent.parentNode.insertBefore(newAC, baseParent);
@@ -488,27 +494,38 @@ class Main extends Component {
                 }
                 event.stopPropagation();
             }
-            if (window.event.ctrlKey && event.keyCode === 191){
+            else if (window.event.ctrlKey && event.keyCode === 191){
                 let isHeader = !(baseParent.getAttribute("header", false) == "true");
                 baseParent.setAttribute("header", isHeader);
                 baseParent.classList.remove('header');
                 isHeader && baseParent.classList.add(isHeader?'header':'');
             }
-            if (event.keyCode === 38){
+            else if (event.keyCode === 38){
                 let el = baseParent.previousElementSibling?.querySelector('.form-check-label');
-                if (el){
-                    el.click();
-                    placeCaretAtEnd(el);
+                window.selectedElement = el;
+                if (!parseInt(element.previousElementSibling.value)){
+                    self.pushAC(element, params, baseParent);
                 }
-                event.stopPropagation();
-            }
-            if (event.keyCode === 40){
-                let el = baseParent.nextElementSibling?.querySelector('.form-check-label');
                 if (el){
                     el.click();
                     el.focus();
                 }
                 event.stopPropagation();
+            }
+            else if (event.keyCode === 40){
+                let el = baseParent.nextElementSibling?.querySelector('.form-check-label');
+                window.selectedElement = el;
+                if (!parseInt(element.previousElementSibling.value)){
+                    self.pushAC(element, params, baseParent);
+                }
+                if (el){
+                    el.click();
+                    el.focus();
+                }
+                event.stopPropagation();
+            }
+            else {
+                baseParent.classList.add("unsaved")
             }
         })
     }

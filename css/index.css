@@ -281,6 +281,14 @@ body {
     border-color: var(--primary);
 }
 
+.main-page .main-action-page .acceptance-criteria .ac-content .ac-container.unsaved .form-check-input{
+    border: dashed 2px var(--primary);
+}
+
+.main-page .main-action-page .acceptance-criteria .ac-content .ac-container.unsaved .form-check-input:checked{
+    border-color: white;
+}
+
 .main-page .main-action-page .acceptance-criteria .ac-content .ac-container .ac-segment .form-check-label{
     outline: none;
     width: 100%;
