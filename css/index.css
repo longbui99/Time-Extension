@@ -311,11 +311,7 @@ body {
     display: none;
 }
 
-.main-page .main-action-page .acceptance-criteria .ac-content .ac-container.unsaved.header .form-check-input{
-    border: dashed 2px var(--primary);
-}
-
-.main-page .main-action-page .acceptance-criteria .ac-content .ac-container.unsaved .form-check-label{
+.main-page .main-action-page .acceptance-criteria .ac-content .ac-container.unsaved.header .form-check-label{
     border-left: solid 2px var(--primary);
 }
 

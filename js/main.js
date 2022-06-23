@@ -372,12 +372,13 @@ class Main extends Component {
         })
     }
     makeACComponent(_id, ac, content){
-        return `<div class="ac-container ${(ac.is_header?'header': '')} ${(ac.initial?'initial': '')}" sequence=${ac.sequence} header=${ac.is_header}>
+        return `<div class="ac-container ${(ac.is_header?'header': 'base')} ${(ac.initial?'initial': '')}" sequence=${ac.sequence} header=${ac.is_header}>
             <div class="ac-segment d-flex justify-content-between">
             ${(ac.initial?'': '<span class="drag-object"><i class="drag-icon fas fa-sort"></i></span>')}
             <div class="form-check">
                 <input class="form-check-input" type="checkbox" value="${ac.id}" id="${_id}" ${ac.checked?'checked': ''}>
                 <label class="form-check-label" contenteditable="true">${content}</label>
+                <span class="original-value" style="display:none">${content}</span>
                 </div>
             </div>
         </div>`
@@ -389,7 +390,7 @@ class Main extends Component {
             payload.checked = element.previousElementSibling.checked || false;
             payload.name = el.innerHTML;
             payload.is_header = parent.getAttribute('header') == "true";
-            payload.sequence = parseInt(parent.previousElementSibling.getAttribute("sequence")) || 0;
+            payload.sequence = parseInt(parent.previousElementSibling?.getAttribute("sequence")) || 0;
             payload.float_sequence = 1;
             payload.ticket_id = this.ticketData.id;
             params.id = parseInt(element.previousElementSibling.value) || 0
@@ -401,23 +402,6 @@ class Main extends Component {
         }
     }
     initEditACEvent(element, params){
-        function placeCaretAtEnd(el) {
-            el.focus();
-            if (typeof window.getSelection != "undefined"
-                    && typeof document.createRange != "undefined") {
-                var range = document.createRange();
-                range.selectNodeContents(el);
-                range.collapse(false);
-                var sel = window.getSelection();
-                sel.removeAllRanges();
-                sel.addRange(range);
-            } else if (typeof document.body.createTextRange != "undefined") {
-                var textRange = document.body.createTextRange();
-                textRange.moveToElementText(el);
-                textRange.collapse(false);
-                textRange.select();
-            }
-        }
         let self = this;
         let baseParent = element
         while (!baseParent.classList.contains('ac-container')) baseParent = baseParent.parentNode;
@@ -501,7 +485,7 @@ class Main extends Component {
                 let isHeader = !(baseParent.getAttribute("header", false) == "true");
                 baseParent.setAttribute("header", isHeader);
                 baseParent.classList.remove('header');
-                isHeader && baseParent.classList.add(isHeader?'header':'');
+                isHeader && baseParent.classList.add(isHeader?'header':'base');
             }
             else if (event.keyCode === 38){
                 let el = baseParent.previousElementSibling?.querySelector('.form-check-label');
@@ -527,8 +511,12 @@ class Main extends Component {
                 }
                 event.stopPropagation();
             }
-            else {
-                baseParent.classList.add("unsaved")
+        })
+        element.addEventListener('keyup', (event) => {
+            if (element.innerHTML.trim() != element.nextElementSibling.innerHTML){
+                baseParent.classList.add("unsaved");
+            } else {
+                baseParent.classList.remove("unsaved");
             }
         })
     }
@@ -593,7 +581,6 @@ class Main extends Component {
             'top': clientTags[0].top,
             'bottom': clientTags[clientTags.length-1].bottom,
         }
-        console.log(clientTags)
         function mouseMoveEvent(event){
             if (event.pageY >= areaRect.top){
                 let position = (rect.top + event.pageY - mouseY)
