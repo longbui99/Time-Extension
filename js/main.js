@@ -27,6 +27,8 @@ class Main extends Component {
         super(...arguments);
         this.ticketData = this.subEnv.ticketData || null;
         this.loadedData = [];
+        this.loadID = uniqueID();
+        this.trigger_up("load_start", this.loadID)
         this.secondToString = parseSecondToString(this.subEnv.resource.hrs_per_day, this.subEnv.resource.days_per_week)
         this.openTicketNaviagor = this.openTicketNaviagor.bind(this);
     }
@@ -399,6 +401,7 @@ class Main extends Component {
             let result = (await res.json());
             element.previousElementSibling.value = result;
             parent.classList.remove("unsaved");
+            el.nextElementSibling.innerHTML = el.innerHTML.trim();
         }
     }
     initEditACEvent(element, params){
@@ -638,7 +641,11 @@ class Main extends Component {
                 "payload": JSON.stringify(payload)
             }
             let result = "";
-            result = (await this.do_invisible_request(`${this.subEnv.serverURL}/management/ticket/ac?${new URLSearchParams(params)}`));
+            if (this.subEnv.contentState.showLog){
+                result = (await this.do_invisible_request(`${this.subEnv.serverURL}/management/ticket/ac?${new URLSearchParams(params)}`));
+            } else{
+                result = (await this.do_request(`${this.subEnv.serverURL}/management/ticket/ac?${new URLSearchParams(params)}`));
+            }
             let default_data = {
                 'id':false,
                 'content': '',
@@ -720,13 +727,7 @@ class Main extends Component {
             self.trigger_up('set-env', self.subEnv)
         })
     }
-    renderContent(){
-        if (this.subEnv.contentState.showLog){
-            this.renderTicketData(true);
-        } 
-        if (this.subEnv.contentState.showAC) {
-            this.initACs();
-        }
+    async renderContent(){
         if (this.ticketData){
             this.ticketData.displayName = this._getDisplayName(this.ticketData);
             this.searchRef.el.value = this.ticketData.displayName;
@@ -746,6 +747,13 @@ class Main extends Component {
         } else {
             this.el.querySelector('.ticket-navigation').style.display = "none";
         }
+        if (this.subEnv.contentState.showLog){
+            await this.renderTicketData(true);
+        } 
+        if (this.subEnv.contentState.showAC) {
+            await this.initACs();
+        }
+        this.trigger_up("load_done", this.loadID)
     }
     initEvent() {
         let self = this;

@@ -13,13 +13,16 @@ class Home extends Component {
     'authentication-failed': this.onAuthenticationFailed,
     'loading': this.onLoading,
     'error': this.onError,
-    'session_errors': this.onSessionError
+    'session_errors': this.onSessionError,
+    'load_start': this.onLoadStart,
+    'load_done': this.onLoadDone,
   }
   constructor() {
     super(...arguments);
     this.payload = {};
     // this.onAuthentication = this.onAuthentication.bind(this);
     this.subEnv = {};
+    this.load = {}
   }
   async loadAuthentication() {
     let self = this;
@@ -37,6 +40,14 @@ class Home extends Component {
       self.onAuthentication(self.payload, false);
     })
   }
+  scrollEvent(){
+    window.addEventListener('scroll', event=>{
+      localStorage.setItem("localScrollStorage", window.pageYOffset);
+    })
+  }
+  initGeneralEvent(){
+    this.scrollEvent();
+  }
   async
   mountingComponent() {
     if (this.payload?.authenticated) {
@@ -50,6 +61,7 @@ class Home extends Component {
       this.el.classList.remove('logged');
     }
     this.component.mount(this.processMainRef.el)
+    this.initGeneralEvent();
   }
   loadUI() {
     let self = this;
@@ -92,6 +104,24 @@ class Home extends Component {
   }
   onSessionError(){
     this.onAuthentication(this.payload,   false);
+  }
+  componentReady(){
+    let lastScrollY = parseInt(localStorage.getItem('localScrollStorage')) || 0;
+    if (lastScrollY){
+      window.scrollTo(0, lastScrollY)
+    }
+  }
+  onLoadStart(data){
+    this.load[data] = false
+  }
+  onLoadDone(data){
+    this.load[data] = true
+    for (let key in this.load){
+      if (!this.load[key]){
+        return;
+      }
+    }
+    this.componentReady()
   }
   template = `
   <div class="main-page">
