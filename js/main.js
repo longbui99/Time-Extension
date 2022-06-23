@@ -114,22 +114,25 @@ class Main extends Component {
         let response = (await this.do_request(`${this.subEnv.serverURL}/management/ticket/fetch/${this.ticketData.id}?jwt=${this.subEnv.jwt}`));
         this.renderContent()
     }
-    async openTicketNaviagor(event){
+    async actionExportToOriginalServer(){
+        this.ticketData.timeStatus = null;
+        let payload = {
+            'source': 'Extension',
+            'mode': {
+                'worklog': this.subEnv.contentState.showLog,
+                'ac': this.subEnv.contentState.showAC
+            }
+        }
+        let params = {
+            "id": this.ticketData.id,
+            "jwt": this.subEnv.jwt,
+            "payload": JSON.stringify(payload)
+        }
+        await this.do_invisible_request(`${this.subEnv.serverURL}/management/ticket/export?${new URLSearchParams(params)}`);
+    }
+    openTicketNaviagor(event){
         if (window.event.ctrlKey && window.event.altKey && this.ticketData) {
-            this.ticketData.timeStatus = null;
-            let payload = {
-                'source': 'Extension',
-                'mode': {
-                    'worklog': this.subEnv.contentState.showLog,
-                    'ac': this.subEnv.contentState.showAC
-                }
-            }
-            let params = {
-                "id": this.ticketData.id,
-                "jwt": this.subEnv.jwt,
-                "payload": JSON.stringify(payload)
-            }
-            await this.do_invisible_request(`${this.subEnv.serverURL}/management/ticket/export?${new URLSearchParams(params)}`);
+            this.actionExportToOriginalServer()
         } 
         else {
             window.open(this.ticketData.url, '_blank')
@@ -780,6 +783,9 @@ class Main extends Component {
             }
             if (event.keyCode === 50 && window.event.ctrlKey && window.event.shiftKey){
                 self.acHeadingRef.el.children[0].click();
+            }
+            if (event.keyCode === 69 && window.event.ctrlKey && window.event.shiftKey){
+                self.actionExportToOriginalServer();
             }
         })
     }

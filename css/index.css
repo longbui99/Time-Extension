@@ -294,6 +294,7 @@ body {
     width: 100%;
     margin-left: 10px;
     cursor: pointer;
+    border-left: none;
 }
 
 .main-page .main-action-page .acceptance-criteria .ac-content .ac-container.header .ac-segment .form-check{
@@ -308,6 +309,14 @@ body {
 
 .main-page .main-action-page .acceptance-criteria .ac-content .ac-container.header .ac-segment .form-check-input{
     display: none;
+}
+
+.main-page .main-action-page .acceptance-criteria .ac-content .ac-container.unsaved.header .form-check-input{
+    border: dashed 2px var(--primary);
+}
+
+.main-page .main-action-page .acceptance-criteria .ac-content .ac-container.unsaved .form-check-label{
+    border-left: solid 2px var(--primary);
 }
 
 
