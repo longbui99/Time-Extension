@@ -515,13 +515,13 @@ class Main extends Component {
         parentElement.insertBefore(clonedElement, acElement);
         // Move element with the position of mouse
         let mouseY = event.pageY;
-        let areaRect = parentElement.getBoundingClientRect();
         // Fetch all visible tags
         function getBoundary(element, res){
             let boundary = element.getBoundingClientRect();
             res.center = boundary.top + boundary.height/2;
             res.top = boundary.top;
             res.bottom = boundary.bottom;
+            res.height = boundary.height;
         }
         let clientTags = [], currentPosition = -1, index = 0;
         for (let el of acElement.parentNode.childNodes){
@@ -535,27 +535,39 @@ class Main extends Component {
             } 
             index++
         }
+        clientTags.pop();
+        let startScroll = window.scrollY;
         function swap(i, j){
-            let res1 = clientTags[i], res2 = clientTags[j];
-            clientTags[i] = res2;
-            clientTags[j] = res1;
+            let res1 = clientTags[i], res2 = clientTags[j], t = res1.el;
             if (i > j){
                 res2.el.parentNode.insertBefore(res1.el, res2.el);
             } else {
                 res2.el.parentNode.insertBefore(res1.el, res2.el.nextElementSibling);
             }
-            getBoundary(res1.el, res1);
-            getBoundary(res2.el, res2);
+            let padding = res2.height - res1.height;
+            clientTags[j].top += padding;
+            clientTags[j].center += padding;
+            clientTags[j].bottom += padding;
+            clientTags[i].el = res2.el;
+            clientTags[j].el = t;
+            // getBoundary(res1.el, res1);
+            // getBoundary(res2.el, res2);
         }
+        let areaRect = {
+            'top': clientTags[0].top,
+            'bottom': clientTags[clientTags.length-1].bottom,
+        }
+        console.log(clientTags)
         function mouseMoveEvent(event){
-            if (event.pageY <= areaRect.bottom && event.pageY >= areaRect.top){
+            if (event.pageY >= areaRect.top){
                 let position = (rect.top + event.pageY - mouseY)
-                acElement.style.top = position.toFixed(2) + "px";
-                if (currentPosition > 0 && position < clientTags[currentPosition-1].center && position < clientTags[currentPosition].center){
+                // console.log(position.toFixed(2), clientTags[currentPosition-1].center.toFixed(2), (clientTags[currentPosition].center).toFixed(2), clientTags[currentPosition+1].top.toFixed(2))
+                acElement.style.top = (position + startScroll - window.scrollY).toFixed(2) + "px";
+                if (currentPosition > 0 && position < clientTags[currentPosition-1].center && (position < clientTags[currentPosition].center)){
                     swap(currentPosition, currentPosition-1)
                     currentPosition--;
                 } else 
-                if (currentPosition < clientTags.length && position > clientTags[currentPosition+1].top && position > clientTags[currentPosition].top){
+                if (currentPosition < clientTags.length-1 && position > clientTags[currentPosition+1].top && position > clientTags[currentPosition].top){
                     swap(currentPosition, currentPosition+1)
                     currentPosition++;
                 }
@@ -578,7 +590,7 @@ class Main extends Component {
             payload.float_sequence = 1;
             params.id = parseInt(acElement.querySelector('.form-check-input').value) || 0
             params.payload = JSON.stringify(payload)
-            self.do_invisible_request(`${self.subEnv.serverURL}/management/ac?${new URLSearchParams(params)}`);
+            // self.do_invisible_request(`${self.subEnv.serverURL}/management/ac?${new URLSearchParams(params)}`);
             for (let index = 0; index < clientTags.length; index++){
                 clientTags[index].el.setAttribute("sequence", index)
             }
