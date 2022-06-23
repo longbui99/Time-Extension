@@ -592,7 +592,7 @@ class Main extends Component {
             payload.float_sequence = 1;
             params.id = parseInt(acElement.querySelector('.form-check-input').value) || 0
             params.payload = JSON.stringify(payload)
-            // self.do_invisible_request(`${self.subEnv.serverURL}/management/ac?${new URLSearchParams(params)}`);
+            self.do_invisible_request(`${self.subEnv.serverURL}/management/ac?${new URLSearchParams(params)}`);
             for (let index = 0; index < clientTags.length; index++){
                 clientTags[index].el.setAttribute("sequence", index)
             }
