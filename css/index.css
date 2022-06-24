@@ -237,7 +237,7 @@ body {
 .main-page .main-action-page .acceptance-criteria .ac-content .ac-container .ac-segment{
     width:100%;
     display: flex;
-    align-items: center;
+    align-items: flex-start;
 }
 
 .main-page .main-action-page .acceptance-criteria .ac-content .ac-container .ac-segment .form-check{
@@ -250,6 +250,7 @@ body {
     color: lightgrey;
     cursor: pointer;
     padding-left: 10px;
+    margin-top: 3px;
 }
 .main-page .main-action-page .acceptance-criteria .ac-content .ac-container .ac-segment .drag-object:hover{
     color: var(--primary);

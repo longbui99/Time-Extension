@@ -491,28 +491,30 @@ class Main extends Component {
                 isHeader && baseParent.classList.add(isHeader?'header':'base');
             }
             else if (event.keyCode === 38){
-                let el = baseParent.previousElementSibling?.querySelector('.form-check-label');
-                window.selectedElement = el;
-                if (!parseInt(element.previousElementSibling.value)){
-                    self.pushAC(element, params, baseParent);
-                }
-                if (el){
-                    el.click();
-                    el.focus();
-                }
-                event.stopPropagation();
+                // let el = baseParent.previousElementSibling?.querySelector('.form-check-label');
+                // window.selectedElement = el;
+                // if (!parseInt(element.previousElementSibling.value)){
+                //     self.pushAC(element, params, baseParent);
+                // }
+                // if (el){
+                //     el.click();
+                //     el.focus();
+                // }
+                // event.stopPropagation();
+                console.log(element.selectionEnd)
             }
             else if (event.keyCode === 40){
-                let el = baseParent.nextElementSibling?.querySelector('.form-check-label');
-                window.selectedElement = el;
-                if (!parseInt(element.previousElementSibling.value)){
-                    self.pushAC(element, params, baseParent);
-                }
-                if (el){
-                    el.click();
-                    el.focus();
-                }
-                event.stopPropagation();
+                console.log(element.selectionEnd)
+                // let el = baseParent.nextElementSibling?.querySelector('.form-check-label');
+                // window.selectedElement = el;
+                // if (!parseInt(element.previousElementSibling.value)){
+                //     self.pushAC(element, params, baseParent);
+                // }
+                // if (el){
+                //     el.click();
+                //     el.focus();
+                // }
+                // event.stopPropagation();
             }
         })
         element.addEventListener('keyup', (event) => {
@@ -521,6 +523,19 @@ class Main extends Component {
             } else {
                 baseParent.classList.remove("unsaved");
             }
+        })
+        function recursiveRemoveAttribute(element, isRoot=false){
+            if (!isRoot){
+                while(element.attributes?.length > 0) element.removeAttribute(element.attributes[0].name);
+            }
+            for (let node of element.children){
+                recursiveRemoveAttribute(node)
+            }
+        }
+        element.addEventListener("paste", event=>{
+            setTimeout(() => {
+                recursiveRemoveAttribute(element, true)
+            }, 1);
         })
     }
     
