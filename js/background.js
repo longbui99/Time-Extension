@@ -92,13 +92,13 @@ chrome.runtime.onMessage.addListener(
             target: { tabId: tab.id },
             function: removeExistedElement,
           }, function (response) {
-            if (!chrome.runtime.lastError) {
+            if (chrome.runtime.lastError) {
               setTimeout(async () => {
                 chrome.scripting.executeScript({
                   target: { tabId: tab.id },
                   function: removeExistedElement,
                 })
-              }, 100)
+              }, 500)
             }
           })
         }
@@ -111,10 +111,10 @@ chrome.runtime.onMessage.addListener(
           if (tab.id === sender.tab.id)
             continue;
           chrome.tabs.sendMessage(tab.id, request, function (response) {
-            if (!chrome.runtime.lastError) {
+            if (chrome.runtime.lastError) {
               setTimeout(async () => {
                 chrome.tabs.sendMessage(tab.id, request)
-              }, 100)
+              }, 500)
             }
           });
         }
