@@ -28,6 +28,9 @@ class Main extends Component {
         this.ticketData = this.subEnv.ticketData || null;
         this.loadedData = [];
         this.secondToString = parseSecondToString(this.subEnv.resource?.hrs_per_day || 8, this.subEnv.resource?.days_per_week || 5)
+        this.loadID = uniqueID();
+        this.trigger_up("load_start", this.loadID)
+        this.secondToString = parseSecondToString(this.subEnv.resource.hrs_per_day, this.subEnv.resource.days_per_week)
         this.openTicketNaviagor = this.openTicketNaviagor.bind(this);
     }
     _getDisplayName(record, length = 40000) {
@@ -114,22 +117,25 @@ class Main extends Component {
         let response = (await this.do_request(`${this.subEnv.serverURL}/management/ticket/fetch/${this.ticketData.id}?jwt=${this.subEnv.jwt}`));
         this.renderContent()
     }
-    async openTicketNaviagor(event){
+    async actionExportToOriginalServer(){
+        this.ticketData.timeStatus = null;
+        let payload = {
+            'source': 'Extension',
+            'mode': {
+                'worklog': this.subEnv.contentState.showLog,
+                'ac': this.subEnv.contentState.showAC
+            }
+        }
+        let params = {
+            "id": this.ticketData.id,
+            "jwt": this.subEnv.jwt,
+            "payload": JSON.stringify(payload)
+        }
+        await this.do_invisible_request(`${this.subEnv.serverURL}/management/ticket/export?${new URLSearchParams(params)}`);
+    }
+    openTicketNaviagor(event){
         if (window.event.ctrlKey && window.event.altKey && this.ticketData) {
-            this.ticketData.timeStatus = null;
-            let payload = {
-                'source': 'Extension',
-                'mode': {
-                    'worklog': this.subEnv.contentState.showLog,
-                    'ac': this.subEnv.contentState.showAC
-                }
-            }
-            let params = {
-                "id": this.ticketData.id,
-                "jwt": this.subEnv.jwt,
-                "payload": JSON.stringify(payload)
-            }
-            await this.do_invisible_request(`${this.subEnv.serverURL}/management/ticket/export?${new URLSearchParams(params)}`);
+            this.actionExportToOriginalServer()
         } 
         else {
             window.open(this.ticketData.url, '_blank')
@@ -374,6 +380,7 @@ class Main extends Component {
             <div class="tm-form-check">
                 <input class="tm-form-check-input" type="checkbox" value="${ac.id}" id="${_id}" ${ac.checked?'checked': ''}>
                 <label class="tm-form-check-label" contenteditable="true">${content}</label>
+                <span class="original-value" style="display:none">${content}</span>
                 </div>
             </div>
         </div>`
@@ -385,62 +392,65 @@ class Main extends Component {
             payload.checked = element.previousElementSibling.checked || false;
             payload.name = el.innerHTML;
             payload.is_header = parent.getAttribute('header') == "true";
-            payload.sequence = parseInt(parent.getAttribute("sequence")) || 0;
+            payload.sequence = parseInt(parent.previousElementSibling?.getAttribute("sequence")) || 0;
+            payload.float_sequence = 1;
             payload.ticket_id = this.ticketData.id;
             params.id = parseInt(element.previousElementSibling.value) || 0
             params.payload = JSON.stringify(payload)
             let res = (await this.do_invisible_request(`${this.subEnv.serverURL}/management/ac?${new URLSearchParams(params)}`));
             let result = (await res.json());
             element.previousElementSibling.value = result;
+            parent.classList.remove("unsaved");
+            el.nextElementSibling.innerHTML = el.innerHTML.trim();
         }
     }
     initEditACEvent(element, params){
-        function placeCaretAtEnd(el) {
-            el.focus();
-            if (typeof window.getSelection != "undefined"
-                    && typeof document.createRange != "undefined") {
-                var range = document.createRange();
-                range.selectNodeContents(el);
-                range.collapse(false);
-                var sel = window.getSelection();
-                sel.removeAllRanges();
-                sel.addRange(range);
-            } else if (typeof document.body.createTextRange != "undefined") {
-                var textRange = document.body.createTextRange();
-                textRange.moveToElementText(el);
-                textRange.collapse(false);
-                textRange.select();
-            }
-        }
         let self = this;
         let baseParent = element
         while (!baseParent.classList.contains('ac-container')) baseParent = baseParent.parentNode;
+        function resetSequence(){
+            for (let index = 0; index < baseParent.parentNode.childNodes.length; index++){
+                baseParent.parentNode.childNodes[index].setAttribute("sequence", index)
+            }
+        }
         element.previousElementSibling.addEventListener('change', event=>{
             self.pushAC(element, params, baseParent)
         })
         element.addEventListener('click', (event) => {
-            window.selectedElement = element;
-            self.acContainerRef.el.querySelector('.editing')?.classList.remove('editing')
-            element.classList.add('editing')
+            if (element != window.selectedElement){
+                let clickedElement = self.acContainerRef.el.querySelector('.editing');
+                clickedElement?.classList.remove('editing');
+                element.classList.add('editing');
+                if (window.selectedElement){
+                    let basePushElement = window.selectedElement;
+                    while (!basePushElement.classList.contains('ac-container')) basePushElement = basePushElement.parentNode;
+                    self.pushAC(window.selectedElement, params, basePushElement)
+                }
+                window.selectedElement = element;
+            }
             event.stopPropagation();
         })
         element.addEventListener('keydown', (event) => {
             if ((event.keyCode === 8 && window.event.ctrlKey) && !baseParent.classList.contains('initial')) {
                 (baseParent.previousElementSibling || baseParent.nextElementSibling).querySelector('.tm-form-check-label').focus();
+                let el = (baseParent.previousElementSibling || baseParent.nextElementSibling).querySelector('.tm-form-check-label')
+                el.focus();
+                window.selectedElement = el;
                 baseParent.remove();
                 if (parseInt(element.previousElementSibling.value)){
                     self.do_invisible_request(`${self.subEnv.serverURL}/management/ac/delete/${parseInt(element.previousElementSibling.value)}?jwt=${self.subEnv.jwt}`)
                 }
             }
-            if (event.keyCode === 13 && !window.event.shiftKey) {
+            else if (event.keyCode === 13 && !window.event.shiftKey) {
                 element.classList.remove('editing');
                 let data = {
                     'is_header': (baseParent.getAttribute('header') === "true")
                 }
                 let fromInitial =  baseParent.classList.contains('initial');
                 let sequencePivot = (fromInitial?baseParent.previousElementSibling: baseParent)
-                data.sequence = parseInt(sequencePivot.getAttribute("sequence")) + 1;
+                data.sequence = (parseInt(sequencePivot?.getAttribute("sequence")) + 1) || 0;
                 let newAC = new DOMParser().parseFromString(self.makeACComponent('', data, ''), 'text/html').body.firstChild;
+                newAC.classList.add("unsaved");
                 let content = ""
                 if (fromInitial) {
                     baseParent.parentNode.insertBefore(newAC, baseParent);
@@ -451,14 +461,17 @@ class Main extends Component {
                     element.focus();
                     element.classList.add('editing');
                     let HandlingElement = baseParent.previousElementSibling;
-                    self.pushAC(element, params, HandlingElement)
+                    self.pushAC(element, params, HandlingElement);
+                    resetSequence();
                 } else {
                     if (!window.event.ctrlKey){
                         baseParent.parentNode.insertBefore(newAC, baseParent.nextSibling);
                         newAC.querySelector('.tm-form-check-label').focus();
                         newAC.querySelector('.tm-form-check-label').classList.add('editing');
+                        window.selectedElement = newAC.querySelector('.tm-form-check-label');
                     }
-                    self.pushAC(element, params, baseParent)
+                    self.pushAC(element, params, baseParent);
+                    resetSequence();
                 }
                 if (!window.event.ctrlKey || baseParent.classList.contains('initial')){
                     self.initEditACEvent(newAC.querySelector('.tm-form-check-label'), params);
@@ -472,28 +485,56 @@ class Main extends Component {
                 }
                 event.stopPropagation();
             }
-            if (window.event.ctrlKey && event.keyCode === 191){
+            else if (window.event.ctrlKey && event.keyCode === 191){
                 let isHeader = !(baseParent.getAttribute("header", false) == "true");
                 baseParent.setAttribute("header", isHeader);
                 baseParent.classList.remove('header');
-                isHeader && baseParent.classList.add(isHeader?'header':'');
+                isHeader && baseParent.classList.add(isHeader?'header':'base');
             }
-            if (event.keyCode === 38){
+            else if (event.keyCode === 38){
                 let el = baseParent.previousElementSibling?.querySelector('.tm-form-check-label');
-                if (el){
-                    el.click();
-                    placeCaretAtEnd(el);
+                window.selectedElement = el;
+                if (!parseInt(element.previousElementSibling.value)){
+                    self.pushAC(element, params, baseParent);
                 }
-                event.stopPropagation();
-            }
-            if (event.keyCode === 40){
-                let el = baseParent.nextElementSibling?.querySelector('.tm-form-check-label');
                 if (el){
                     el.click();
                     el.focus();
                 }
                 event.stopPropagation();
             }
+            else if (event.keyCode === 40){
+                let el = baseParent.nextElementSibling?.querySelector('.tm-form-check-label');
+                window.selectedElement = el;
+                if (!parseInt(element.previousElementSibling.value)){
+                    self.pushAC(element, params, baseParent);
+                }
+                if (el){
+                    el.click();
+                    el.focus();
+                }
+                event.stopPropagation();
+            }
+        })
+        element.addEventListener('keyup', (event) => {
+            if (element.innerHTML.trim() != element.nextElementSibling.innerHTML){
+                baseParent.classList.add("unsaved");
+            } else {
+                baseParent.classList.remove("unsaved");
+            }
+        })
+        function recursiveRemoveAttribute(element, isRoot=false){
+            if (!isRoot){
+                while(element.attributes?.length > 0) element.removeAttribute(element.attributes[0].name);
+            }
+            for (let node of element.children){
+                recursiveRemoveAttribute(node)
+            }
+        }
+        element.addEventListener("paste", event=>{
+            setTimeout(() => {
+                recursiveRemoveAttribute(element, true)
+            }, 1);
         })
     }
     
@@ -573,7 +614,6 @@ class Main extends Component {
             }
         }
         function mouseUpEvent(event){
-            element.removeEventListener("mousedown", self.initDragEventRoot);
             window.removeEventListener("mousemove", mouseMoveEvent);
             window.removeEventListener("mouseup", mouseUpEvent);
             acElement.classList.remove("dragging");
@@ -598,6 +638,7 @@ class Main extends Component {
         window.addEventListener("mouseup", mouseUpEvent)
     }
     initDragEventRoot(element, event){
+        element.removeEventListener("mousedown", self.initDragEventRoot);
         this.initDragEvent(element, event.srcElement, event)
     }
     async initACs() {
@@ -613,7 +654,11 @@ class Main extends Component {
                 "payload": JSON.stringify(payload)
             }
             let result = "";
-            result = (await this.do_invisible_request(`${this.subEnv.serverURL}/management/ticket/ac?${new URLSearchParams(params)}`));
+            if (this.subEnv.contentState.showLog){
+                result = (await this.do_invisible_request(`${this.subEnv.serverURL}/management/ticket/ac?${new URLSearchParams(params)}`));
+            } else{
+                result = (await this.do_request(`${this.subEnv.serverURL}/management/ticket/ac?${new URLSearchParams(params)}`));
+            }
             let default_data = {
                 'id':false,
                 'content': '',
@@ -647,6 +692,7 @@ class Main extends Component {
                 event.srcElement.classList.contains('drag-icon') || 
                 event.srcElement.nodeName === "path"){
                     this.initDragEventRoot(element, event)
+                    event.stopImmediatePropagation();
                 }
             })
         }
@@ -694,13 +740,7 @@ class Main extends Component {
             self.trigger_up('set-env', self.subEnv)
         })
     }
-    renderContent(){
-        if (this.subEnv.contentState.showLog){
-            this.renderTicketData(true);
-        } 
-        if (this.subEnv.contentState.showAC) {
-            this.initACs();
-        }
+    async renderContent(){
         if (this.ticketData){
             this.ticketData.displayName = this._getDisplayName(this.ticketData);
             this.searchRef.el.value = this.ticketData.displayName;
@@ -724,6 +764,13 @@ class Main extends Component {
                 }
             })
         });
+        if (this.subEnv.contentState.showLog){
+            await this.renderTicketData(true);
+        } 
+        if (this.subEnv.contentState.showAC) {
+            await this.initACs();
+        }
+        this.trigger_up("load_done", this.loadID)
     }
     initEvent() {
         let self = this;
@@ -748,6 +795,9 @@ class Main extends Component {
             }
             if (event.keyCode === 50 && window.event.ctrlKey && window.event.shiftKey){
                 self.acHeadingRef.el.children[0].click();
+            }
+            if (event.keyCode === 69 && window.event.ctrlKey && window.event.shiftKey){
+                self.actionExportToOriginalServer();
             }
         })
     }

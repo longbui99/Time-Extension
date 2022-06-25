@@ -10,7 +10,12 @@
 .tm-icon-svg .svg .path{
     display: block;
     color: white;
+
 }
+html {
+    scroll-behavior: smooth;
+}
+
 
 @keyframes spin {
     0% {
@@ -413,6 +418,14 @@ svg:not(:host).tm-svg-inline--fa, svg:not(:root).tm-svg-inline--fa {
     box-shadow: 0 0 0 .25rem rgba(4, 146, 87, 0.25)
 }
 
+.main-page .main-action-page .acceptance-criteria .ac-content .ac-container.unsaved .tm-form-check-input{
+    border: dashed 2px var(--primary);
+}
+
+.main-page .main-action-page .acceptance-criteria .ac-content .ac-container.unsaved .tm-form-check-input:checked{
+    border-color: white;
+}
+
 .main-page .main-action-page .acceptance-criteria .ac-content .ac-container .ac-segment .tm-form-check-label{
     outline: none;
     width: 100%;
@@ -425,6 +438,7 @@ svg:not(:host).tm-svg-inline--fa, svg:not(:root).tm-svg-inline--fa {
 }
 .main-page .main-action-page .acceptance-criteria .ac-content .ac-container .ac-segment .tm-form-check-label *{
     display: contents;
+    border-left: none;
 }
 
 .main-page .main-action-page .acceptance-criteria .ac-content .ac-container.header .ac-segment .tm-form-check{
@@ -439,6 +453,10 @@ svg:not(:host).tm-svg-inline--fa, svg:not(:root).tm-svg-inline--fa {
 
 .main-page .main-action-page .acceptance-criteria .ac-content .ac-container.header .ac-segment .tm-form-check-input{
     display: none;
+}
+
+.main-page .main-action-page .acceptance-criteria .ac-content .ac-container.unsaved.header .tm-form-check-label{
+    border-left: solid 2px var(--primary);
 }
 
 

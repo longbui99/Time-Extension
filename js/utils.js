@@ -66,13 +66,14 @@ let ac_rules = {
     '*': ['<em>', '</em>'],
 }
 let replace_rule = {
-    '\n\n': '<br>',
+    '\r\n\r\n': '<br>',
+    '\r\n': '<br>',
     '\n': '<br>'
 }
 
 function parseAC(text){
     for( let rule in replace_rule)
-        text = text.replace(rule, replace_rule[rule])
+        text = text.replaceAll(rule, replace_rule[rule])
     let pivot = 0, index = 0, final = [''], final_key = 0;
     let length = text.length;
     let res = "";
