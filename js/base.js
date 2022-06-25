@@ -13,6 +13,12 @@ class Component {
             this.parent.childrens.push(this);
             this.subEnv = this.parent.subEnv;
         }
+        if (params.subEnv){
+            this.subEnv = params.subEnv;
+        }
+        if (params.extensionID){
+            this.subEnv.extensionID = params.extensionID;
+        }
     }
     useRef(name) {
         let self = this;
@@ -108,6 +114,6 @@ class Component {
     }
 }
 
-function mount(object, element) {
-    new object(null, {}).mount(element)
+function mount(object, element, params={}) {
+    new object(null, params).mount(element)
 }

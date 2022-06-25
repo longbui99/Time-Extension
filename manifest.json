@@ -4,15 +4,27 @@
     "version": "1.0",
     "manifest_version": 3,
     "permissions": [
+        "tabs",
         "storage",
         "scripting",
-        "activeTab"
+        "activeTab",
+        "notifications",
+        "contextMenus"
     ],
+    "host_permissions": ["https://*/*"],
     "action": {
         "default_popup": "index.html"
     },
     "content_security_policy":{
         "extension_pages": "script-src 'self'; object-src 'self'"
+    },
+    "icons": { 
+        "16": "./static/logo.png",
+        "48": "./static/logo.png",
+       "128": "./static/logo.png" 
+    },
+    "background":{
+        "service_worker": "./js/background.js"
     },
     "commands": {
         "_execute_action": {
