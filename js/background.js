@@ -83,7 +83,7 @@ chrome.runtime.onMessage.addListener(
       let data = (await chrome.storage.local.get(["timeLogStorage"]))?.timeLogStorage
       data.pinHTML = false;
       chrome.storage.local.set({ 'timeLogStorage': data })
-      let tabs = await chrome.tabs.query({ currentWindow: true });
+      let tabs = (await chrome.tabs.query({active: false, currentWindow: true}));
       tabs.pop();
       for (let tab of tabs) {
         if (tab.id === sender.tab.id)
@@ -95,7 +95,7 @@ chrome.runtime.onMessage.addListener(
       }
     }
     if (request.ticketUpdate) {
-      let tabs = await chrome.tabs.query({ currentWindow: true });
+      let tabs = (await chrome.tabs.query({active: false, currentWindow: true}));
       tabs.pop();
       for (let tab of tabs) {
         if (tab.id === sender.tab.id)
