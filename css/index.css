@@ -261,7 +261,7 @@ svg:not(:host).tm-svg-inline--fa, svg:not(:root).tm-svg-inline--fa {
     width: 10%;
 }
 
-.main-page .main-action-page .ticket-active .active-item-group .active-item .icon-group .icon svg {
+.main-page .main-action-page .ticket-active .active-item-group .active-item .icon-group .tm-icon svg {
     transform: rotate(30deg);
     border-radius: 50%;
     width: 20px;
@@ -289,23 +289,23 @@ svg:not(:host).tm-svg-inline--fa, svg:not(:root).tm-svg-inline--fa {
     justify-content: space-between;
 }
 
-.main-page .main-action-page .ticket-active .active-item-group .active-item .icon {
+.main-page .main-action-page .ticket-active .active-item-group .active-item .tm-icon {
     cursor: pointer;
     font-size: 1.2em;
     color: var(--secondary);
 }
 
-.main-page .main-action-page .ticket-active .active-item-group .active-item .icon svg:hover {
+.main-page .main-action-page .ticket-active .active-item-group .active-item .tm-icon svg:hover {
     color: orange;
     border-top: solid 4px orange;
     border-left: solid 4px orange;
 }
 
-.main-page .main-action-page .ticket-active .active-item-group .active-item .icon.stop {
+.main-page .main-action-page .ticket-active .active-item-group .active-item .tm-icon.stop {
     color: var(--secondary) !important;
 }
 
-.main-page .main-action-page .ticket-active .active-item-group .active-item.start .icon {
+.main-page .main-action-page .ticket-active .active-item-group .active-item.start .tm-icon {
     color: var(--primary);
 }
 .main-page .main-action-page .acceptance-criteria {

@@ -56,7 +56,14 @@ class Home extends Component {
     })
   }
   initGeneralEvent(){
+    let self = this;
     this.scrollEvent();
+    window.addEventListener('keydown', event=>{
+      if (window.event.altKey && window.event.ctrlKey && window.event.shiftKey){
+          self.pinRef.el.click();
+      }
+      event.stopImmediatePropagation();
+    })
   }
   async
   mountingComponent() {
