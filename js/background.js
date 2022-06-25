@@ -83,25 +83,42 @@ chrome.runtime.onMessage.addListener(
       let data = (await chrome.storage.local.get(["timeLogStorage"]))?.timeLogStorage
       data.pinHTML = false;
       chrome.storage.local.set({ 'timeLogStorage': data })
-      let tabs = (await chrome.tabs.query({active: false, currentWindow: true}));
-      tabs.pop();
-      for (let tab of tabs) {
-        if (tab.id === sender.tab.id)
-          continue;
-        chrome.scripting.executeScript({
-          target: { tabId: tab.id },
-          function: removeExistedElement,
-        })
-      }
+      chrome.tabs.query({ currentWindow: true }, function (tabs) {
+        tabs.pop();
+        for (let tab of tabs) {
+          if (tab.id === sender.tab.id)
+            continue;
+          chrome.scripting.executeScript({
+            target: { tabId: tab.id },
+            function: removeExistedElement,
+          }, function (response) {
+            if (!chrome.runtime.lastError) {
+              setTimeout(async () => {
+                chrome.scripting.executeScript({
+                  target: { tabId: tab.id },
+                  function: removeExistedElement,
+                })
+              }, 100)
+            }
+          })
+        }
+      });
     }
     if (request.ticketUpdate) {
-      let tabs = (await chrome.tabs.query({active: false, currentWindow: true}));
-      tabs.pop();
-      for (let tab of tabs) {
-        if (tab.id === sender.tab.id)
-          continue;
-        chrome.tabs.sendMessage(tab.id, request);
-      }
+      chrome.tabs.query({ currentWindow: true }, function (tabs) {
+        tabs.pop();
+        for (let tab of tabs) {
+          if (tab.id === sender.tab.id)
+            continue;
+          chrome.tabs.sendMessage(tab.id, request, function (response) {
+            if (!chrome.runtime.lastError) {
+              setTimeout(async () => {
+                chrome.tabs.sendMessage(tab.id, request)
+              }, 100)
+            }
+          });
+        }
+      });
     }
   }
 );
@@ -114,10 +131,12 @@ chrome.tabs.onActivated.addListener(async function (activeInfo) {
 });
 
 chrome.tabs.onUpdated.addListener(async function (tabId, changeInfo, tab) {
-  let subEnv = (await chrome.storage.local.get(["timeLogStorage"]))?.timeLogStorage;
-  if (changeInfo.status == 'complete') {
-    if (subEnv.pinHTML) {
-      injectFile({ subEnv: subEnv })
+  if (tab.url.startsWith('http')) {
+    let subEnv = (await chrome.storage.local.get(["timeLogStorage"]))?.timeLogStorage;
+    if (changeInfo.status == 'complete') {
+      if (subEnv.pinHTML) {
+        injectFile({ subEnv: subEnv })
+      }
     }
   }
 });
