@@ -16,7 +16,7 @@ class PinPopup extends Component {
     loadEvent() {
         let self = this;
         function onMounseDown(event) {
-            let maxHeight = self.mainPopupRef.el.getBoundingClientRect().height;
+            // let maxHeight = self.mainPopupRef.el.getBoundingClientRect().height;
             var rect = self.el.getBoundingClientRect();
             let startScroll = window.scrollY;
             let mouseX = event.pageX, mouseY = event.pageY;
@@ -27,9 +27,9 @@ class PinPopup extends Component {
                     self.el.style.top = (position + startScroll - window.scrollY).toFixed(2) + "px";
                     self.el.style.left = (rect.left + event.pageX - mouseX).toFixed(2) + "px";
                 } 
-                let windowMarginHeight = window.innerHeight - position - 40;
-                let height = (windowMarginHeight > maxHeight? maxHeight : windowMarginHeight)
-                self.mainPopupRef.el.style.height = height + "px";
+                // let windowMarginHeight = window.innerHeight - position - 40;
+                // let height = (windowMarginHeight > maxHeight? maxHeight : windowMarginHeight)
+                // self.mainPopupRef.el.style.height = height + "px";
             }
             function mouseUpEvent(event) {
                 window.removeEventListener("mousemove", mouseMoveEvent);
