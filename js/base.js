@@ -75,7 +75,7 @@ class Component {
         try {
             let json = {
                 method: method,
-                mode: 'no-cors',
+                mode: 'cors',
             }
             if (!['GET'].includes(method)){
                 json.body = JSON.stringify(content)
@@ -83,8 +83,6 @@ class Component {
             this.trigger_up('error', {})
             this.trigger_up('loading', true);
             let res = (await fetch(url, json));
-            let data = (await res.text())
-            console.log(data)
             if (res.ok){
                 return res
             }
@@ -107,7 +105,7 @@ class Component {
         try {
             let json = {
                 method: method,
-                mode: 'no-cors',
+                mode: 'cors',
             }
             if (!['GET'].includes(method)){
                 json.body = JSON.stringify(content)

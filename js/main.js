@@ -114,7 +114,7 @@ class Main extends Component {
 
     }
     async fetchTicketFromServer(){
-        let response = (await this.do_request(`${this.subEnv.serverURL}/management/ticket/fetch/${this.ticketData.id}?jwt=${this.subEnv.jwt}`));
+        let response = (await this.do_request('GET', `${this.subEnv.serverURL}/management/ticket/fetch/${this.ticketData.id}?jwt=${this.subEnv.jwt}`));
         this.renderContent()
     }
     async actionExportToOriginalServer(){
@@ -129,9 +129,9 @@ class Main extends Component {
         let params = {
             "id": this.ticketData.id,
             "jwt": this.subEnv.jwt,
-            "payload": JSON.stringify(payload)
+            "payload": payload
         }
-        await this.do_invisible_request(`${this.subEnv.serverURL}/management/ticket/export?${new URLSearchParams(params)}`);
+        await this.do_invisible_request('POST', `${this.subEnv.serverURL}/management/ticket/export?`, params);
     }
     openTicketNaviagor(event){
         if (window.event.ctrlKey && window.event.altKey && this.ticketData) {
@@ -154,7 +154,7 @@ class Main extends Component {
         }
         if (this.ticketData) {
             if (refresh && !this.ticketData.broardcast) {
-                let response = (await this.do_request(`${this.subEnv.serverURL}/management/ticket/get/${this.ticketData.id}?jwt=${this.subEnv.jwt}`));
+                let response = (await this.do_request('GET', `${this.subEnv.serverURL}/management/ticket/get/${this.ticketData.id}?jwt=${this.subEnv.jwt}`));
                 let result = (await response.json());
                 for (let key of Object.keys(result)) { this.ticketData[key] = result[key]; }
             }
@@ -231,7 +231,7 @@ class Main extends Component {
         element.style.display = 'inline-block';
     }
     async _searchTicket(text) {
-        let result = (await this.do_request(`${this.subEnv.serverURL}/management/ticket/search/${text}?limitRecord=${11}&jwt=${this.subEnv.jwt}`));
+        let result = (await this.do_request('GET', `${this.subEnv.serverURL}/management/ticket/search/${text}?limitRecord=${11}&jwt=${this.subEnv.jwt}`));
         this.loadedData = (await result.json());
         this.loadSearchedTickets(this.loadedData);
     }
@@ -248,12 +248,12 @@ class Main extends Component {
         let params = {
             "id": id || this.ticketData.id,
             "jwt": this.subEnv.jwt,
-            "payload": JSON.stringify({
+            "payload": {
                 'description': this.commentRef.el.value,
                 'source': 'Extension'
-            })
+            }
         }
-        let result = (await this.do_request(`${this.subEnv.serverURL}/management/ticket/work-log/pause?${new URLSearchParams(params)}`));
+        let result = (await this.do_request('POST', `${this.subEnv.serverURL}/management/ticket/work-log/pause`, params));
         if (refresh)
             this.renderTicketData(true);
     }
@@ -270,11 +270,11 @@ class Main extends Component {
         let params = {
             "id": this.ticketData.id,
             "jwt": this.subEnv.jwt,
-            "payload": JSON.stringify({
+            "payload": {
                 'source': 'Extension'
-            })
+            }
         }
-        let result = (await this.do_request(`${this.subEnv.serverURL}/management/ticket/work-log/add?${new URLSearchParams(params)}`));
+        let result = (await this.do_request('POST', `${this.subEnv.serverURL}/management/ticket/work-log/add`, params));
         this.renderTicketData(true);
     }
     _initAddWorkLog() {
@@ -309,15 +309,15 @@ class Main extends Component {
         let params = {
             "id": this.ticketData.id,
             "jwt": this.subEnv.jwt,
-            "payload": JSON.stringify(payload)
+            "payload": payload
         }
 
         if (triggerServer) {
             this.ticketData.timeStatus = false;
-            (await this.do_request(`${this.subEnv.serverURL}/management/ticket/work-log/done?${new URLSearchParams(params)}`));
+            (await this.do_request('POST', `${this.subEnv.serverURL}/management/ticket/work-log/done`, params));
         }
         else {
-            (await this.do_request(`${this.subEnv.serverURL}/management/ticket/work-log/manual?${new URLSearchParams(params)}`));
+            (await this.do_request('POST', `${this.subEnv.serverURL}/management/ticket/work-log/manual`, params));
             this.manualLogref.el.value = '';
         }
         this.renderTicketData(true)
@@ -365,9 +365,9 @@ class Main extends Component {
                 let params = {
                     "id": self.ticketData.id,
                     "jwt": self.subEnv.jwt,
-                    "payload": JSON.stringify(payload)
+                    "payload": payload
                 }
-                await self.do_request(`${self.subEnv.serverURL}/management/ticket/work-log/cancel?${new URLSearchParams(params)}`);
+                await self.do_request('POST', `${self.subEnv.serverURL}/management/ticket/work-log/cancel`, params);
                 self.renderTicketData(true);
             }
         })
@@ -386,7 +386,7 @@ class Main extends Component {
         </div>`
     }
     async pushAC(el, params, parent){
-        if (el.innerText !== ""){
+        if (el.innerText !== "" && el.innerHTML.trim() !== el.nextElementSibling.innerHTML.trim()){
             let payload = {};
             let element = parent.querySelector('.tm-form-check-label');
             payload.checked = element.previousElementSibling.checked || false;
@@ -396,8 +396,8 @@ class Main extends Component {
             payload.float_sequence = 1;
             payload.ticket_id = this.ticketData.id;
             params.id = parseInt(element.previousElementSibling.value) || 0
-            params.payload = JSON.stringify(payload)
-            let res = (await this.do_invisible_request(`${this.subEnv.serverURL}/management/ac?${new URLSearchParams(params)}`));
+            params.payload = payload
+            let res = (await this.do_invisible_request('POST', `${this.subEnv.serverURL}/management/ac`, params));
             let result = (await res.json());
             element.previousElementSibling.value = result;
             parent.classList.remove("unsaved");
@@ -438,7 +438,7 @@ class Main extends Component {
                 window.selectedElement = el;
                 baseParent.remove();
                 if (parseInt(element.previousElementSibling.value)){
-                    self.do_invisible_request(`${self.subEnv.serverURL}/management/ac/delete/${parseInt(element.previousElementSibling.value)}?jwt=${self.subEnv.jwt}`)
+                    self.do_invisible_request('POST', `${self.subEnv.serverURL}/management/ac/delete`, {acID:parseInt(element.previousElementSibling.value), jwt: self.subEnv.jwt})
                 }
             }
             else if (event.keyCode === 13 && !window.event.shiftKey) {
@@ -627,8 +627,8 @@ class Main extends Component {
             payload.sequence = parseInt(clientTags[currentPosition-1]?.el.getAttribute("sequence")) || -1;
             payload.float_sequence = 1;
             params.id = parseInt(acElement.querySelector('.tm-form-check-input').value) || 0
-            params.payload = JSON.stringify(payload)
-            self.do_invisible_request(`${self.subEnv.serverURL}/management/ac?${new URLSearchParams(params)}`);
+            params.payload = payload
+            self.do_invisible_request('POST', `${self.subEnv.serverURL}/management/ac?`, params);
             for (let index = 0; index < clientTags.length; index++){
                 clientTags[index].el.setAttribute("sequence", index)
             }
@@ -657,9 +657,9 @@ class Main extends Component {
                 result = this.ticketData.acs;
             } else{
                 if (this.subEnv.contentState.showLog){
-                    result = (await this.do_invisible_request(`${this.subEnv.serverURL}/management/ticket/ac?${new URLSearchParams(params)}`));
+                    result = (await this.do_invisible_request('GET', `${this.subEnv.serverURL}/management/ticket/ac?${new URLSearchParams(params)}`));
                 } else{
-                    result = (await this.do_request(`${this.subEnv.serverURL}/management/ticket/ac?${new URLSearchParams(params)}`));
+                    result = (await this.do_request('GET', `${this.subEnv.serverURL}/management/ticket/ac?${new URLSearchParams(params)}`));
                 }
                 result = (await result.json())
                 this.ticketData.acs = result;
@@ -751,7 +751,7 @@ class Main extends Component {
                 "limit": 6,
                 "source": "Extension"
             }), self = this;
-            let response = (await this.do_invisible_request(`${this.subEnv.serverURL}/management/ticket/my-active?jwt=${this.subEnv.jwt}&payload=${params}`))
+            let response = (await this.do_invisible_request('GET', `${this.subEnv.serverURL}/management/ticket/my-active?jwt=${this.subEnv.jwt}&payload=${params}`))
             let result = (await response.json());
             this.relatedActiveTickets = result;
             setTimeout(()=>{
