@@ -104,7 +104,6 @@ chrome.runtime.onMessage.addListener(
         }
       });
     }
-    console.log(request)
     if (request.ticketUpdate || request.relativeUpdate) {
       function sendMEssage(tab){
         chrome.tabs.sendMessage(tab.id, request, function (response) {
