@@ -84,10 +84,12 @@ class PinPopup extends Component {
             }
         );
         this.minimizeRef.el.addEventListener('click', event=>{
-            let rect = self.mainPopupRef.el.getBoundingClientRect();
-            self.dragElRef.el.style.width = rect.width*0.98 + "px";
-            self.el.style.left = self.el.getBoundingClientRect().left.toFixed(2) + "px";
-            self.mainPopupRef.el.style.display="none";
+            if (self.mainPopupRef.el.style.display !== "none"){
+                let rect = self.mainPopupRef.el.getBoundingClientRect();
+                self.dragElRef.el.style.width = rect.width*0.98 + "px";
+                self.el.style.left = self.el.getBoundingClientRect().left.toFixed(2) + "px";
+                self.mainPopupRef.el.style.display="none";
+            }
         })
         this.epxandRef.el.addEventListener('click', event=>{
             self.dragElRef.el.style.width = null;
