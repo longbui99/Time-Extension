@@ -25,7 +25,7 @@ class Login extends Component {
         let payload = this._prepareValues();
         let serverURL = this._prepareServerAPI();
         try {
-            const response = await this.do_request(serverURL + "/web/login/jwt?" + new URLSearchParams(payload));
+            const response = await this.do_request('POST', serverURL + "/web/login/jwt", payload);
             const data = await response.json();
             this.popupRef.el.style.display = "none";
             this.trigger_up('authentication', {

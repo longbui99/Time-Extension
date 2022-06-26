@@ -71,11 +71,20 @@ class Component {
             this.parent.event(event, data)
         }
     }
-    async do_request(url) {
+    async do_request(method='GET', url, content) {
         try {
+            let json = {
+                method: method,
+                mode: 'no-cors',
+            }
+            if (!['GET'].includes(method)){
+                json.body = JSON.stringify(content)
+            }
             this.trigger_up('error', {})
             this.trigger_up('loading', true);
-            let res = (await fetch(url));
+            let res = (await fetch(url, json));
+            let data = (await res.text())
+            console.log(data)
             if (res.ok){
                 return res
             }
@@ -94,9 +103,16 @@ class Component {
             this.trigger_up('loading', false);
         }
     }
-    async do_invisible_request(url) {
+    async do_invisible_request(method='GET', url, content) {
         try {
-            let res = (await fetch(url));
+            let json = {
+                method: method,
+                mode: 'no-cors',
+            }
+            if (!['GET'].includes(method)){
+                json.body = JSON.stringify(content)
+            }
+            let res = (await fetch(url, json));
             if (res.ok){
                 return res
             }
