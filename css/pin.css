@@ -60,7 +60,7 @@
     overflow-y: auto;
     overflow-x: hidden;
     padding-right: 10px;
-    resize: both;
+    /* resize: both; */
     max-width: 550px;
 }
 .popup-container .t-popup-content::-webkit-scrollbar {
