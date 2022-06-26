@@ -546,12 +546,13 @@ class Main extends Component {
         var rect = acElement.getBoundingClientRect();
         // Set drag element object
         acElement.classList.add('dragging')
-        acElement.style.top = rect.top.toFixed(2) + "px";
-        acElement.style.left = rect.left.toFixed(2) + "px";
-        acElement.style.height = rect.height.toFixed(2) + "px";
-        acElement.style.width = rect.width.toFixed(2) + "px";
+        // acElement.style.top = rect.top.toFixed(2) + "px";
+        // acElement.style.left = rect.left.toFixed(2) + "px";
+        // acElement.style.height = rect.height.toFixed(2) + "px";
+        acElement.style.width = rect.width + "px";
         // Clone the object and set it to base parent
-        clonedElement.style.height = (rect.height).toFixed(2) + "px";
+        clonedElement.style.height = (rect.height - 12) + "px";
+        clonedElement.style.width = (rect.width - 4) + "px";
         clonedElement.classList.add('clone-drag')
         parentElement.insertBefore(clonedElement, acElement);
         // Move element with the position of mouse
