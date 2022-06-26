@@ -1,7 +1,7 @@
-.popup-container{
-    -webkit-user-select: none; 
-    -ms-user-select: none; 
-    user-select: none; 
+.popup-container {
+    -webkit-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
     position: fixed;
     right: 5px;
     top: 5px;
@@ -17,11 +17,13 @@
     width: fit-content;
     box-shadow: rgba(0, 0, 0, 0.25) 0px 54px 55px, rgba(0, 0, 0, 0.12) 0px -12px 30px, rgba(0, 0, 0, 0.12) 0px 4px 6px, rgba(0, 0, 0, 0.17) 0px 12px 13px, rgba(0, 0, 0, 0.09) 0px -3px 5px;
 }
-.popup-container *[aria-hidden="true"], 
+
+.popup-container *[aria-hidden="true"],
 .popup-containe *[aria-hidden="1"] {
-    display: unset!important;
+    display: unset !important;
 }
-.popup-container .drag-drop-header{
+
+.popup-container .drag-drop-header {
     padding: 5px;
     border-bottom: solid 1px lightgray;
     color: var(--primary);
@@ -32,29 +34,78 @@
     justify-content: space-between;
 }
 
-.pin-html.pinned svg{
-    transform: rotate(30deg);
-    border-radius: 50%;
-    color: var(--secondary);
+.pin-html {
+    display: flex;
+    flex-flow: column;
 }
 
-.popup-container .drag-drop-header div{
+.pin-html .tm-icon-svg {
+    position: absolute;
+    line-height: 25px;
+}
+
+.pin-html svg {
+    line-height: 0.75em;
+}
+
+.pin-html .left2right, .pin-html .right2left{
+    display: none;
+}
+
+@keyframes tm-left2right {
+    from {
+        left: 10%;
+    }
+
+    to {
+        left: 90%;
+    }
+}
+
+@keyframes tm-right2left {
+    from {
+        left: 90%;
+    }
+
+    to {
+        left: 10%;
+    }
+}
+
+.pin-html.pinned .sync{
+    display: none;
+}
+
+.pin-html.pinned .left2right {
+    display: inline-block;
+    color: var(--primary);
+    animation: tm-left2right 10s infinite linear;
+}
+
+.pin-html.pinned .right2left {
+    display: inline-block;
+    color: var(--secondary);
+    animation: tm-right2left 10s infinite linear;
+}
+
+.popup-container .drag-drop-header div {
     cursor: pointer;
 }
-.popup-container .drag-drop-header div:hover{
+
+.popup-container .drag-drop-header div:hover {
     color: orange;
 }
 
-.popup-container .drag-drop-header .drag-drop-icon{
+.popup-container .drag-drop-header .drag-drop-icon {
     color: var(--primary);
 }
 
-.popup-container .drag-drop-header .tm-close{
+.popup-container .drag-drop-header .tm-close {
     color: rgb(180, 2, 2);
 }
 
 
-.popup-container .t-popup-content{
+.popup-container .t-popup-content {
     margin-top: 35px;
     max-height: 80vh;
     overflow-y: auto;
@@ -63,6 +114,7 @@
     /* resize: both; */
     max-width: 550px;
 }
+
 .popup-container .t-popup-content::-webkit-scrollbar {
     width: 5px;
 }
