@@ -55,6 +55,7 @@ class PinPopup extends Component {
             if (event.keycode === 68 && window.event.ctrlKey && window.event.altKey) {
                 self.el.remove();
                 self.instance = null;
+                delete window.tmInstance;
                 event.stopPropagation();
                 if (chrome.runtime) {
                     chrome.runtime.sendMessage({ closeAll: true });
@@ -83,10 +84,13 @@ class PinPopup extends Component {
             }
         );
         this.minimizeRef.el.addEventListener('click', event=>{
+            let rect = self.mainPopupRef.el.getBoundingClientRect();
+            self.dragElRef.el.style.width = rect.width*0.98 + "px";
             self.el.style.left = self.el.getBoundingClientRect().left.toFixed(2) + "px";
             self.mainPopupRef.el.style.display="none";
         })
         this.epxandRef.el.addEventListener('click', event=>{
+            self.dragElRef.el.style.width = null;
             self.mainPopupRef.el.style.display="inline-block";
         })
     }
