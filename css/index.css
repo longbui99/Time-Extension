@@ -167,17 +167,55 @@ svg:not(:host).tm-svg-inline--fa, svg:not(:root).tm-svg-inline--fa {
     background-color: var(--primary);
     color: white;
 }
+.main-page .process-page{
+    width: 100%;
+}
 
 .main-page .login-page input {
     font-size: 12px !important;
 }
 
+.main-page .login-page{
+    width: 100%;
+}
+
 .main-page .login-page .main-login-page {
     max-width: 400px;
+    display: flex;
+    flex-flow: column;
+    width: 100%;
+}
+
+.main-page .login-page .main-login-page .navigator{
+    width: 100%;
+}
+.main-page .login-page .main-login-page .navigator div{
+    width: 100%;
+    margin-bottom: 10px;
+}
+.main-page .login-page .main-login-page .nagivator-button{
+    width: 100%;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.main-page .login-page .main-login-page .nagivator-button button{
+    text-align: center;
+    padding: 5px;
+    border-radius: 5px;
+    font-size: 12px;
+    cursor: pointer;
+}
+
+.main-page .login-page .main-login-page .nagivator-button button:focus{
+    border-color: white;
 }
 
 .main-page .login-page .sign-in-tooltip {
     padding: 5px 5px;
+    display: none;
 }
 
 .main-page .title {
@@ -635,12 +673,12 @@ svg:not(:host).tm-svg-inline--fa, svg:not(:root).tm-svg-inline--fa {
     margin-left: 5px;
 }
 .main-page .main-action-page .ticket.time-log .duration .total-duration p{
-    width: 75%;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
     display: flex;
     align-items: center;
+    width: fit-content;
 }
 
 .main-page .main-action-page .ticket.time-log .duration .total-duration small{

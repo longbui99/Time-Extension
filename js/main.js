@@ -153,7 +153,7 @@ class Main extends Component {
             clearInterval(this.currentInterval)
         }
         if (this.ticketData) {
-            if (refresh) {
+            if (refresh && !this.ticketData.broardcast) {
                 let response = (await this.do_request(`${this.subEnv.serverURL}/management/ticket/get/${this.ticketData.id}?jwt=${this.subEnv.jwt}`));
                 let result = (await response.json());
                 for (let key of Object.keys(result)) { this.ticketData[key] = result[key]; }
@@ -181,8 +181,8 @@ class Main extends Component {
         }
         this.renderTimeActions()
     }
-    storeAndRenderTicket(refresh = false) {
-        this.renderContent()
+    async storeAndRenderTicket(refresh = false) {
+        await this.renderContent()
         this.trigger_up('ticket-changed', this.ticketData)
     }
     async chooseTicket(index) {
@@ -591,8 +591,6 @@ class Main extends Component {
             clientTags[j].bottom += padding;
             clientTags[i].el = res2.el;
             clientTags[j].el = t;
-            // getBoundary(res1.el, res1);
-            // getBoundary(res2.el, res2);
         }
         let areaRect = {
             'top': clientTags[0].top,
@@ -653,11 +651,17 @@ class Main extends Component {
                 "jwt": this.subEnv.jwt,
                 "payload": JSON.stringify(payload)
             }
-            let result = "";
-            if (this.subEnv.contentState.showLog){
-                result = (await this.do_invisible_request(`${this.subEnv.serverURL}/management/ticket/ac?${new URLSearchParams(params)}`));
+            let result = [];
+            if (this.ticketData.broardcast && this.ticketData.acs){
+                result = this.ticketData.acs;
             } else{
-                result = (await this.do_request(`${this.subEnv.serverURL}/management/ticket/ac?${new URLSearchParams(params)}`));
+                if (this.subEnv.contentState.showLog){
+                    result = (await this.do_invisible_request(`${this.subEnv.serverURL}/management/ticket/ac?${new URLSearchParams(params)}`));
+                } else{
+                    result = (await this.do_request(`${this.subEnv.serverURL}/management/ticket/ac?${new URLSearchParams(params)}`));
+                }
+                result = (await result.json())
+                this.ticketData.acs = result;
             }
             let default_data = {
                 'id':false,
@@ -665,8 +669,6 @@ class Main extends Component {
                 'is_header': true,
                 'initial': true,
             }
-            result = (await result.json())
-            this.acs = result;
             result.push(default_data)
             let string = ""
             for (let ac of result){
@@ -740,6 +742,26 @@ class Main extends Component {
             self.trigger_up('set-env', self.subEnv)
         })
     }
+    async fetchRelativeActive(){
+        this.relatedActiveRef.el.parentNode.style.display = "none";
+        if (!this.ticketData?.broardcast){
+            let params = JSON.stringify({
+                "except": this.ticketData.id,
+                "limit": 6,
+                "source": "Extension"
+            }), self = this;
+            let response = (await this.do_invisible_request(`${this.subEnv.serverURL}/management/ticket/my-active?jwt=${this.subEnv.jwt}&payload=${params}`))
+            let result = (await response.json());
+            this.relatedActiveTickets = result;
+            setTimeout(()=>{
+                self.trigger_up('relative-updated', result);
+            },200)
+        }
+        this.renderRelatedActiveData()
+        if (this.relatedActiveTickets.length){
+            this.relatedActiveRef.el.parentNode.style.display = "block";
+        }
+    }
     async renderContent(){
         if (this.ticketData){
             this.ticketData.displayName = this._getDisplayName(this.ticketData);
@@ -749,21 +771,7 @@ class Main extends Component {
         } else {
             this.el.querySelector('.ticket-navigation').style.display = "none";
         }
-        let params = JSON.stringify({
-            "except": this.ticketData.id,
-            "limit": 6,
-            "source": "Extension"
-        }), self = this;
-        this.relatedActiveRef.el.parentNode.style.display = "none";
-        this.do_invisible_request(`${this.subEnv.serverURL}/management/ticket/my-active?jwt=${this.subEnv.jwt}&payload=${params}`).then((response) => {
-            response.json().then(result => {
-                self.relatedActiveTickets = result;
-                self.renderRelatedActiveData()
-                if (result.length){
-                    this.relatedActiveRef.el.parentNode.style.display = "block";
-                }
-            })
-        });
+        this.fetchRelativeActive();
         if (this.subEnv.contentState.showLog){
             await this.renderTicketData(true);
         } 

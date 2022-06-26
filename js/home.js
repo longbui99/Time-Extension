@@ -16,6 +16,7 @@ class Home extends Component {
     'error': this.onError,
     'session_errors': this.onSessionError,
     'ticket-changed': this.onTicketChanged,
+    'relative-updated': this.onRelativeUpdated,
     'load_start': this.onLoadStart,
     'load_done': this.onLoadDone,
   }
@@ -117,6 +118,7 @@ class Home extends Component {
       }
       this.processMainRef.el.innerHTML = '';
       // this.flushDataToExtension(data);
+      this.subEnv = {};
       this.loadUI();
     }
   }
@@ -140,20 +142,33 @@ class Home extends Component {
       let data = (await chrome.storage.local.get(["timeLogStorage"]))?.timeLogStorage
       data.ticketData = ticketData;
       chrome.storage.local.set({'timeLogStorage': data})
-      this.flushDataToExtension(data.ticketData);
+      this.flushDataToExtension({ticketUpdate: data.ticketData});
     } else {
       let data = JSON.parse(localStorage.getItem(storage) || "{}");
       data.ticketData = ticketData;
       localStorage.setItem(storage, JSON.stringify(data));
     }
   }
+  onRelativeUpdated(relatives){
+    this.flushDataToExtension({'relativeUpdate': relatives})
+  }
   flushDataToExtension(data){
-    chrome.runtime.sendMessage({ticketUpdate: data});
+    chrome.runtime.sendMessage(data);
   }
   ticketUpdate(ticketData){
     if (this.subEnv.authenticated){
+      ticketData.broardcast = true;
       this.component.ticketData = ticketData;
       this.component.renderContent();
+      this.component.ticketData.broardcast = false;
+    }
+  }
+  relativeActiveUpdate(relativeActives){
+    if (this.subEnv.authenticated){
+      this.component.ticketData.broardcast = true;
+      this.component.relatedActiveTickets = relativeActives;
+      this.component.fetchRelativeActive();
+      this.component.ticketData.broardcast = false;
     }
   }
   componentReady(){

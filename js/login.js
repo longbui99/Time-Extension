@@ -54,21 +54,21 @@ class Login extends Component {
             </div>
         </div>
         <div class="main-login-page">
-            <div class="server-url">
-                <div class="input-group mb-3">
-                    <input type="text" class="form-control" placeholder="Server URL" l-ref="server-url"
+            <div class="navigator server-url">
+                <div class="tm-input-group mb-3">
+                    <input type="text" class="tm-form-control" placeholder="Server URL" l-ref="server-url"
                         aria-describedby="basic-addon3" value="" />
                 </div>
             </div>
-            <div class="navigator-username">
-                <div class="input-group mb-3">
-                    <input type="text" class="form-control" placeholder="Username" aria-label="Username" l-ref="username"
+            <div class="navigator navigator-username">
+                <div class="tm-input-group mb-3">
+                    <input type="text" class="tm-form-control" placeholder="Username" aria-label="Username" l-ref="username"
                         aria-describedby="basic-addon1" value=""/>
                 </div>
             </div>
-            <div class="navigator-password">
-                <div class="input-group mb-3">
-                    <input type="password" class="form-control" placeholder="Password / Access Token" l-ref="password"
+            <div class="navigator navigator-password">
+                <div class="tm-input-group mb-3">
+                    <input type="password" class="tm-form-control" placeholder="Password / Access Token" l-ref="password"
                         aria-describedby="basic-addon3" value=""/>
                 </div>
             </div>

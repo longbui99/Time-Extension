@@ -5,7 +5,6 @@
     position: fixed;
     right: 5px;
     top: 5px;
-    max-width: 550px;
     min-width: 400px;
     background-color: white;
     z-index: 2007483647;
@@ -15,9 +14,7 @@
     --primary: rgb(4, 105, 105);
     --secondary: rgb(133, 0, 0);
     --third: rgb(18, 155, 18);
-    resize: both;
-    overflow-y: auto;
-    overflow-x: hidden;
+    width: fit-content;
     box-shadow: rgba(0, 0, 0, 0.25) 0px 54px 55px, rgba(0, 0, 0, 0.12) 0px -12px 30px, rgba(0, 0, 0, 0.12) 0px 4px 6px, rgba(0, 0, 0, 0.17) 0px 12px 13px, rgba(0, 0, 0, 0.09) 0px -3px 5px;
 }
 .popup-container *[aria-hidden="true"], 
@@ -63,6 +60,8 @@
     overflow-y: auto;
     overflow-x: hidden;
     padding-right: 10px;
+    resize: both;
+    max-width: 550px;
 }
 .popup-container .t-popup-content::-webkit-scrollbar {
     width: 5px;

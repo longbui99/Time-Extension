@@ -8,10 +8,9 @@
         "storage",
         "scripting",
         "activeTab",
-        "notifications",
         "contextMenus"
     ],
-    "host_permissions": ["https://*/*"],
+    "host_permissions": ["https://*/*", "http://*/*"],
     "action": {
         "default_popup": "index.html"
     },

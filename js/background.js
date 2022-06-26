@@ -17,6 +17,7 @@ const JSFILE = [
 
 function removeExistedElement() {
   document.querySelector('.popup-container').remove();
+  return true;
 }
 
 async function checkExistedElement() {
@@ -84,15 +85,14 @@ chrome.runtime.onMessage.addListener(
       data.pinHTML = false;
       chrome.storage.local.set({ 'timeLogStorage': data })
       chrome.tabs.query({ currentWindow: true }, function (tabs) {
-        tabs.pop();
         for (let tab of tabs) {
-          if (tab.id === sender.tab.id)
+          if (tab.id === sender.tab.id && tab.url.startsWith('http'))
             continue;
           chrome.scripting.executeScript({
             target: { tabId: tab.id },
             function: removeExistedElement,
           }, function (response) {
-            if (chrome.runtime.lastError) {
+            if (response && response[0].result === undefined) {
               setTimeout(async () => {
                 chrome.scripting.executeScript({
                   target: { tabId: tab.id },
@@ -104,19 +104,25 @@ chrome.runtime.onMessage.addListener(
         }
       });
     }
-    if (request.ticketUpdate) {
-      chrome.tabs.query({ currentWindow: true }, function (tabs) {
-        tabs.pop();
+    console.log(request)
+    if (request.ticketUpdate || request.relativeUpdate) {
+      function sendMEssage(tab){
+        chrome.tabs.sendMessage(tab.id, request, function (response) {
+          if (response === undefined) {
+            setTimeout(async () => {
+              chrome.tabs.sendMessage(tab.id, request)
+            }, 500)
+          }
+        });
+      }
+      chrome.tabs.query({ currentWindow: true }, async function (tabs) {
+        if (tabs.length === 0){
+          tabs = await chrome.tabs.query({ currentWindow: true });
+        }
         for (let tab of tabs) {
-          if (tab.id === sender.tab.id)
+          if (tab.id === sender.tab.id && tab.url.startsWith('http'))
             continue;
-          chrome.tabs.sendMessage(tab.id, request, function (response) {
-            if (chrome.runtime.lastError) {
-              setTimeout(async () => {
-                chrome.tabs.sendMessage(tab.id, request)
-              }, 500)
-            }
-          });
+          sendMEssage(tab)
         }
       });
     }
