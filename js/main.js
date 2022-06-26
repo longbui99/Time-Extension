@@ -650,7 +650,7 @@ class Main extends Component {
             let params = {
                 "id": this.ticketData.id,
                 "jwt": this.subEnv.jwt,
-                "payload": JSON.stringify(payload)
+                "payload": payload
             }
             let result = [];
             if (this.ticketData.broardcast && this.ticketData.acs){

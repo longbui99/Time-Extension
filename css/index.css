@@ -555,10 +555,11 @@ svg:not(:host).tm-svg-inline--fa, svg:not(:root).tm-svg-inline--fa {
     width: 100%;
 }
 
-.main-page .main-action-page .ticket.search-bar p {
-    margin-bottom: 0px;
+.main-page .main-action-page .ticket.search-bar p {    
+    margin-bottom: 2px;
     padding: 2px 10px;
     cursor: pointer;
+    margin-top: 0px;
     font-size: 1.1em;
 }
 
