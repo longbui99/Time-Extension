@@ -382,6 +382,7 @@ svg:not(:host).tm-svg-inline--fa, svg:not(:root).tm-svg-inline--fa {
     padding-top: 3px;
     padding-bottom: 5px;
     margin: 0px;
+    display: block;
 }
 .main-page .main-action-page .acceptance-criteria .ac-content .ac-container .ac-segment{
     width:100%;
