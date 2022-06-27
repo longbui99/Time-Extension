@@ -45,9 +45,10 @@ class Home extends Component {
   mountServerAction() {
     let self = this;
     this.serverActionRef.el.addEventListener('click', event => {
-      window.open(self.payload.serverURL, '_blank')
+      window.open(self.payload.serverURL, '_blank');
     })
     this.serverLogoutRef.el.addEventListener('click', event => {
+      self.processMainRef.innerHTML = "";
       self.onAuthentication(self.payload, false);
     })
   }

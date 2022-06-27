@@ -379,7 +379,7 @@ class Main extends Component {
             </span>`)}
             <div class="tm-form-check">
                 <input class="tm-form-check-input" type="checkbox" value="${ac.id}" id="${_id}" ${ac.checked?'checked': ''}>
-                <label class="tm-form-check-label" contenteditable="true">${content}</label>
+                <p class="tm-form-check-label" contenteditable="true">${content}</p>
                 <span class="original-value" style="display:none">${content}</span>
                 </div>
             </div>
@@ -515,6 +515,10 @@ class Main extends Component {
                 }
                 event.stopPropagation();
             }
+            // else if (event.ctrlKey && [66,73,85].includes(event.keyCode)){
+            //     element.innerHTML = element.innerHTML.replaceAll('')
+            // }
+            event.stopImmediatePropagation();
         })
         element.addEventListener('keyup', (event) => {
             if (element.innerHTML.trim() != element.nextElementSibling.innerHTML){
@@ -522,10 +526,21 @@ class Main extends Component {
             } else {
                 baseParent.classList.remove("unsaved");
             }
+            event.stopImmediatePropagation();
         })
         function recursiveRemoveAttribute(element, isRoot=false){
             if (!isRoot){
-                while(element.attributes?.length > 0) element.removeAttribute(element.attributes[0].name);
+                let isBold = element.style.fontWeight;
+                if (isBold == "bold" || parseInt(isBold) > 600){
+                    let p = document.createElement('p');
+                    p.innerHTML = element.innerHTML;
+                    element.parentNode.insertBefore(p, element);
+                    element.remove()
+                    element = p;
+                }
+                while(element.attributes?.length > 0) {
+                    element.removeAttribute(element.attributes[0].name)
+                };
             }
             for (let node of element.children){
                 recursiveRemoveAttribute(node)
@@ -535,6 +550,7 @@ class Main extends Component {
             setTimeout(() => {
                 recursiveRemoveAttribute(element, true)
             }, 1);
+            event.stopImmediatePropagation();
         })
     }
     

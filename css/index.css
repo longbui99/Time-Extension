@@ -466,7 +466,7 @@ svg:not(:host).tm-svg-inline--fa, svg:not(:root).tm-svg-inline--fa {
     border-color: white;
 }
 
-.main-page .main-action-page .acceptance-criteria .ac-content .ac-container .ac-segment .tm-form-check-label{
+.main-page .main-action-page .acceptance-criteria .ac-content .ac-container .ac-segment .tm-form-check-label{    
     outline: none;
     width: 100%;
     margin-left: 10px;
@@ -475,10 +475,20 @@ svg:not(:host).tm-svg-inline--fa, svg:not(:root).tm-svg-inline--fa {
     line-height: 20px;
     text-align: left;
     margin-bottom: 0px;
+    margin-top: 0px;
+    margin-left: 3px;
+    display: block;
+    white-space: pre-wrap;
+}
+
+.main-page .main-action-page .acceptance-criteria .ac-content .ac-container .ac-segment .tm-form-check-label text{
+    display: contents;
+    white-space: pre-wrap;
 }
 .main-page .main-action-page .acceptance-criteria .ac-content .ac-container .ac-segment .tm-form-check-label *{
     display: contents;
     border-left: none;
+    white-space: pre-wrap;
 }
 
 .main-page .main-action-page .acceptance-criteria .ac-content .ac-container.header .ac-segment .tm-form-check{
@@ -488,7 +498,6 @@ svg:not(:host).tm-svg-inline--fa, svg:not(:root).tm-svg-inline--fa {
     align-items: center;
     justify-items: left;
     padding-left: 0px;
-    font-weight: 600;
 }
 
 .main-page .main-action-page .acceptance-criteria .ac-content .ac-container.header .ac-segment .tm-form-check-input{
