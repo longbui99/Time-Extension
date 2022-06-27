@@ -119,7 +119,7 @@ chrome.runtime.onMessage.addListener(
           tabs = await chrome.tabs.query({ currentWindow: true });
         }
         for (let tab of tabs) {
-          if (tab.id === sender.tab.id && tab.url.startsWith('http'))
+          if (tab.id === sender.tab?.id && tab.url?.startsWith('http'))
             continue;
           sendMEssage(tab)
         }

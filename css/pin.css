@@ -24,18 +24,16 @@
 }
 
 .popup-container .drag-drop-header {
-    padding: 5px;
+    padding: 1%;
     border-bottom: solid 1px lightgray;
     color: var(--primary);
-    position: absolute;
-    top: 0px;
     display: flex;
-    width: 99%;
     justify-content: space-between;
     box-shadow: rgba(0, 0, 0, 0.35) 0px 2.5px 5px;
     background-color: white;
-    width: 100%;
-
+    position: absolute;
+    top: 0px;
+    width: 98%;
 }
 
 .pin-html {
