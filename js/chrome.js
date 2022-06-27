@@ -19,8 +19,14 @@ const JSFILE = [
 async function injectFile(params) {
     params.extensionID = chrome.runtime.id;
     function injectFunction(pr){
-        mount(PinPopup, document.body, pr);
-        document.body.click();
+        let object = mount(PinPopup, document.body, pr);
+      //   var evt = new MouseEvent("click", {
+      //     view: window,
+      //     bubbles: true,
+      //     cancelable: true,
+      //     clientX: 20,
+      // });
+      // object.el.dispatchEvent(evt);
     }
     async function checkExistedElement(){
         let element = await document.querySelector('.popup-container');
@@ -58,7 +64,7 @@ async function injectFile(params) {
                 args: [params]
               })
               let data = (await chrome.storage.local.get(["timeLogStorage"]))?.timeLogStorage
-              data.statisPinned = true;
+              data.staticPinned = true;
               chrome.storage.local.set({ 'timeLogStorage': data })
             }
           }

@@ -129,5 +129,7 @@ class Component {
 }
 
 function mount(object, element, params={}) {
-    new object(null, params).mount(element)
+    let component = new object(null, params);
+    component.mount(element);
+    return component
 }
