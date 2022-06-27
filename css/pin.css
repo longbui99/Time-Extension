@@ -5,7 +5,7 @@
     position: fixed;
     right: 5px;
     top: 5px;
-    background-color: white;
+    background-color: #fefefe;
     z-index: 2007483647;
     color: black;
     font-size: 16px;
@@ -33,7 +33,7 @@
     width: 99%;
     justify-content: space-between;
     box-shadow: rgba(0, 0, 0, 0.35) 0px 2.5px 5px;
-    background-color: white;
+    background-color: #fefefe;
     width: 98%;
 
 }
@@ -105,7 +105,7 @@
 }
 
 
-.popup-container .drag-drop-header .tm-close {
+.popup-container .drag-drop-header .tm-action-close {
     color: rgb(180, 2, 2);
 }
 
@@ -119,6 +119,7 @@
     resize: both;
     min-width: 400px;
     max-width: 550px;
+    padding-left: 5px;
 }
 
 .popup-container .t-popup-content::-webkit-scrollbar {

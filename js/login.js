@@ -41,8 +41,8 @@ class Login extends Component {
     }
     mounted() {
         let res = super.mounted();
-        this.serverURLRef.el.value = this.subEnv.serverURL;
         this.signInRef.el.addEventListener('click', this.actionSignIn)
+        this.serverURLRef.el.value = this.subEnv.serverURL;
         return res
     }
 
