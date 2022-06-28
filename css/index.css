@@ -659,7 +659,6 @@ svg:not(:host).tm-svg-inline--fa, svg:not(:root).tm-svg-inline--fa {
     height: 100%;
     width: 100%;
     position: absolute;
-    background-image: linear-gradient(to right, var(--primary) 100%, white);
 }
 
 @keyframes tm-tab-left2right {
@@ -684,10 +683,12 @@ svg:not(:host).tm-svg-inline--fa, svg:not(:root).tm-svg-inline--fa {
 
 .main-page .main-action-page .tm-tab.left .tm-tab-background{
     animation: tm-tab-left2right 0.5s;
+    background-image: linear-gradient(to right, var(--primary) 80%, white);
 }
 
 .main-page .main-action-page .tm-tab.right .tm-tab-background{
     animation: tm-tab-right2left 0.5s;
+    background-image: linear-gradient(to left, var(--primary) 80%, white);
 }
 .main-page .main-action-page .tm-tab .tm-tab-action{
     width: 50%;
