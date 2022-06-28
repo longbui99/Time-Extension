@@ -615,7 +615,7 @@ svg:not(:host).tm-svg-inline--fa, svg:not(:root).tm-svg-inline--fa {
 .main-page .main-action-page .ticket.search-bar .search-bar-result {
     position: absolute;
     background-color: white;
-    width: 85%;
+    width: 98%;
     box-shadow: rgba(100, 100, 111, 0.2) 0px 7px 29px 0px;
     color: grey;
     max-height: 68%;

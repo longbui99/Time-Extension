@@ -385,8 +385,8 @@ class Main extends Component {
             </div>
         </div>`
     }
-    async pushAC(el, params, parent){
-        if (el.innerText !== "" && el.innerHTML.trim() !== el.nextElementSibling.innerHTML.trim()){
+    async pushAC(el, params, parent, force=false){
+        if (force || (el.innerText !== "" && el.innerHTML.trim() !== el.nextElementSibling.innerHTML.trim())){
             let payload = {};
             let element = parent.querySelector('.tm-form-check-label');
             payload.checked = element.previousElementSibling.checked || false;
@@ -414,7 +414,7 @@ class Main extends Component {
             }
         }
         element.previousElementSibling.addEventListener('change', event=>{
-            self.pushAC(element, params, baseParent)
+            self.pushAC(element, params, baseParent, true)
         })
         element.addEventListener('click', (event) => {
             if (element != window.selectedElement){
