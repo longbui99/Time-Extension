@@ -6,7 +6,7 @@
     right: 5px;
     top: 5px;
     background-color: #fefefe;
-    z-index: 2007483647;
+    z-index: 2000000000;
     color: black;
     font-size: 16px;
     font-family: var(--bs-font-sans-serif);
@@ -134,4 +134,17 @@
 
 .popup-container .t-popup-content::-webkit-scrollbar-thumb:hover {
     background: #555;
+}
+
+
+.popup-container .main-page .main-action-page .ticket.time-log .time-action .start-date {
+    font-size: 0.5em;
+    display: block;
+    width: 0px;
+    height: 0px;
+    position: relative;
+    margin-left: -53px;
+    border: none;
+    margin-top: 10px;
+    box-shadow: none!important;
 }

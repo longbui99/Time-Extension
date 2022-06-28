@@ -19,14 +19,13 @@ const JSFILE = [
 async function injectFile(params) {
     params.extensionID = chrome.runtime.id;
     function injectFunction(pr){
-        let object = mount(PinPopup, document.body, pr);
-      //   var evt = new MouseEvent("click", {
-      //     view: window,
-      //     bubbles: true,
-      //     cancelable: true,
-      //     clientX: 20,
-      // });
-      // object.el.dispatchEvent(evt);
+      let tm = document.getElementsByTagName('wt-container')[0]
+      if (!tm){
+        tm = document.createElement('wt-container');
+        tm.classList.add('wt-class');
+        document.body.parentElement.append(tm);
+      }
+      let object = mount(PinPopup, tm, pr);
     }
     async function checkExistedElement(){
         let element = await document.querySelector('.popup-container');

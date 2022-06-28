@@ -110,9 +110,8 @@ svg:not(:host).tm-svg-inline--fa, svg:not(:root).tm-svg-inline--fa {
 .tm-form-control:focus{
     color: #212529;
     background-color: #fff;
-    border-color: #86b7fe;
     outline: 0;
-    box-shadow: 0 0 0 .25rem rgba(4, 146, 87, 0.25);
+    box-shadow: 0 0 0 .25rem rgba(4, 146, 87, 0.25)!important;
 }
 .main-page b{
     font-weight: 600;
@@ -560,8 +559,11 @@ svg:not(:host).tm-svg-inline--fa, svg:not(:root).tm-svg-inline--fa {
     padding-left: 30px;
     height: 30px;
     border: none;
-    outline: none;
-    box-shadow: rgba(0, 0, 0, 0.2) 0px 3px 15px;
+    box-shadow: rgba(0, 0, 0, 0.2) 0px 3px 15px!important;
+}
+
+.main-page .main-action-page .ticket .input-group .input-s-ticket:focus{
+    box-shadow: rgba(4, 146, 87, 0.4) 0px 3px 15px!important;
 }
 
 .main-page .main-action-page .ticket .input-group .ticket-navigation {
@@ -849,9 +851,10 @@ svg:not(:host).tm-svg-inline--fa, svg:not(:root).tm-svg-inline--fa {
     position: relative;
     left: -30px;
     margin: 1px 1px;
-    font-size: 1.2em;
+    font-size: 1.25em;
     display: flex;
     align-items: center;
+    z-index: 20;
 }
 
 .main-page .main-action-page .ticket.time-log .time-action .start-date {

@@ -331,7 +331,6 @@ class Main extends Component {
     _initManualChange() {
         let self = this;
         this.manualLogref.el.addEventListener('keyup', event => {
-            (10 != event.keyCode && 13 != event.keyCode) || !event.ctrlKey || self._doneWorkLog() || event.stopPropagation();
             if (!['pause', 'active'].includes(self.ticketData?.timeStatus)) {
                 self.ticketData.timeStatus = "pause";
                 self.renderTimeActions();
