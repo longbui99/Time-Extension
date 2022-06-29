@@ -926,21 +926,21 @@ class Main extends Component {
                         </div>
                         <div class="action-group">
                             <div>
-                                <div class="action add" l-ref="action-add" tabindex="1002">
+                                <div class="action add" l-ref="action-add" tabindex="1003">
                                     <span class="tm-icon-svg">
                                         <svg class="svg-inline--fa fa-circle-play" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="circle-play" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" data-fa-i2svg=""><path fill="currentColor" d="M512 256C512 397.4 397.4 512 256 512C114.6 512 0 397.4 0 256C0 114.6 114.6 0 256 0C397.4 0 512 114.6 512 256zM176 168V344C176 352.7 180.7 360.7 188.3 364.9C195.8 369.2 205.1 369 212.5 364.5L356.5 276.5C363.6 272.1 368 264.4 368 256C368 247.6 363.6 239.9 356.5 235.5L212.5 147.5C205.1 142.1 195.8 142.8 188.3 147.1C180.7 151.3 176 159.3 176 168V168z"></path></svg>
                                     </span>
                                 </div>
                             </div>
                             <div>
-                                <div class="action pause" l-ref="action-pause" tabindex="1003">
+                                <div class="action pause" l-ref="action-pause" tabindex="1004">
                                 <span class="tm-icon-svg">
                                     <svg class="svg-inline--fa fa-circle-pause" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="circle-pause" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" data-fa-i2svg=""><path fill="currentColor" d="M256 0C114.6 0 0 114.6 0 256s114.6 256 256 256s256-114.6 256-256S397.4 0 256 0zM224 191.1v128C224 337.7 209.7 352 192 352S160 337.7 160 320V191.1C160 174.3 174.3 160 191.1 160S224 174.3 224 191.1zM352 191.1v128C352 337.7 337.7 352 320 352S288 337.7 288 320V191.1C288 174.3 302.3 160 319.1 160S352 174.3 352 191.1z"></path></svg>                            
                                 </span>
                                 </div>
                             </div>
                             <div>
-                                <div class="action stop" l-ref="action-stop" tabindex="1004">
+                                <div class="action stop" l-ref="action-stop" tabindex="1005">
                                 <span class="tm-icon-svg">
                                     <svg class="svg-inline--fa fa-circle-stop" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="circle-stop" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" data-fa-i2svg=""><path fill="currentColor" d="M256 0C114.6 0 0 114.6 0 256c0 141.4 114.6 256 256 256s256-114.6 256-256C512 114.6 397.4 0 256 0zM352 328c0 13.2-10.8 24-24 24h-144C170.8 352 160 341.2 160 328v-144C160 170.8 170.8 160 184 160h144C341.2 160 352 170.8 352 184V328z"></path></svg>                            
                                 </span>
@@ -949,7 +949,7 @@ class Main extends Component {
                         </div>
                     </div>
                     <div class="comment">
-                        <textarea rows="1" type="text" class="tm-form-control" placeholder="Comment to log step/ log work" l-ref="comment-for-ticket" tabindex="1005"></textarea>
+                        <textarea rows="1" type="text" class="tm-form-control" placeholder="Comment to log step/ log work" l-ref="comment-for-ticket" tabindex="1002"></textarea>
                     </div>
                 </div>
             </div>

@@ -151,7 +151,9 @@ class Home extends Component {
     }
   }
   onRelativeUpdated(relatives){
-    this.flushDataToExtension({'relativeUpdate': relatives})
+    if (this.subEnv.extensionID){
+      this.flushDataToExtension({'relativeUpdate': relatives})
+    }
   }
   flushDataToExtension(data){
     chrome.runtime.sendMessage(data);
