@@ -243,6 +243,13 @@ class Main extends Component {
                 self._searchTicket(this.searchRef.el.value)
             }
         })
+        this.searchRef.el.addEventListener('click', event=>{
+            if (self.loadedData){
+                self.searchResultRef.el.innerHTML = '';
+                self.loadSearchedTickets(self.loadedData);
+                event.stopImmediatePropagation();
+            }
+        })
     }
     async _pauseWorkLog(id = false, refresh = true) {
         let params = {
@@ -385,7 +392,7 @@ class Main extends Component {
         </div>`
     }
     async pushAC(el, params, parent, force=false){
-        if (force || (el.innerText !== "" && el.innerHTML.trim() !== el.nextElementSibling.innerHTML.trim())){
+        if (force || parent.getAttribute('force') === 'true' || (el.innerText !== "" && el.innerHTML.trim() !== el.nextElementSibling.innerHTML.trim())){
             let payload = {};
             let element = parent.querySelector('.tm-form-check-label');
             payload.checked = element.previousElementSibling.checked || false;
@@ -401,6 +408,7 @@ class Main extends Component {
             element.previousElementSibling.value = result;
             parent.classList.remove("unsaved");
             el.nextElementSibling.innerHTML = el.innerHTML.trim();
+            parent.setAttribute('force', 'false')
         }
     }
     initEditACEvent(element, params){
@@ -488,6 +496,7 @@ class Main extends Component {
                 let isHeader = !(baseParent.getAttribute("header", false) == "true");
                 baseParent.setAttribute("header", isHeader);
                 baseParent.classList.remove('header');
+                baseParent.setAttribute('force', 'true');
                 isHeader && baseParent.classList.add(isHeader?'header':'base');
             }
             else if (event.keyCode === 38){
@@ -520,7 +529,7 @@ class Main extends Component {
             event.stopImmediatePropagation();
         })
         element.addEventListener('keyup', (event) => {
-            if (element.innerHTML.trim() != element.nextElementSibling.innerHTML){
+            if ((element.innerHTML.trim() != element.nextElementSibling.innerHTML.trim()) || baseParent.getAttribute('force') === 'true'){
                 baseParent.classList.add("unsaved");
             } else {
                 baseParent.classList.remove("unsaved");
@@ -841,6 +850,9 @@ class Main extends Component {
                     self._doneWorkLog();
                 }
             }
+        })
+        window.addEventListener('click', event=>{
+            self.searchResultRef.el.innerHTML = ""
         })
     }
     mounted() {
