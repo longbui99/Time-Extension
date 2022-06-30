@@ -71,6 +71,7 @@ class Home extends Component {
   async
   mountingComponent() {
     let self = this;
+    this.component = null;
     if (this.payload?.authenticated) {
       this.component = new Main(this);
       this.mountServerAction();
