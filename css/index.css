@@ -49,6 +49,7 @@ html {
     background-color: #f5f5f5;
     display: inline-block;
     margin: -8px;
+    min-height: 400px;
 }
 
 ::-webkit-scrollbar {
@@ -358,8 +359,8 @@ svg:not(:host).tm-svg-inline--fa, svg:not(:root).tm-svg-inline--fa {
     color: var(--primary);
 }
 .main-page .main-action-page .acceptance-criteria {
-    padding: 10px 10px;
-    width: 100%;
+    padding: 8px 2%;
+    width: 96%;
 }
 
 .main-page .main-action-page .acceptance-criteria.open .space-segment{

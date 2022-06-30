@@ -80,6 +80,9 @@ class PinPopup extends Component {
                 if (request.relativeUpdate){
                     self.component.relativeActiveUpdate(request.relativeUpdate);
                 }
+                if (request.searchData){
+                    self.component.searchedUpdate(request.searchData);
+                }
                 sendResponse({farewell: "done"});
             }
         );

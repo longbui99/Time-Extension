@@ -104,7 +104,7 @@ chrome.runtime.onMessage.addListener(
         }
       });
     }
-    if (request.ticketUpdate || request.relativeUpdate) {
+    if (request.ticketUpdate || request.relativeUpdate || request.searchData) {
       function sendMEssage(tab){
         chrome.tabs.sendMessage(tab.id, request, function (response) {
           if (response === undefined) {

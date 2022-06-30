@@ -28,7 +28,7 @@ class Main extends Component {
     constructor() {
         super(...arguments);
         this.ticketData = this.subEnv.ticketData || null;
-        this.loadedData = [];
+        this.searchData = this.subEnv.searchData || null;
         this.secondToString = parseSecondToString(this.subEnv.resource?.hrs_per_day || 8, this.subEnv.resource?.days_per_week || 5)
         this.loadID = uniqueID();
         this.trigger_up("load_start", this.loadID)
@@ -187,7 +187,7 @@ class Main extends Component {
     }
     async chooseTicket(index) {
         // if (this.ticketData) this._pauseWorkLog(this.ticketData.id, false);
-        this.ticketData = this.loadedData[index];
+        this.ticketData = this.searchData[index];
         this.searchResultRef.el.style.display = 'none';
         this.storeAndRenderTicket()
     }
@@ -232,8 +232,9 @@ class Main extends Component {
     }
     async _searchTicket(text) {
         let result = (await this.do_request('GET', `${this.subEnv.serverURL}/management/ticket/search/${text}?limitRecord=${11}&jwt=${this.subEnv.jwt}`));
-        this.loadedData = (await result.json());
-        this.loadSearchedTickets(this.loadedData);
+        this.searchData = (await result.json());
+        this.loadSearchedTickets(this.searchData);
+        this.trigger_up('search-change', this.searchData)
     }
     _initSearchBar() {
         let self = this;
@@ -244,9 +245,9 @@ class Main extends Component {
             }
         })
         this.searchRef.el.addEventListener('click', event=>{
-            if (self.loadedData){
+            if (self.searchData){
                 self.searchResultRef.el.innerHTML = '';
-                self.loadSearchedTickets(self.loadedData);
+                self.loadSearchedTickets(self.searchData);
                 event.stopImmediatePropagation();
             }
         })

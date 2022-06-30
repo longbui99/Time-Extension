@@ -19,6 +19,7 @@ class Home extends Component {
     'relative-updated': this.onRelativeUpdated,
     'load_start': this.onLoadStart,
     'load_done': this.onLoadDone,
+    'search-change': this.searchChanged
   }
   constructor() {
     super(...arguments);
@@ -150,6 +151,18 @@ class Home extends Component {
       localStorage.setItem(storage, JSON.stringify(data));
     }
   }
+  async searchChanged(searchData){
+    if (chrome.storage){
+      let data = (await chrome.storage.local.get(["timeLogStorage"]))?.timeLogStorage
+      data.searchData = searchData;
+      chrome.storage.local.set({'timeLogStorage': data})
+      this.flushDataToExtension({searchData: data.searchData});
+    } else {
+      let data = JSON.parse(localStorage.getItem(storage) || "{}");
+      data.searchData = searchData;
+      localStorage.setItem(storage, JSON.stringify(data));
+    }
+  }
   onRelativeUpdated(relatives){
     if (this.subEnv.extensionID){
       this.flushDataToExtension({'relativeUpdate': relatives})
@@ -172,6 +185,11 @@ class Home extends Component {
       this.component.relatedActiveTickets = relativeActives;
       this.component.fetchRelativeActive();
       this.component.ticketData.broardcast = false;
+    }
+  }
+  searchedUpdate(searchData){
+    if (this.subEnv.authenticated) {
+      this.component.searchData = searchData;
     }
   }
   componentReady(){
