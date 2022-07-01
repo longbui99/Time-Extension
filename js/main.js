@@ -393,28 +393,26 @@ class Main extends Component {
         </div>`
     }
     insertCheckGroup(payload){
+        let newAC = ""
         if (!payload.params.id){
-            let embeddedDone = false;
-            let newAC = new DOMParser().parseFromString(this.makeACComponent('', payload.params, ''), 'text/html').body.firstChild;
-            if (payload.after){
-                let element = this.acContainerRef.el.querySelector(`[sequence="${payload.after}"`);
-                if (element){
-                    this.acContainerRef.el.insertBefore(newAC, element);
-                    embeddedDone = true
-                }
-            }
-            else if (payload.previous){
-                let element = this.acContainerRef.el.querySelector(`[sequence="${payload.previous}"`);
-                if (element){
-                    this.acContainerRef.el.insertBefore(newAC, element.nextElementSibling);
-                    embeddedDone = true
-                }
-            }
-            if (embeddedDone){
-                this.initEditACEvent(newAC, payload.params)
-            }
+            newAC = new DOMParser().parseFromString(this.makeACComponent('', payload.params, ''), 'text/html').body.firstChild;
+            this.initEditACEvent(newAC, payload.params)
         } else{
-            let element = this.acContainerRef.el.querySelector(`[checklistID="${payload.params.id}"`);
+            newAC = this.acContainerRef.el.querySelector(`[checklistID="${payload.params.id}"`);
+        }
+        if (payload.after){
+            let element = this.acContainerRef.el.querySelector(`[sequence="${payload.after}"`);
+            if (element){
+                this.acContainerRef.el.insertBefore(newAC, element);
+                embeddedDone = true
+            }
+        }
+        else if (payload.previous){
+            let element = this.acContainerRef.el.querySelector(`[sequence="${payload.previous}"`);
+            if (element){
+                this.acContainerRef.el.insertBefore(newAC, element.nextElementSibling);
+                embeddedDone = true
+            }
         }
     }
     checkListChanged(params, previousID, afterID){
