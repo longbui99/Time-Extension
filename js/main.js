@@ -396,7 +396,6 @@ class Main extends Component {
         let newAC = ""
         if (!payload.params.id){
             newAC = new DOMParser().parseFromString(this.makeACComponent('', payload.params, ''), 'text/html').body.firstChild;
-            this.initEditACEvent(newAC, payload.params)
         } else{
             newAC = this.acContainerRef.el.querySelector(`[checklistID="${payload.params.id}"`);
         }
@@ -404,15 +403,16 @@ class Main extends Component {
             let element = this.acContainerRef.el.querySelector(`[sequence="${payload.after}"`);
             if (element){
                 this.acContainerRef.el.insertBefore(newAC, element);
-                embeddedDone = true
             }
         }
         else if (payload.previous){
             let element = this.acContainerRef.el.querySelector(`[sequence="${payload.previous}"`);
             if (element){
                 this.acContainerRef.el.insertBefore(newAC, element.nextElementSibling);
-                embeddedDone = true
             }
+        }
+        if (!payload.params.id){
+            this.initEditACEvent(newAC, payload.params)
         }
     }
     checkListChanged(params, previousID, afterID){
@@ -421,7 +421,7 @@ class Main extends Component {
             'previous': previousID,
             'after': afterID
         }
-        this.trigger_up('checklist-changed', params)
+        this.trigger_up('checklist-changed', data)
     }
     async pushAC(el, params, parent, force=false){
         if (force || parent.getAttribute('force') === 'true' || (el.innerText !== "" && el.innerHTML.trim() !== el.nextElementSibling.innerHTML.trim())){
