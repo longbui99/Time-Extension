@@ -380,7 +380,7 @@ class Main extends Component {
         })
     }
     makeACComponent(_id, ac, content){
-        return `<div class="ac-container ${(ac.is_header?'header': '')} ${(ac.initial?'initial': '')}" sequence=${ac.sequence} header=${ac.is_header}>
+        return `<div class="ac-container checklistID="${ac.id}" ${(ac.is_header?'header': '')} ${(ac.initial?'initial': '')}" sequence=${ac.sequence} header=${ac.is_header}>
             <div class="ac-segment justify-content-between">
             ${(ac.initial?'': `<span class="drag-object"><span class="tm-icon-svg"><svg class="svg-inline--fa fa-sort drag-icon" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="sort" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 512" data-fa-i2svg=""><path fill="currentColor" d="M27.66 224h264.7c24.6 0 36.89-29.78 19.54-47.12l-132.3-136.8c-5.406-5.406-12.47-8.107-19.53-8.107c-7.055 0-14.09 2.701-19.45 8.107L8.119 176.9C-9.229 194.2 3.055 224 27.66 224zM292.3 288H27.66c-24.6 0-36.89 29.77-19.54 47.12l132.5 136.8C145.9 477.3 152.1 480 160 480c7.053 0 14.12-2.703 19.53-8.109l132.3-136.8C329.2 317.8 316.9 288 292.3 288z"></path></svg></span>
             </span>`)}
@@ -391,6 +391,39 @@ class Main extends Component {
                 </div>
             </div>
         </div>`
+    }
+    insertCheckGroup(payload){
+        if (!payload.params.id){
+            let embeddedDone = false;
+            let newAC = new DOMParser().parseFromString(this.makeACComponent('', payload.params, ''), 'text/html').body.firstChild;
+            if (payload.after){
+                let element = this.acContainerRef.el.querySelector(`[sequence="${payload.after}"`);
+                if (element){
+                    this.acContainerRef.el.insertBefore(newAC, element);
+                    embeddedDone = true
+                }
+            }
+            else if (payload.previous){
+                let element = this.acContainerRef.el.querySelector(`[sequence="${payload.previous}"`);
+                if (element){
+                    this.acContainerRef.el.insertBefore(newAC, element.nextElementSibling);
+                    embeddedDone = true
+                }
+            }
+            if (embeddedDone){
+                this.initEditACEvent(newAC, payload.params)
+            }
+        } else{
+            let element = this.acContainerRef.el.querySelector(`[checklistID="${payload.params.id}"`);
+        }
+    }
+    checkListChanged(params, previousID, afterID){
+        let data = {
+            'params': params,
+            'previous': previousID,
+            'after': afterID
+        }
+        this.trigger_up('checklist-changed', params)
     }
     async pushAC(el, params, parent, force=false){
         if (force || parent.getAttribute('force') === 'true' || (el.innerText !== "" && el.innerHTML.trim() !== el.nextElementSibling.innerHTML.trim())){
@@ -411,6 +444,7 @@ class Main extends Component {
             el.nextElementSibling.innerHTML = el.innerHTML.trim();
             parent.setAttribute('force', 'false')
         }
+        this.checkListChanged(params, parent.previousElementSibling?.getAttribute('sequence'), parent.nextElementSibling?.getAttribute('sequence'))
     }
     initEditACEvent(element, params){
         let self = this;
@@ -425,7 +459,9 @@ class Main extends Component {
             self.pushAC(element, params, baseParent, true)
         })
         element.addEventListener('click', (event) => {
-            if (element != window.selectedElement){
+            if (element != window.selectedElement 
+                && (element.innerText !== "" && element.innerHTML.trim() !== element.nextElementSibling.innerHTML.trim())
+                ){
                 let clickedElement = self.acContainerRef.el.querySelector('.editing');
                 clickedElement?.classList.remove('editing');
                 element.classList.add('editing');

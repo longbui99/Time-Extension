@@ -83,6 +83,9 @@ class PinPopup extends Component {
                 if (request.searchData){
                     self.component.searchedUpdate(request.searchData);
                 }
+                if (request.checkGroup){
+                    self.component.checkListUpdated(request.checkGroup);
+                }
                 sendResponse({farewell: "done"});
             }
         );

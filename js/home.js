@@ -19,7 +19,8 @@ class Home extends Component {
     'relative-updated': this.onRelativeUpdated,
     'load_start': this.onLoadStart,
     'load_done': this.onLoadDone,
-    'search-change': this.searchChanged
+    'search-change': this.searchChanged,
+    'checklist-changed': this.checkListChanged,
   }
   constructor() {
     super(...arguments);
@@ -169,6 +170,9 @@ class Home extends Component {
       this.flushDataToExtension({'relativeUpdate': relatives})
     }
   }
+  checkListChanged(payload){
+    this.flushDataToExtension({checkGroup: payload});
+  }
   flushDataToExtension(data){
     chrome.runtime.sendMessage(data);
   }
@@ -191,6 +195,11 @@ class Home extends Component {
   searchedUpdate(searchData){
     if (this.subEnv.authenticated) {
       this.component.searchData = searchData;
+    }
+  }
+  checkListUpdated(payload){
+    if (this.subEnv.authenticated){
+      this.component.insertCheckGroup(payload)
     }
   }
   componentReady(){
