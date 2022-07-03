@@ -622,9 +622,10 @@ svg:not(:host).tm-svg-inline--fa, svg:not(:root).tm-svg-inline--fa {
     width: 98%;
     box-shadow: rgba(100, 100, 111, 0.2) 0px 7px 29px 0px;
     color: grey;
-    max-height: 68%;
+    max-height: 70%;
     overflow-y: auto;
     z-index: 2017483647;
+    display: none;
 }
 
 .main-page .main-action-page .ticket.search-bar .search-bar-result p {
@@ -642,7 +643,6 @@ svg:not(:host).tm-svg-inline--fa, svg:not(:root).tm-svg-inline--fa {
 }
 .main-page .main-action-page .ticket.search-bar .search-bar-result p em{
     margin-left: auto;
-    max-width: 60px;
     overflow-x: hidden;
     white-space: nowrap;
     text-overflow: ellipsis;

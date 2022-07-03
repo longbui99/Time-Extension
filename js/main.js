@@ -198,7 +198,9 @@ class Main extends Component {
             let p = document.createElement('p');
             data[i].displayName = this._getDisplayName(record);
             let statusSpan = document.createElement('em')
-            statusSpan.innerText = this._minifyString(record.status, 11)
+            let sprints = (record.sprint && record.sprint.split(' ') || '')
+            let sprintText = ((typeof sprints === 'string')? '' : "|" + sprints[sprints.length-1])
+            statusSpan.innerHTML = `${this._minifyString(record.status, 5)}<b>${sprintText} </b>`
             let typeImg = document.createElement('img')
             typeImg.setAttribute('src', record.type_url)
             let textSpan = document.createElement('span')
@@ -239,7 +241,8 @@ class Main extends Component {
     _initSearchBar() {
         let self = this;
         this.searchRef.el.addEventListener('change', (event) => {
-            this.searchResultRef.el.innerHTML = '';
+            self.searchResultRef.el.innerHTML = '';
+            self.searchResultRef.el.style.display = 'none';
             if (this.searchRef.el.value.length > 0) {
                 self._searchTicket(this.searchRef.el.value)
             }
@@ -247,6 +250,7 @@ class Main extends Component {
         this.searchRef.el.addEventListener('click', event=>{
             if (self.searchData){
                 self.searchResultRef.el.innerHTML = '';
+                self.searchResultRef.el.style.display = 'none';
                 self.loadSearchedTickets(self.searchData);
                 event.stopImmediatePropagation();
             }
@@ -380,7 +384,7 @@ class Main extends Component {
         })
     }
     makeACComponent(_id, ac, content){
-        return `<div class="ac-container checklistID="${ac.id}" ${(ac.is_header?'header': '')} ${(ac.initial?'initial': '')}" sequence=${ac.sequence} header=${ac.is_header}>
+        return `<div class="ac-container ${(ac.is_header?'header': '')} ${(ac.initial?'initial': '')}" checklistID="${ac.id}"  sequence=${ac.sequence} header=${ac.is_header}>
             <div class="ac-segment justify-content-between">
             ${(ac.initial?'': `<span class="drag-object"><span class="tm-icon-svg"><svg class="svg-inline--fa fa-sort drag-icon" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="sort" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 512" data-fa-i2svg=""><path fill="currentColor" d="M27.66 224h264.7c24.6 0 36.89-29.78 19.54-47.12l-132.3-136.8c-5.406-5.406-12.47-8.107-19.53-8.107c-7.055 0-14.09 2.701-19.45 8.107L8.119 176.9C-9.229 194.2 3.055 224 27.66 224zM292.3 288H27.66c-24.6 0-36.89 29.77-19.54 47.12l132.5 136.8C145.9 477.3 152.1 480 160 480c7.053 0 14.12-2.703 19.53-8.109l132.3-136.8C329.2 317.8 316.9 288 292.3 288z"></path></svg></span>
             </span>`)}
@@ -399,16 +403,16 @@ class Main extends Component {
         } else{
             newAC = this.acContainerRef.el.querySelector(`[checklistID="${payload.params.id}"`);
         }
-        if (payload.after){
-            let element = this.acContainerRef.el.querySelector(`[sequence="${payload.after}"`);
-            if (element){
-                this.acContainerRef.el.insertBefore(newAC, element);
-            }
-        }
-        else if (payload.previous){
+        if (payload.previous){
             let element = this.acContainerRef.el.querySelector(`[sequence="${payload.previous}"`);
             if (element){
                 this.acContainerRef.el.insertBefore(newAC, element.nextElementSibling);
+            }
+        }
+        else if (payload.after){
+            let element = this.acContainerRef.el.querySelector(`[sequence="${payload.after}"`);
+            if (element){
+                this.acContainerRef.el.insertBefore(newAC, element);
             }
         }
         if (!payload.params.id){
@@ -441,12 +445,15 @@ class Main extends Component {
             parent.classList.remove("unsaved");
             el.nextElementSibling.innerHTML = el.innerHTML.trim();
             parent.setAttribute('force', 'false')
+            element._checkListData = params;
         }
-        this.checkListChanged(params, parent.previousElementSibling?.getAttribute('sequence'), parent.nextElementSibling?.getAttribute('sequence'))
+
+        // this.checkListChanged(params, parent.previousElementSibling?.getAttribute('sequence'), parent.nextElementSibling?.getAttribute('sequence'))
     }
     initEditACEvent(element, params){
         let self = this;
-        let baseParent = element
+        let baseParent = element;
+        element._checkListData = params;
         while (!baseParent.classList.contains('ac-container')) baseParent = baseParent.parentNode;
         function resetSequence(){
             for (let index = 0; index < baseParent.parentNode.childNodes.length; index++){
