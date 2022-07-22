@@ -526,6 +526,9 @@ svg:not(:root).tm-svg-inline--fa {
     border-left: none;
     white-space: pre-wrap;
 }
+.main-page .main-action-page .acceptance-criteria .ac-content .ac-container .ac-segment .tm-form-check-label br{
+    display: inline;
+}
 
 .main-page .main-action-page .acceptance-criteria .ac-content .ac-container.header .ac-segment .tm-form-check {
     width: 100%;

@@ -66,9 +66,10 @@ let ac_rules = {
     '*': ['<em>', '</em>'],
 }
 let replace_rule = {
-    '\r\n\r\n': '<br>',
-    '\r\n': '<br>',
-    '\n': '<br>'
+    '\r\n\r\n': '<br/>',
+    '\n\r\n': '<br/>',
+    '\r\n': '<br/>',
+    '\n': '<br/>'
 }
 
 function parseAC(text){
