@@ -749,21 +749,21 @@ svg:not(:root).tm-svg-inline--fa {
 }
 
 .main-page .main-action-page .tm-tab.left .tm-tab-background {
-    animation: tm-tab-left2right 0.5s;
+    animation: tm-tab-left2right 0.3s;
     background-image: linear-gradient(to right, var(--primary) 80%, white);
 }
 
 .main-page .main-action-page .tm-tab.right .tm-tab-background {
-    animation: tm-tab-right2left 0.5s;
+    animation: tm-tab-right2left 0.3s;
     background-image: linear-gradient(to left, var(--primary) 80%, white);
 }
 .main-page .main-action-page .tm-tab.middle .tm-tab-background {
-    animation: tm-tab-middle 0.5s;
+    animation: tm-tab-middle 0.2s;
     background-image: linear-gradient(to left, white, var(--primary) 25%, var(--primary) 75%, white);
 }
 
 .main-page .main-action-page .tm-tab .tm-tab-action {
-    min-width: 33.33%;
+    min-width: 33%;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -793,6 +793,7 @@ svg:not(:root).tm-svg-inline--fa {
     background-color: white;
     border-top: unset;
     box-shadow: rgba(0, 0, 0, 0.16) 0px 3px 6px, rgba(0, 0, 0, 0.23) 0px 3px 6px;
+    min-height: 200px;
 }
 
 .main-page .main-action-page .ticket.time-log {
@@ -926,8 +927,7 @@ svg:not(:root).tm-svg-inline--fa {
     cursor: pointer;
     color: orange;
 }
-
-.main-page .main-action-page .ticket.time-log .time-action .action-group .action .btn {
+.btn {
     background-color: #c2fbd7;
     border-radius: 10%;
     color: var(--primary);
@@ -943,8 +943,7 @@ svg:not(:root).tm-svg-inline--fa {
     touch-action: manipulation;
     font-weight: 500;
 }
-
-.main-page .main-action-page .ticket.time-log .time-action .action-group .action .btn:hover {
+.btn:hover {
     box-shadow:
         rgba(44, 187, 99, .35) 0 -25px 18px -14px inset,
         rgba(44, 187, 99, .25) 0 1px 2px,
@@ -954,13 +953,11 @@ svg:not(:root).tm-svg-inline--fa {
         rgba(44, 187, 99, .25) 0 16px 32px;
     transform: scale(1.05) rotate(-1deg);
 }
-
-.main-page .main-action-page .ticket.time-log .time-action .action-group .action .btn.btn-pause {
+.btn.btn-pause {
     background-color: #f7fbc2;
     color: var(--third);
 }
-
-.main-page .main-action-page .ticket.time-log .time-action .action-group .action .btn.btn-pause:hover {
+.btn.btn-pause:hover {
     box-shadow:
         rgba(187, 137, 44, 0.35) 0 -25px 18px -14px inset,
         rgba(187, 137, 44, 0.35) 0 1px 2px,
@@ -969,13 +966,11 @@ svg:not(:root).tm-svg-inline--fa {
         rgba(187, 137, 44, 0.35) 0 8px 16px,
         rgba(187, 137, 44, 0.35) 0 16px 32px;
 }
-
-.main-page .main-action-page .ticket.time-log .time-action .action-group .action .btn.btn-done {
+.btn.btn-done {
     background-color: #9eeffc;
     color: #042f6e;
 }
-
-.main-page .main-action-page .ticket.time-log .time-action .action-group .action .btn.btn-done:hover{
+.btn.btn-done:hover{
     box-shadow:
         rgba(44, 111, 187, 0.35) 0 -25px 18px -14px inset,
         rgba(44, 111, 187, 0.35) 0 1px 2px,
@@ -983,8 +978,40 @@ svg:not(:root).tm-svg-inline--fa {
         rgba(44, 111, 187, 0.35) 0 4px 8px,
         rgba(44, 111, 187, 0.35) 0 8px 16px,
         rgba(44, 111, 187, 0.35) 0 16px 32px;
-
 }
+.btn.btn-done {
+    background-color: #9eeffc;
+    color: #042f6e;
+}
+.btn.btn-done:hover{
+    box-shadow:
+        rgba(44, 111, 187, 0.35) 0 -25px 18px -14px inset,
+        rgba(44, 111, 187, 0.35) 0 1px 2px,
+        rgba(44, 111, 187, 0.35) 0 2px 4px,
+        rgba(44, 111, 187, 0.35) 0 4px 8px,
+        rgba(44, 111, 187, 0.35) 0 8px 16px,
+        rgba(44, 111, 187, 0.35) 0 16px 32px;
+}
+.btn.btn-danger {
+    background-color: #fc9e9e;
+    color: #6e0404;
+}
+.btn.btn-danger:hover{
+    box-shadow:
+        rgba(187, 44, 44, 0.35) 0 -25px 18px -14px inset,
+        rgba(187, 44, 44, 0.35) 0 1px 2px,
+        rgba(187, 44, 44, 0.35) 0 2px 4px,
+        rgba(187, 44, 44, 0.35) 0 4px 8px,
+        rgba(187, 44, 44, 0.35) 0 8px 16px,
+        rgba(187, 44, 44, 0.35) 0 16px 32px;
+}
+.btn.btn-thin{
+    padding: 3px;
+}
+.btn svg{
+    width: 1em;
+}
+
 
 
 .main-page .main-action-page .ticket.time-log .time-action .start-date-label {
@@ -1002,4 +1029,66 @@ svg:not(:root).tm-svg-inline--fa {
 .main-page .main-action-page .ticket.time-log .time-action .start-date {
     display: none;
     font-size: 0.5em;
+}
+
+.main-page .main-action-page .favorite-tickets {
+    width: 100%;
+}
+
+.main-page .main-action-page .favorite-content {
+    display: flex;
+    flex-flow: column;
+}
+.main-page .main-action-page .favorite-content .favorite-content-navigator {
+    display: flex;
+    justify-content: flex-end;
+    padding: 5px;
+}
+.main-page .main-action-page .favorite-content .favorite-content-navigator .button-remove-favorite{
+    display: none;
+}
+.main-page .main-action-page .favorite-content .favorite-content-navigator.favorite .button-add-favorite{
+    display: none;
+}
+.main-page .main-action-page .favorite-content .favorite-content-navigator.favorite .button-remove-favorite{
+    display: unset;
+}
+.main-page .main-action-page .favorite-list{
+    width: 100%;
+    box-shadow: rgba(0, 0, 0, 0.16) 0px 3px 6px, rgba(0, 0, 0, 0.23) 0px 3px 6px;
+    display: flex;
+    flex-flow: column;
+}
+.main-page .main-action-page .favorite-list .favorite-ticket{
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 96%;
+    padding: 5px 2% 5px 2%;
+    border-bottom: solid 1px lightgray;
+}
+.main-page .main-action-page .favorite-list .favorite-ticket .favorite-ticket-key{
+    font-weight: 700;
+    color: var(--primary);
+    font-size: 1.1em;
+    cursor: pointer;
+    width: fit-content;
+    display: inline-block;
+    width: 20%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+.main-page .main-action-page .favorite-list .favorite-ticket .favorite-ticket-key:hover{
+    color: orange;
+}
+.main-page .main-action-page .favorite-list .favorite-ticket .favorite-ticket-name{
+    width: 75%;
+    text-align: left;
+    overflow-x: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+.main-page .main-action-page .favorite-list .favorite-ticket .favorite-ticket-action{
+    width: 5%;
 }
