@@ -323,6 +323,7 @@ svg:not(:root).tm-svg-inline--fa {
     width: 100%;
 }
 
+
 .main-page .main-action-page .ticket-active .active-item-group .active-item .icon-group {
     width: 10%;
 }
@@ -337,10 +338,25 @@ svg:not(:root).tm-svg-inline--fa {
 }
 
 .main-page .main-action-page .ticket-active .active-item-group .active-item .ticket-key {
+    display: inline-block;
+    width: max-content;
+    white-space: nowrap;
+    color: var(--primary);
+    font-weight: 800;
+    margin-right: 10px;
+    cursor: pointer;
+}
+.main-page .main-action-page .ticket-active .active-item-group .active-item .ticket-key:hover{
+    color: orange;
+}
+
+.main-page .main-action-page .ticket-active .active-item-group .active-item .ticket-name {
     width: 100%;
-    overflow: hidden;
+    overflow-x: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
+    display: inline-block;
+    max-width: 500px;
 }
 
 .main-page .main-action-page .ticket-active .active-item-group .active-item .duration {
@@ -719,6 +735,16 @@ svg:not(:root).tm-svg-inline--fa {
     }
 }
 
+@keyframes tm-tab-middle {
+    from {
+        height: 0%;
+    }
+
+    to {
+        height: 100%;
+    }
+}
+
 .main-page .main-action-page .tm-tab.left .tm-tab-background {
     animation: tm-tab-left2right 0.5s;
     background-image: linear-gradient(to right, var(--primary) 80%, white);
@@ -728,9 +754,13 @@ svg:not(:root).tm-svg-inline--fa {
     animation: tm-tab-right2left 0.5s;
     background-image: linear-gradient(to left, var(--primary) 80%, white);
 }
+.main-page .main-action-page .tm-tab.middle .tm-tab-background {
+    animation: tm-tab-middle 0.5s;
+    background-image: linear-gradient(to left, white, var(--primary) 25%, var(--primary) 75%, white);
+}
 
 .main-page .main-action-page .tm-tab .tm-tab-action {
-    width: 50%;
+    min-width: 33.33%;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -886,6 +916,7 @@ svg:not(:root).tm-svg-inline--fa {
     display: flex;
     justify-content: space-between;
     height: 32px;
+    position: relative;
 }
 
 .main-page .main-action-page .ticket.time-log .time-action .action-group .action:hover {
@@ -895,16 +926,9 @@ svg:not(:root).tm-svg-inline--fa {
 
 .main-page .main-action-page .ticket.time-log .time-action .action-group .action .btn {
     background-color: #c2fbd7;
-    border-radius: 100px;
-    box-shadow: rgba(4, 105, 105, .2) 0 -25px 18px -14px inset,
-        rgba(4, 105, 105, .15) 0 1px 2px,
-        rgba(4, 105, 105, .15) 0 2px 4px,
-        rgba(4, 105, 105, .15) 0 4px 8px,
-        rgba(4, 105, 105, .15) 0 8px 16px,
-        rgba(4, 105, 105, .15) 0 16px 32px;
+    border-radius: 10%;
     color: var(--primary);
     cursor: pointer;
-    display: inline-block;
     padding: 7px 20px;
     text-align: center;
     text-decoration: none;
@@ -914,8 +938,7 @@ svg:not(:root).tm-svg-inline--fa {
     user-select: none;
     -webkit-user-select: none;
     touch-action: manipulation;
-    height: 30px;
-    margin-top: -2px;
+    font-weight: 500;
 }
 
 .main-page .main-action-page .ticket.time-log .time-action .action-group .action .btn:hover {
@@ -932,24 +955,32 @@ svg:not(:root).tm-svg-inline--fa {
 .main-page .main-action-page .ticket.time-log .time-action .action-group .action .btn.btn-pause {
     background-color: #f7fbc2;
     color: var(--third);
+}
+
+.main-page .main-action-page .ticket.time-log .time-action .action-group .action .btn.btn-pause:hover {
     box-shadow:
-        rgba(105, 103, 4, 0.15) 0 1px 2px,
-        rgba(105, 103, 4, 0.15) 0 2px 4px,
-        rgba(105, 103, 4, 0.15) 0 4px 8px,
-        rgba(105, 103, 4, 0.15) 0 8px 16px,
-        rgba(105, 103, 4, 0.15) 0 16px 32px;
-    ;
+        rgba(187, 137, 44, 0.35) 0 -25px 18px -14px inset,
+        rgba(187, 137, 44, 0.35) 0 1px 2px,
+        rgba(187, 137, 44, 0.35) 0 2px 4px,
+        rgba(187, 137, 44, 0.35) 0 4px 8px,
+        rgba(187, 137, 44, 0.35) 0 8px 16px,
+        rgba(187, 137, 44, 0.35) 0 16px 32px;
 }
 
 .main-page .main-action-page .ticket.time-log .time-action .action-group .action .btn.btn-done {
-    background-color: #fbc4c2;
+    background-color: #9eeffc;
+    color: #042f6e;
+}
+
+.main-page .main-action-page .ticket.time-log .time-action .action-group .action .btn.btn-done:hover{
     box-shadow:
-        rgba(105, 4, 4, 0.15) 0 1px 2px,
-        rgba(105, 4, 4, 0.15) 0 2px 4px,
-        rgba(105, 4, 4, 0.15) 0 4px 8px,
-        rgba(105, 4, 4, 0.15) 0 8px 16px,
-        rgba(105, 4, 4, 0.15) 0 16px 32px;
-    color: var(--secondary);
+        rgba(44, 111, 187, 0.35) 0 -25px 18px -14px inset,
+        rgba(44, 111, 187, 0.35) 0 1px 2px,
+        rgba(44, 111, 187, 0.35) 0 2px 4px,
+        rgba(44, 111, 187, 0.35) 0 4px 8px,
+        rgba(44, 111, 187, 0.35) 0 8px 16px,
+        rgba(44, 111, 187, 0.35) 0 16px 32px;
+
 }
 
 

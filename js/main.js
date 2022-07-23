@@ -22,6 +22,7 @@ class Main extends Component {
     acContainerRef = this.useRef("ac-content")
     timeLogHeadingRef = this.useRef('time-log-heading')
     acHeadingRef = this.useRef('ac-heading')
+    favoriteHeadingRef = this.useRef('favorite-heading')
     timeLogSectionRef = this.useRef('time-log-section')
     acSectionRef = this.useRef('tm-ac-section')
 
@@ -74,13 +75,11 @@ class Main extends Component {
         for (let record of this.relatedActiveTickets) {
             template += `
                 <div class="active-item">
-                    <div class="icon-group push-relative-ticket">
-                        <span class="tm-icon" tabindex="${1100+i}">
-                            <span class="tm-icon-svg"><svg class="svg-inline--fa fa-map-pin" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="map-pin" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 512" data-fa-i2svg=""><path fill="currentColor" d="M320 144C320 223.5 255.5 288 176 288C96.47 288 32 223.5 32 144C32 64.47 96.47 0 176 0C255.5 0 320 64.47 320 144zM192 64C192 55.16 184.8 48 176 48C122.1 48 80 90.98 80 144C80 152.8 87.16 160 96 160C104.8 160 112 152.8 112 144C112 108.7 140.7 80 176 80C184.8 80 192 72.84 192 64zM144 480V317.1C154.4 319 165.1 319.1 176 319.1C186.9 319.1 197.6 319 208 317.1V480C208 497.7 193.7 512 176 512C158.3 512 144 497.7 144 480z"></path></svg></span>
-                        </span>
-                    </div>
-                    <span class="ticket-key" title="${this._getDisplayName(record, 40)}">
-                        ${this._getDisplayName(record, 40)}
+                    <span class="ticket-key" tabindex="${1100+i}">
+                        ${record.key}   
+                    </span>
+                    <span class="ticket-name" title="${record.name}">
+                        ${record.name}
                     </span>
                     <span class="duration">
                         ${this.secondToString(record.active_duration)}
@@ -89,7 +88,7 @@ class Main extends Component {
             i++;
         }   
         this.relatedActiveRef.el.innerHTML = template;
-        let elements = this.relatedActiveRef.el.querySelectorAll('.push-relative-ticket')
+        let elements = this.relatedActiveRef.el.querySelectorAll('.ticket-key')
         let self = this;
         let progressLog = []
         for (let index = 0; index < elements.length; index++) {
@@ -116,7 +115,7 @@ class Main extends Component {
 
     }
     async fetchTicketFromServer(){
-        let response = (await this.do_request('GET', `${this.subEnv.serverURL}/management/ticket/fetch/${this.ticketData.id}?jwt=${this.subEnv.jwt}`));
+        let response = (await this.do_invisible_request('GET', `${this.subEnv.serverURL}/management/ticket/fetch/${this.ticketData.id}?jwt=${this.subEnv.jwt}`));
         this.renderContent()
     }
     async actionExportToOriginalServer(){
@@ -156,7 +155,7 @@ class Main extends Component {
         }
         if (this.ticketData) {
             if (refresh && !this.ticketData.broardcast) {
-                let response = (await this.do_request('GET', `${this.subEnv.serverURL}/management/ticket/get/${this.ticketData.id}?jwt=${this.subEnv.jwt}`));
+                let response = (await this.do_invisible_request('GET', `${this.subEnv.serverURL}/management/ticket/get/${this.ticketData.id}?jwt=${this.subEnv.jwt}`));
                 let result = (await response.json());
                 for (let key of Object.keys(result)) { this.ticketData[key] = result[key]; }
             }
@@ -233,7 +232,7 @@ class Main extends Component {
         element.style.display = 'inline-block';
     }
     async _searchTicket(text) {
-        let result = (await this.do_request('GET', `${this.subEnv.serverURL}/management/ticket/search/${text}?limitRecord=${11}&jwt=${this.subEnv.jwt}`));
+        let result = (await this.do_invisible_request('GET', `${this.subEnv.serverURL}/management/ticket/search/${text}?limitRecord=${11}&jwt=${this.subEnv.jwt}`));
         this.searchData = (await result.json());
         this.loadSearchedTickets(this.searchData);
         this.trigger_up('search-change', this.searchData)
@@ -265,7 +264,7 @@ class Main extends Component {
                 'source': 'Extension'
             }
         }
-        let result = (await this.do_request('POST', `${this.subEnv.serverURL}/management/ticket/work-log/pause`, params));
+        let result = (await this.do_invisible_request('POST', `${this.subEnv.serverURL}/management/ticket/work-log/pause`, params));
         if (refresh)
             this.renderTicketData(true);
     }
@@ -286,7 +285,7 @@ class Main extends Component {
                 'source': 'Extension'
             }
         }
-        let result = (await this.do_request('POST', `${this.subEnv.serverURL}/management/ticket/work-log/add`, params));
+        let result = (await this.do_invisible_request('POST', `${this.subEnv.serverURL}/management/ticket/work-log/add`, params));
         this.renderTicketData(true);
     }
     _initAddWorkLog() {
@@ -326,10 +325,10 @@ class Main extends Component {
 
         if (triggerServer) {
             this.ticketData.timeStatus = false;
-            (await this.do_request('POST', `${this.subEnv.serverURL}/management/ticket/work-log/done`, params));
+            (await this.do_invisible_request('POST', `${this.subEnv.serverURL}/management/ticket/work-log/done`, params));
         }
         else {
-            (await this.do_request('POST', `${this.subEnv.serverURL}/management/ticket/work-log/manual`, params));
+            (await this.do_invisible_request('POST', `${this.subEnv.serverURL}/management/ticket/work-log/manual`, params));
             this.manualLogref.el.value = '';
         }
         this.renderTicketData(true)
@@ -378,7 +377,7 @@ class Main extends Component {
                     "jwt": self.subEnv.jwt,
                     "payload": payload
                 }
-                await self.do_request('POST', `${self.subEnv.serverURL}/management/ticket/work-log/cancel`, params);
+                await self.do_invisible_request('POST', `${self.subEnv.serverURL}/management/ticket/work-log/cancel`, params);
                 self.renderTicketData(true);
             }
         })
@@ -725,7 +724,7 @@ class Main extends Component {
                 if (this.subEnv.contentState.showLog){
                     result = (await this.do_invisible_request('GET', `${this.subEnv.serverURL}/management/ticket/ac?${new URLSearchParams(params)}`));
                 } else{
-                    result = (await this.do_request('GET', `${this.subEnv.serverURL}/management/ticket/ac?${new URLSearchParams(params)}`));
+                    result = (await this.do_invisible_request('GET', `${this.subEnv.serverURL}/management/ticket/ac?${new URLSearchParams(params)}`));
                 }
                 result = (await result.json())
                 this.ticketData.acs = result;
@@ -766,37 +765,41 @@ class Main extends Component {
             })
         }
     }
-    contentStateChange(element, contentElement, type, customClass=""){
-        if (type){
-            element.classList.add('tm-active');
-            contentElement.classList.add('open');
-            contentElement.classList.remove('tm-close');
-            element.parentElement.classList.add(customClass);
-        } else{
-            element.classList.remove('tm-active')
-            contentElement.classList.remove('open')
-            contentElement.classList.add('tm-close')
+    contentStateChange(newClass){
+        for (let key in this.subEnv.contentState){
+            if (this.subEnv.contentState[key]){
+                this.tabAtionElements[key][0].classList.add('tm-active');
+                this.tabAtionElements[key][1].classList.add('open');
+                this.tabAtionElements[key][1].classList.remove('tm-close');
+                let parent = this.tabAtionElements[key][0].parentElement;
+                parent.classList.remove('right', 'left', 'middle');
+                parent.classList.add(this.tabAtionElements[key][0].getAttribute('data-action'));
+            }
+            else{
+                this.tabAtionElements[key][0].classList.remove('tm-active');
+                this.tabAtionElements[key][1].classList.remove('open');
+                this.tabAtionElements[key][1].classList.add('tm-close');
+            }
         }
     }
-    initContentState(){
+    initContentState(newClass){
         if (this.subEnv.contentState){
-            this.contentStateChange(this.timeLogHeadingRef.el, this.timeLogSectionRef.el, this.subEnv.contentState.showLog, "left");
-            this.contentStateChange(this.acHeadingRef.el, this.acSectionRef.el, this.subEnv.contentState.showAC, "right");
+            this.contentStateChange(newClass);
+            this.contentStateChange(newClass);
         } else{
             this.subEnv.contentState = {
                 showLog: true,
-                showAC: false
+                showAC: false,
+                showFavorite: false
             }
             this.trigger_up('set-env', this.subEnv)
+            this.initContentState(newClass);
         }
     }
-    triggerContentType(class1, class2){
-        this.initContentState();
-        this.renderContent();
+    triggerContentType(newClass){
+        this.initContentState(newClass);
+        this.renderContent(false);
         this.trigger_up('set-env', this.subEnv)
-        let parent = this.timeLogHeadingRef.el.parentElement;
-        parent.classList.remove(class1);
-        parent.classList.add(class2);
     }
     initContentEvent(){
         let self = this;
@@ -804,14 +807,14 @@ class Main extends Component {
             if (!self.subEnv.contentState.showLog){
                 self.subEnv.contentState.showAC = false;
                 self.subEnv.contentState.showLog = true;
-                self.triggerContentType('right', 'left')
+                self.triggerContentType('left')
             }
         })
         this.acHeadingRef.el.addEventListener('click', ()=>{
             if (!self.subEnv.contentState.showAC){
                 self.subEnv.contentState.showLog = false;
                 self.subEnv.contentState.showAC = true;
-                self.triggerContentType('left', 'right')
+                self.triggerContentType('right')
             }
         })
     }
@@ -819,7 +822,7 @@ class Main extends Component {
         this.relatedActiveRef.el.parentNode.style.display = "none";
         if (!this.ticketData?.broardcast){
             let params = JSON.stringify({
-                "except": this.ticketData.id,
+                "except": this.ticketData?.id,
                 "limit": 6,
                 "source": "Extension"
             }), self = this;
@@ -841,7 +844,7 @@ class Main extends Component {
             this.statusRef.el.innerText = this.ticketData.status || '';
         }
     }
-    async renderContent(){
+    async renderContent(refreshRelated=true){
         if (this.ticketData){
             this.ticketData.displayName = this._getDisplayName(this.ticketData);
             this.searchRef.el.value = this.ticketData.displayName;
@@ -850,12 +853,14 @@ class Main extends Component {
         } else {
             this.el.querySelector('.ticket-navigation').style.display = "none";
         }
-        this.fetchRelativeActive();
         if (this.subEnv.contentState.showLog){
             await this.renderTicketData(true);
         } 
         if (this.subEnv.contentState.showAC) {
             await this.initACs();
+        }
+        if (refreshRelated){
+            this.fetchRelativeActive()
         }
         this.renderOverview()
         this.trigger_up("load_done", this.loadID)
@@ -868,7 +873,7 @@ class Main extends Component {
         this._initManualChange();
         this._initCommentEvent();
         this._initIconRef();
-        flatpickr(this.loggedDate.el,{defaultDate: new Date(),dateFormat: 'Y-m-d'});
+        this.flatPickr = flatpickr(this.loggedDate.el,{defaultDate: new Date(),dateFormat: 'Y-m-d'});
         window.addEventListener('keydown', event=>{
             if (event.keyCode === 13){
                 document.activeElement.click()               
@@ -892,13 +897,25 @@ class Main extends Component {
                     self._doneWorkLog();
                 }
             }
+            if (event.key === "Escape"){
+                this.searchResultRef.el.style.display = 'none';
+                self.flatPickr.close();
+            }
         })
         window.addEventListener('click', event=>{
             self.searchResultRef.el.innerHTML = ""
         })
     }
+    initGeneral(){
+        this.tabAtionElements = {
+            'showLog': [this.timeLogHeadingRef.el, this.timeLogSectionRef.el],
+            'showAC': [this.acHeadingRef.el, this.acSectionRef.el]
+            // 'showFavorite': [this.favoriteHeadingRef.el, this.timeLogSectionRef.el]
+        }
+    }
     mounted() {
         let res = super.mounted();
+        this.initGeneral();
         this.initContentState();
         this.initContentEvent();
         this._initSearchBar();
@@ -912,16 +929,16 @@ class Main extends Component {
                 <div class="ticket-type">
                     <span l-ref="type-ref"></span>
                 </div>
-                <input type="text" class="tm-form-control input-s-ticket" placeholder="Search Ticket" l-ref="search-bar-ticket" tabindex="1"/>
+                <input type="text" class="tm-form-control input-s-ticket" placeholder="Search Ticket" l-ref="search-bar-ticket" tabindex="1" title="Ctrl+Shift+F"/>
                     <div class="ticket-navigation">
                         <div class="navigation-group"> 
                             <div class="ticket-status" l-ref="status-ref"></div>
-                            <span l-ref="open-ticket" tabindex="998">
+                            <span l-ref="open-ticket" tabindex="998" title="Ctrl+Shift+E or Ctrl+Alt+Click: Export To The Original Server">
                                 <span class="tm-icon-svg">
                                 <svg class="tm-svg-inline--fa" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="square-arrow-up-right" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" data-fa-i2svg=""><path fill="currentColor" d="M384 32H64C28.65 32 0 60.66 0 96v320c0 35.34 28.65 64 64 64h320c35.35 0 64-28.66 64-64V96C448 60.66 419.3 32 384 32zM344 312c0 17.69-14.31 32-32 32s-32-14.31-32-32V245.3l-121.4 121.4C152.4 372.9 144.2 376 136 376s-16.38-3.125-22.62-9.375c-12.5-12.5-12.5-32.75 0-45.25L234.8 200H168c-17.69 0-32-14.31-32-32s14.31-32 32-32h144c17.69 0 32 14.31 32 32V312z"></path></svg>                            
                                 </span>
                             </span>
-                            <span l-ref="reload-ticket" tabindex="999">
+                            <span l-ref="reload-ticket" tabindex="999" title="Reload From The Original Server">
                             <span class="tm-icon-svg">
                                 <svg class="svg-inline--fa fa-arrow-rotate-right" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="arrow-rotate-right" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" data-fa-i2svg=""><path fill="currentColor" d="M496 48V192c0 17.69-14.31 32-32 32H320c-17.69 0-32-14.31-32-32s14.31-32 32-32h63.39c-29.97-39.7-77.25-63.78-127.6-63.78C167.7 96.22 96 167.9 96 256s71.69 159.8 159.8 159.8c34.88 0 68.03-11.03 95.88-31.94c14.22-10.53 34.22-7.75 44.81 6.375c10.59 14.16 7.75 34.22-6.375 44.81c-39.03 29.28-85.36 44.86-134.2 44.86C132.5 479.9 32 379.4 32 256s100.5-223.9 223.9-223.9c69.15 0 134 32.47 176.1 86.12V48c0-17.69 14.31-32 32-32S496 30.31 496 48z"></path></svg>                        
                             </span>
@@ -939,11 +956,14 @@ class Main extends Component {
         <div class="tm-tab">
             <div class="tm-tab-background">
             </div>
-            <div class="tm-tab-action" l-ref="time-log-heading" >
+            <div class="tm-tab-action" data-action="left" l-ref="time-log-heading"  title="Ctrl+Shift+1">
                 Clock
             </div>
-            <div class="tm-tab-action" l-ref="ac-heading" >
-                Checklist
+            <div class="tm-tab-action" data-action="middle" l-ref="ac-heading" title="Ctrl+Shift+2">
+                Checklists
+            </div>
+            <div class="tm-tab-action" data-action="right" l-ref="favorite-heading" title="Ctrl+Shift+3">
+                Favorites
             </div>
         </div>
         <div class="tm-tab-content">
@@ -963,7 +983,7 @@ class Main extends Component {
                             <small l-ref="total-duration">0m</small>
                         </div>
                         <div class="active-duration">
-                            <span l-ref="active-duration-icon" class="avt">
+                            <span l-ref="active-duration-icon" class="avt" title="Ctrl+Alt+Click: To delete current tracking">
                                 <span class="tm-icon-svg"><svg class="svg-inline--fa fa-stopwatch" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="stopwatch" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" data-fa-i2svg=""><path fill="currentColor" d="M272 0C289.7 0 304 14.33 304 32C304 49.67 289.7 64 272 64H256V98.45C293.5 104.2 327.7 120 355.7 143L377.4 121.4C389.9 108.9 410.1 108.9 422.6 121.4C435.1 133.9 435.1 154.1 422.6 166.6L398.5 190.8C419.7 223.3 432 262.2 432 304C432 418.9 338.9 512 224 512C109.1 512 16 418.9 16 304C16 200 92.32 113.8 192 98.45V64H176C158.3 64 144 49.67 144 32C144 14.33 158.3 0 176 0L272 0zM248 192C248 178.7 237.3 168 224 168C210.7 168 200 178.7 200 192V320C200 333.3 210.7 344 224 344C237.3 344 248 333.3 248 320V192z"></path></svg>
                             </span>
                             </span> <span l-ref="active-duration">0m</span>
@@ -981,9 +1001,7 @@ class Main extends Component {
                         <div class="action-group">
                             <div>
                                 <div class="action add" l-ref="action-add" tabindex="1003">
-                                    <span class="tm-icon-svg">
-                                        <button class="btn btn-start">START</button>    
-                                    </span>
+                                    <button class="btn btn-start">START</button>    
                                 </div>
                             </div>
                             <div>
@@ -993,7 +1011,7 @@ class Main extends Component {
                                 </span>
                                 </div>
                             </div>
-                            <div>
+                            <div title="Ctrl+Enter">
                                 <div class="action stop" l-ref="action-stop" tabindex="1005">
                                 <span class="tm-icon-svg">
                                     <button type="button"  class="btn btn-done">DONE</button>      

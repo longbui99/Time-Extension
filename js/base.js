@@ -54,6 +54,7 @@ class Component {
             let element = this.el.querySelector(`[l-ref="${ref}"]`);
             if (element) {
                 this.refs[ref] = element;
+                element.removeAttribute('l-ref');
             }
         }
     }
