@@ -218,7 +218,7 @@ class Main extends Component {
                         el.focus();
                     }
                     event.stopPropagation();
-                }
+                } 
                 if (event.keyCode === 40){
                     let el = p.nextElementSibling;
                     if (el){
@@ -362,6 +362,10 @@ class Main extends Component {
                 let value = self.commentRef.el.value;
                 self.commentRef.el.setAttribute("rows", ((value !== "") ? value.split("\n").length : 1));
             }
+        })
+        this.commentRef.el.addEventListener("change", event=>{
+            self.ticketData.localComment = self.commentRef.el.value;
+            self.trigger_up('ticket-changed', self.ticketData)
         })
     }
     async _initIconRef(){
@@ -846,6 +850,9 @@ class Main extends Component {
     }
     async renderContent(refreshRelated=true){
         if (this.ticketData){
+            if (this.ticketData.localComment){
+                this.commentRef.el.innerText = this.ticketData.localComment;
+            }
             this.ticketData.displayName = this._getDisplayName(this.ticketData);
             this.searchRef.el.value = this.ticketData.displayName;
             this.el.querySelector('.ticket-navigation').style.display = "inline-block";
@@ -878,18 +885,18 @@ class Main extends Component {
             if (event.keyCode === 13){
                 document.activeElement.click()               
             }
-            if (event.keyCode === 70 && window.event.ctrlKey && window.event.shiftKey){
+            if (event.key === 'f' && window.event.ctrlKey && window.event.shiftKey){
                 self.searchRef.el.click();
                 self.searchRef.el.focus();
             }
-            if (event.keyCode === 49 && window.event.ctrlKey && window.event.shiftKey){
+            if (event.key === '1' && window.event.ctrlKey && window.event.shiftKey){
                 self.timeLogHeadingRef.el.click();
                 event.stopImmediatePropagation();
             }
-            if (event.keyCode === 50 && window.event.ctrlKey && window.event.shiftKey){
+            if (event.key === '2' && window.event.ctrlKey && window.event.shiftKey){
                 self.acHeadingRef.el.click();
             }
-            if (event.keyCode === 69 && window.event.ctrlKey && window.event.shiftKey){
+            if (event.key === 'e' && window.event.ctrlKey && window.event.shiftKey){
                 self.actionExportToOriginalServer();
             }
             if (window.event.ctrlKey && event.keyCode == 13){

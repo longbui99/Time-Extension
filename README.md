@@ -14,7 +14,7 @@ I am also provide a system for you to doing a time management tracking with so m
 - Start, Pause, Stop tracking time.
 - View all related active tickets and quick change to continue working if something interrupted your normal progress.
 
-## For Developer.
+## For Developer.   
 
 | Name | Description | Endpoint | Request Type | Request Payload | Response Type | Response Payload
 --- | --- | --- | --- | --- |--- |--- 
