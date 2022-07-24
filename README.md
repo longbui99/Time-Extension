@@ -47,11 +47,4 @@ I am also provide a system for you to doing a time management tracking with so m
 - **Enter**: To create new checklist under current checklist.
 - **Ctrl + Enter**: To save current checklist to the server.
 ## For Developer.   
-
-| Name | Description | Endpoint | Request Type | Request Payload | Response Type | Response Payload
---- | --- | --- | --- | --- |--- |--- 
-| Login | This API is used for detect user in your system.  You have to response the unique set of character then use can use it later for erase access from extension to your system. | /web/login/jwt | POST (text/html) | ```{login:string, password:string}```| json/application | `{"data": string}`
-| Search ticket | We will send and unique character to your system via GET method to fetch all issues.  Default is limit 11 result, but if your system have another config, you can ignore our limit. | /management/ticket/search/{string: keyword} | GET (text/html) | jwt=string | json/application | ```[{id: string, name:string, key:string, point:integer, project:string,projectKey:string, assignee:string, assigneeEmail:string, status:string, total_duration:integer,my_total_duration:integer, active_duration:integer, last_start: Date(), url:string}, ...] ```
-|
-
-Continue updating ...
+[WIP] ...
