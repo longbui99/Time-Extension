@@ -16,6 +16,7 @@ class Main extends Component {
     typeRef = this.useRef("type-ref")
     statusRef = this.useRef("status-ref")
     assingneeRef = this.useRef("assignee-ref")
+    testerRef = this.useRef("tester-ref")
     openTicketref = this.useRef("open-ticket")
     reloadTicketRef = this.useRef("reload-ticket")
     loggedDate = this.useRef("start-date")
@@ -120,7 +121,7 @@ class Main extends Component {
 
     }
     async fetchTicketFromServer(){
-        let response = (await this.do_invisible_request('GET', `${this.subEnv.serverURL}/management/ticket/fetch/${this.ticketData.id}?jwt=${this.subEnv.jwt}`));
+        let response = (await this.do_request('GET', `${this.subEnv.serverURL}/management/ticket/fetch/${this.ticketData.id}?jwt=${this.subEnv.jwt}`));
         this.renderContent()
     }
     async actionExportToOriginalServer(){
@@ -168,8 +169,9 @@ class Main extends Component {
             this.totalDurationRef.el.innerText =this.secondToString(record.total_duration);
             this.myTotalDurationRef.el.innerText =this.secondToString(record.my_total_duration);
             this.activeDurationRef.el.innerText =this.secondToString(record.active_duration);
-            this.pointRef.el.innerText = record.point;
-            this.assingneeRef.el.innerText = record.assignee || '';
+            this.pointRef.el.innerText = record.point + (record.estimate_unit !== "general"? `(${record.estimate_unit})`:'');
+            this.assingneeRef.el.innerText = record.assignee || 'Unset';
+            this.testerRef.el.innerText = record.tester || 'Unset'
             this.commentRef.el.innerText = record.comment || '';
             this.commentRef.el.setAttribute("rows", ((record.comment !== "" && record.comment) ? record.comment.split("\n").length : 1));
             if (record.active_duration > 0) {
@@ -956,18 +958,21 @@ class Main extends Component {
             if (event.keyCode === 13){
                 document.activeElement.click()               
             }
-            if (event.key === 'f' && window.event.ctrlKey && window.event.shiftKey){
+            if (event.code === 'KeyF' && window.event.ctrlKey && window.event.shiftKey){
                 self.searchRef.el.click();
                 self.searchRef.el.focus();
             }
-            if (event.key === '1' && window.event.ctrlKey && window.event.shiftKey){
+            if (event.code === 'Digit1' && window.event.ctrlKey && window.event.shiftKey){
                 self.timeLogHeadingRef.el.click();
                 event.stopImmediatePropagation();
             }
-            if (event.key === '2' && window.event.ctrlKey && window.event.shiftKey){
+            if (event.code === 'Digit2' && window.event.ctrlKey && window.event.shiftKey){
                 self.acHeadingRef.el.click();
             }
-            if (event.key === 'e' && window.event.ctrlKey && window.event.shiftKey){
+            if (event.code === 'Digit3' && window.event.ctrlKey && window.event.shiftKey){
+                self.favoriteHeadingRef.el.click();
+            }
+            if (event.code === 'KeyE' && window.event.ctrlKey && window.event.shiftKey){
                 self.actionExportToOriginalServer();
             }
             if (window.event.ctrlKey && event.keyCode == 13){
@@ -1025,7 +1030,7 @@ class Main extends Component {
                             <div class="ticket-status" l-ref="status-ref"></div>
                             <span l-ref="open-ticket" tabindex="998" title="Ctrl+Shift+E or Ctrl+Alt+Click: Export To The Original Server">
                                 <span class="tm-icon-svg">
-                                <svg class="tm-svg-inline--fa" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="square-arrow-up-right" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" data-fa-i2svg=""><path fill="currentColor" d="M384 32H64C28.65 32 0 60.66 0 96v320c0 35.34 28.65 64 64 64h320c35.35 0 64-28.66 64-64V96C448 60.66 419.3 32 384 32zM344 312c0 17.69-14.31 32-32 32s-32-14.31-32-32V245.3l-121.4 121.4C152.4 372.9 144.2 376 136 376s-16.38-3.125-22.62-9.375c-12.5-12.5-12.5-32.75 0-45.25L234.8 200H168c-17.69 0-32-14.31-32-32s14.31-32 32-32h144c17.69 0 32 14.31 32 32V312z"></path></svg>                            
+                                    <svg class="tm-svg-inline--fa" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="square-arrow-up-right" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" data-fa-i2svg=""><path fill="currentColor" d="M384 32H64C28.65 32 0 60.66 0 96v320c0 35.34 28.65 64 64 64h320c35.35 0 64-28.66 64-64V96C448 60.66 419.3 32 384 32zM344 312c0 17.69-14.31 32-32 32s-32-14.31-32-32V245.3l-121.4 121.4C152.4 372.9 144.2 376 136 376s-16.38-3.125-22.62-9.375c-12.5-12.5-12.5-32.75 0-45.25L234.8 200H168c-17.69 0-32-14.31-32-32s14.31-32 32-32h144c17.69 0 32 14.31 32 32V312z"></path></svg>                            
                                 </span>
                             </span>
                             <span l-ref="reload-ticket" tabindex="999" title="Reload From The Original Server">
@@ -1059,13 +1064,20 @@ class Main extends Component {
         <div class="tm-tab-content">
             <div class="ticket time-log" l-ref="time-log-section">
                 <div class="space-segment">
-                    <div class="ticket-content p-1" style="display:none">
+                    <div class="ticket-content p-1">
                         <div>
-                        <span class="tm-icon-svg">
-                            <svg class="svg-inline--fa fa-arrow-right" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="arrow-right" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" data-fa-i2svg=""><path fill="currentColor" d="M438.6 278.6l-160 160C272.4 444.9 264.2 448 256 448s-16.38-3.125-22.62-9.375c-12.5-12.5-12.5-32.75 0-45.25L338.8 288H32C14.33 288 .0016 273.7 .0016 256S14.33 224 32 224h306.8l-105.4-105.4c-12.5-12.5-12.5-32.75 0-45.25s32.75-12.5 45.25 0l160 160C451.1 245.9 451.1 266.1 438.6 278.6z"></path></svg>
-                        </span>
-                        <b l-ref="assignee-ref"></b></div>
-                        <div><b>Point: </b><span l-ref="point-ref">Unset</span></div>
+                            <span class="tm-icon-svg">
+                                <svg class="svg-inline--fa fa-arrow-right" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="arrow-right" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" data-fa-i2svg=""><path fill="currentColor" d="M438.6 278.6l-160 160C272.4 444.9 264.2 448 256 448s-16.38-3.125-22.62-9.375c-12.5-12.5-12.5-32.75 0-45.25L338.8 288H32C14.33 288 .0016 273.7 .0016 256S14.33 224 32 224h306.8l-105.4-105.4c-12.5-12.5-12.5-32.75 0-45.25s32.75-12.5 45.25 0l160 160C451.1 245.9 451.1 266.1 438.6 278.6z"></path></svg>
+                            </span>
+                            <b l-ref="assignee-ref"></b>
+                        </div>
+                        <div>
+                            <span class="tm-icon-svg">
+                                <svg class="svg-inline--fa fa-spell-check" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="spell-check" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512" data-fa-i2svg=""><path fill="currentColor" d="M566.6 265.4c-12.5-12.5-32.75-12.5-45.25 0L352 434.8l-73.38-73.38c-12.5-12.5-32.75-12.5-45.25 0s-12.5 32.75 0 45.25l96 96c6.25 6.25 14.44 9.368 22.62 9.368s16.38-3.118 22.63-9.368l192-192C579.1 298.1 579.1 277.9 566.6 265.4zM221.5 211.7l-80-192C136.6 7.796 124.9 .0147 112 .0147S87.44 7.796 82.47 19.7l-80 192C-4.328 228 3.375 246.8 19.69 253.5c16.36 6.812 35.06-.9375 41.84-17.22l5.131-12.31h90.68l5.131 12.31c5.109 12.28 17.02 19.69 29.55 19.69c4.094 0 8.266-.7812 12.3-2.469C220.6 246.8 228.3 228 221.5 211.7zM93.33 160L112 115.2l18.67 44.81H93.33zM288 256h80c44.11 0 80-35.87 80-79.1c0-23.15-10.03-43.85-25.79-58.47C428.3 106.3 432 93.65 432 80.01c0-44.13-35.89-80-79.1-80L288 .0147c-17.67 0-32 14.31-32 31.1v192C256 241.7 270.3 256 288 256zM320 64.01h32c8.828 0 16 7.188 16 16s-7.172 16-16 16h-32V64.01zM320 160h48c8.828 0 16 7.188 16 16s-7.172 16-16 16H320V160z"></path></svg>
+                            </span>
+                            <b l-ref="tester-ref"></b>
+                        </div>
+                        <div ><b>Estimate: </b><span l-ref="point-ref">Unset</span></div>
                     </div>
                     <div class="duration">
                         <div class="total-duration">
