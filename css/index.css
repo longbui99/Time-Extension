@@ -1088,6 +1088,7 @@ svg:not(:root).tm-svg-inline--fa {
     overflow-x: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
+    display: inline-block;
 }
 .main-page .main-action-page .favorite-list .favorite-ticket .favorite-ticket-action{
     width: 5%;

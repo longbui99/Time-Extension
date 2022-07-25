@@ -138,7 +138,7 @@ class Main extends Component {
             "jwt": this.subEnv.jwt,
             "payload": payload
         }
-        await this.do_invisible_request('POST', `${this.subEnv.serverURL}/management/ticket/export?`, params);
+        await this.do_request('POST', `${this.subEnv.serverURL}/management/ticket/export?`, params);
     }
     openTicketNaviagor(event){
         if (window.event.ctrlKey && window.event.altKey && this.ticketData) {
@@ -239,7 +239,7 @@ class Main extends Component {
         element.style.display = 'inline-block';
     }
     async _searchTicket(text) {
-        let result = (await this.do_invisible_request('GET', `${this.subEnv.serverURL}/management/ticket/search/${text}?limitRecord=${11}&jwt=${this.subEnv.jwt}`));
+        let result = (await this.do_request('GET', `${this.subEnv.serverURL}/management/ticket/search/${text}?limitRecord=${11}&jwt=${this.subEnv.jwt}`));
         this.searchData = (await result.json());
         this.loadSearchedTickets(this.searchData);
         this.trigger_up('search-change', this.searchData)
@@ -292,7 +292,7 @@ class Main extends Component {
                 'source': 'Extension'
             }
         }
-        let result = (await this.do_invisible_request('POST', `${this.subEnv.serverURL}/management/ticket/work-log/add`, params));
+        let result = (await this.do_request('POST', `${this.subEnv.serverURL}/management/ticket/work-log/add`, params));
         this.renderTicketData(true);
     }
     _initAddWorkLog() {
@@ -332,10 +332,10 @@ class Main extends Component {
 
         if (triggerServer) {
             this.ticketData.timeStatus = false;
-            (await this.do_invisible_request('POST', `${this.subEnv.serverURL}/management/ticket/work-log/done`, params));
+            (await this.do_request('POST', `${this.subEnv.serverURL}/management/ticket/work-log/done`, params));
         }
         else {
-            (await this.do_invisible_request('POST', `${this.subEnv.serverURL}/management/ticket/work-log/manual`, params));
+            (await this.do_request('POST', `${this.subEnv.serverURL}/management/ticket/work-log/manual`, params));
             this.manualLogref.el.value = '';
         }
         this.renderTicketData(true)
