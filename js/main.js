@@ -107,10 +107,10 @@ class Main extends Component {
                 progressLog.push({el:elements[index].parentNode.querySelector('.duration'), active_duration: self.relatedActiveTickets[index].active_duration})
             }
         }
-        if (progressLog){
-            if (this.relatedCurrentInterval){
-                clearInterval(this.relatedCurrentInterval)
-            }
+        if (this.relatedCurrentInterval){
+            clearInterval(this.relatedCurrentInterval)
+        }
+        if (progressLog.length){
             let pivotTime = new Date().getTime();
             this.relatedCurrentInterval = setInterval(() => {
                 for (let progress of progressLog){

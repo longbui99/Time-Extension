@@ -17,6 +17,9 @@
 html {
     scroll-behavior: smooth;
 }
+.lbwt{
+
+}
 
 
 @keyframes spin {
@@ -927,7 +930,7 @@ svg:not(:root).tm-svg-inline--fa {
     cursor: pointer;
     color: orange;
 }
-.btn {
+lbwt .btn {
     background-color: #c2fbd7;
     border-radius: 10%;
     color: var(--primary);
@@ -943,7 +946,7 @@ svg:not(:root).tm-svg-inline--fa {
     touch-action: manipulation;
     font-weight: 500;
 }
-.btn:hover {
+lbwt .btn:hover {
     box-shadow:
         rgba(44, 187, 99, .35) 0 -25px 18px -14px inset,
         rgba(44, 187, 99, .25) 0 1px 2px,
@@ -953,11 +956,11 @@ svg:not(:root).tm-svg-inline--fa {
         rgba(44, 187, 99, .25) 0 16px 32px;
     transform: scale(1.05) rotate(-1deg);
 }
-.btn.btn-pause {
+lbwt .btn.btn-pause {
     background-color: #f7fbc2;
     color: var(--third);
 }
-.btn.btn-pause:hover {
+lbwt .btn.btn-pause:hover {
     box-shadow:
         rgba(187, 137, 44, 0.35) 0 -25px 18px -14px inset,
         rgba(187, 137, 44, 0.35) 0 1px 2px,
@@ -966,11 +969,11 @@ svg:not(:root).tm-svg-inline--fa {
         rgba(187, 137, 44, 0.35) 0 8px 16px,
         rgba(187, 137, 44, 0.35) 0 16px 32px;
 }
-.btn.btn-done {
+lbwt .btn.btn-done {
     background-color: #9eeffc;
     color: #042f6e;
 }
-.btn.btn-done:hover{
+lbwt .btn.btn-done:hover{
     box-shadow:
         rgba(44, 111, 187, 0.35) 0 -25px 18px -14px inset,
         rgba(44, 111, 187, 0.35) 0 1px 2px,
@@ -979,11 +982,11 @@ svg:not(:root).tm-svg-inline--fa {
         rgba(44, 111, 187, 0.35) 0 8px 16px,
         rgba(44, 111, 187, 0.35) 0 16px 32px;
 }
-.btn.btn-done {
+lbwt .btn.btn-done {
     background-color: #9eeffc;
     color: #042f6e;
 }
-.btn.btn-done:hover{
+lbwt .btn.btn-done:hover{
     box-shadow:
         rgba(44, 111, 187, 0.35) 0 -25px 18px -14px inset,
         rgba(44, 111, 187, 0.35) 0 1px 2px,
@@ -992,11 +995,11 @@ svg:not(:root).tm-svg-inline--fa {
         rgba(44, 111, 187, 0.35) 0 8px 16px,
         rgba(44, 111, 187, 0.35) 0 16px 32px;
 }
-.btn.btn-danger {
+lbwt .btn.btn-danger {
     background-color: #fc9e9e;
     color: #6e0404;
 }
-.btn.btn-danger:hover{
+lbwt .btn.btn-danger:hover{
     box-shadow:
         rgba(187, 44, 44, 0.35) 0 -25px 18px -14px inset,
         rgba(187, 44, 44, 0.35) 0 1px 2px,
@@ -1005,10 +1008,10 @@ svg:not(:root).tm-svg-inline--fa {
         rgba(187, 44, 44, 0.35) 0 8px 16px,
         rgba(187, 44, 44, 0.35) 0 16px 32px;
 }
-.btn.btn-thin{
+lbwt .btn.btn-thin{
     padding: 3px;
 }
-.btn svg{
+lbwt .btn svg{
     width: 1em;
 }
 

@@ -19,9 +19,9 @@ const JSFILE = [
 async function injectFile(params) {
     params.extensionID = chrome.runtime.id;
     function injectFunction(pr){
-      let tm = document.getElementsByTagName('wt-container')[0]
+      let tm = document.getElementsByTagName('lbwt')[0]
       if (!tm){
-        tm = document.createElement('wt-container');
+        tm = document.createElement('lbwt');
         tm.classList.add('wt-class');
         document.body.parentElement.append(tm);
       }
