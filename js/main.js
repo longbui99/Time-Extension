@@ -118,6 +118,9 @@ class Main extends Component {
                 }
             }, 500)
         }
+        if (this.relatedActiveTickets.length){
+            this.relatedActiveRef.el.parentNode.style.display = "block";
+        }
 
     }
     async fetchTicketFromServer(){
@@ -284,7 +287,7 @@ class Main extends Component {
             }
         })
     }
-    async _addWorkLog() {
+    async _addWorkLog(refresh=true) {
         let params = {
             "id": this.ticketData.id,
             "jwt": this.subEnv.jwt,
@@ -293,7 +296,7 @@ class Main extends Component {
             }
         }
         let result = (await this.do_request('POST', `${this.subEnv.serverURL}/management/ticket/work-log/add`, params));
-        this.renderTicketData(true);
+        this.renderTicketData(refresh);
     }
     _initAddWorkLog() {
         let self = this;
@@ -313,7 +316,7 @@ class Main extends Component {
         return offset
     }
 
-    async _doneWorkLog() {
+    async _doneWorkLog(refresh=true) {
         let payload = {
             'source': 'Extension',
             'description': this.commentRef.el.value,
@@ -338,7 +341,7 @@ class Main extends Component {
             (await this.do_request('POST', `${this.subEnv.serverURL}/management/ticket/work-log/manual`, params));
             this.manualLogref.el.value = '';
         }
-        this.renderTicketData(true)
+        this.renderTicketData(refresh)
     }
     _initDoneWorkLog() {
         let self = this;
@@ -857,9 +860,6 @@ class Main extends Component {
             },200)
         }
         this.renderRelatedActiveData()
-        if (this.relatedActiveTickets.length){
-            this.relatedActiveRef.el.parentNode.style.display = "block";
-        }
     }
     renderOverview(){
         if (this.ticketData){
@@ -874,40 +874,89 @@ class Main extends Component {
             self.favoriteNavigatorRef.el.classList.remove('favorite');
             for (let index = 0; index < this.favoriteTickets.length; index++){
                 if (this.favoriteTickets[index].key === this.ticketData?.key){
-                    this.favoriteTickets.splice(index, index+1);
+                    this.favoriteTickets.splice(index, 1);
                     self.favoriteNavigatorRef.el.classList.add('favorite');
                     break;
                 }
             }
-            for (let record of this.favoriteTickets){
-                tmpl += `
-                <div class="favorite-ticket">
-                    <div class="favorite-ticket-key">
-                        ${record.key}
+            let groupResult = {};
+            for( let element of this.favoriteTickets){
+                let key = `${element['project']}`
+                if (groupResult[key]){
+                    groupResult[key].push(element)
+                } else {
+                    groupResult[key] = [element]
+                }
+            }
+            for (let groupKey in groupResult){
+                let tickets = ""
+                for (let record of groupResult[groupKey]){
+                    tickets += `
+                    <div class="favorite-ticket">
+                        <div class="favorite-ticket-start"  data-key=${record.key} style="margin-right: 5px">
+                            <button class="btn btn-thin btn-start">
+                                <svg class="svg-inline--fa fa-play" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="play" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512" data-fa-i2svg=""><path fill="currentColor" d="M361 215C375.3 223.8 384 239.3 384 256C384 272.7 375.3 288.2 361 296.1L73.03 472.1C58.21 482 39.66 482.4 24.52 473.9C9.377 465.4 0 449.4 0 432V80C0 62.64 9.377 46.63 24.52 38.13C39.66 29.64 58.21 29.99 73.03 39.04L361 215z"></path></svg>                           
+                            </button>
+                        </div>
+                        <div class="favorite-ticket-key" data-key=${record.key}>
+                            ${record.key}
+                        </div>
+                        <div class="favorite-ticket-name">
+                            ${record.name}
+                        </div>
+                        <div class="favorite-ticket-action"  data-key=${record.key}>
+                            <button class="btn btn-thin btn-danger">
+                                <svg class="svg-inline--fa fa-eraser" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="eraser" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" data-fa-i2svg=""><path fill="currentColor" d="M480 416C497.7 416 512 430.3 512 448C512 465.7 497.7 480 480 480H150.6C133.7 480 117.4 473.3 105.4 461.3L25.37 381.3C.3786 356.3 .3786 315.7 25.37 290.7L258.7 57.37C283.7 32.38 324.3 32.38 349.3 57.37L486.6 194.7C511.6 219.7 511.6 260.3 486.6 285.3L355.9 416H480zM265.4 416L332.7 348.7L195.3 211.3L70.63 336L150.6 416L265.4 416z"></path></svg>
+                            </button>
+                        </div>
+                    </div>`
+                }
+                if (tickets.length){
+                    tmpl += `
+                    <div class="favorite-group">
+                        <div class="favorite-group-title">${groupKey} </div>\
+                        <div class="favorite-segment">
+                            ${tickets}
+                        </div>  
                     </div>
-                    <div class="favorite-ticket-name">
-                        ${record.name}
-                    </div>
-                    <div class="favorite-ticket-action">
-                        <button class="btn btn-thin btn-danger">
-                            <svg class="svg-inline--fa fa-eraser" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="eraser" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" data-fa-i2svg=""><path fill="currentColor" d="M480 416C497.7 416 512 430.3 512 448C512 465.7 497.7 480 480 480H150.6C133.7 480 117.4 473.3 105.4 461.3L25.37 381.3C.3786 356.3 .3786 315.7 25.37 290.7L258.7 57.37C283.7 32.38 324.3 32.38 349.3 57.37L486.6 194.7C511.6 219.7 511.6 260.3 486.6 285.3L355.9 416H480zM265.4 416L332.7 348.7L195.3 211.3L70.63 336L150.6 416L265.4 416z"></path></svg>
-                        </button>
-                    </div>
-                </div>`
+                `
+                }
             }
             this.favoriteListRef.el.innerHTML = tmpl;
             let elements = this.favoriteListRef.el.querySelectorAll('.favorite-ticket-key');
+            function findTicket(ticketKey){
+                let index = self.favoriteTickets.findIndex(e=> e.key === ticketKey)
+                if (index !== -1){
+                    return self.favoriteTickets[index]
+                }
+            }
             for (let index=0; index < elements.length; index++){
-                elements[index].addEventListener('click', ()=>{
-                    self.ticketData = self.favoriteTickets[index];
-                    self.storeAndRenderTicket(true)
+                elements[index].addEventListener('click', (event)=>{
+                    self.ticketData = findTicket(event.currentTarget.getAttribute('data-key'));
+                    self.storeAndRenderTicket(true);
+                    event.stopPropagation();
                 })
             }
             elements = this.favoriteListRef.el.querySelectorAll('.favorite-ticket-action');
             for (let index=0; index < elements.length; index++){
-                elements[index].addEventListener('click', ()=>{
-                    self.do_invisible_request('POST', `${self.subEnv.serverURL}/management/ticket/favorite/delete?jwt=${self.subEnv.jwt}&id=${self.favoriteTickets[index].id}`);
+                elements[index].addEventListener('click', (event)=>{
+                    self.do_invisible_request('POST', `${self.subEnv.serverURL}/management/ticket/favorite/delete?jwt=${self.subEnv.jwt}&id=${findTicket(event.currentTarget.getAttribute('data-key')).id}`);
                     elements[index].parentNode.remove();
+                    event.stopPropagation();
+                })
+            }
+            elements = this.favoriteListRef.el.querySelectorAll('.favorite-ticket-start');
+            for (let index=0; index < elements.length; index++){
+                elements[index].addEventListener('click', async (event)=>{
+                    let data = findTicket(event.currentTarget.getAttribute('data-key'));
+                    if (self.relatedActiveTickets.findIndex(e=>e.key===data.key) === -1){
+                        let backupTicketData = self.ticketData;
+                        self.ticketData = data;
+                        await self._addWorkLog(false);
+                        self.ticketData = backupTicketData;
+                        self.fetchRelativeActive();
+                    }
+                    event.stopPropagation();
                 })
             }
         }
@@ -915,6 +964,7 @@ class Main extends Component {
     async initFavorites(){
         let response = (await this.do_invisible_request('GET', `${this.subEnv.serverURL}/management/ticket/favorite?jwt=${this.subEnv.jwt}`));
         let result = (await response.json());
+        // let groupResult = {};
         this.favoriteTickets = result;
         this.renderFavoriteTickets();
     }
@@ -936,11 +986,11 @@ class Main extends Component {
         if (this.subEnv.contentState.showAC) {
             await this.initACs();
         }
+        if (refreshRelated){
+            await this.fetchRelativeActive()
+        }
         if (this.subEnv.contentState.showFavorite){
             await this.initFavorites();
-        }
-        if (refreshRelated){
-            this.fetchRelativeActive()
         }
         this.renderOverview()
         this.trigger_up("load_done", this.loadID)
