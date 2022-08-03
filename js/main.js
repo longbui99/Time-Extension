@@ -196,12 +196,16 @@ class Main extends Component {
     }
     async chooseTicket(index) {
         // if (this.ticketData) this._pauseWorkLog(this.ticketData.id, false);
-        this.ticketData = this.searchData[index];
+        this.ticketData = this.searchData.values[index];
         this.searchResultRef.el.style.display = 'none';
         this.storeAndRenderTicket()
     }
     loadSearchedTickets(data) {
+        if (data === null || data === undefined){
+            return
+        }
         let element = this.searchResultRef.el, record = {}, self = this;
+        element.querySelector('.search-more')?.remove()
         for (let i = 0; i < data.length; i++) {
             record = data[i];
             let p = document.createElement('p');
@@ -239,13 +243,34 @@ class Main extends Component {
             })
             element.append(p);
         }
-        element.style.display = 'inline-block';
+        if (data.length){
+            let p = document.createElement('p');
+            p.classList.add('search-more');
+            p.innerHTML = "Search More...";
+            p.setAttribute('tabindex', this.searchData?.values?.length+1);
+            element.append(p);
+            p.addEventListener('click', event=>{
+                event.stopImmediatePropagation();
+                self.fetchSearchTicket(self.searchData.query).then(result=>{
+                    self.searchData.values.push(...result);
+                    self.loadSearchedTickets(self.searchData.values);
+                    self.trigger_up('search-change', self.searchData);
+                });
+            })
+            element.style.display = 'inline-block';
+        }
+    }
+    async fetchSearchTicket(text){
+        let offset = this.searchData?.values?.length || 0;
+        let result = (await this.do_request('GET', `${this.subEnv.serverURL}/management/ticket/search/${text}?offset=${offset}&jwt=${this.subEnv.jwt}`));
+        return (await result.json());
     }
     async _searchTicket(text) {
-        let result = (await this.do_request('GET', `${this.subEnv.serverURL}/management/ticket/search/${text}?limitRecord=${11}&jwt=${this.subEnv.jwt}`));
-        this.searchData = (await result.json());
-        this.loadSearchedTickets(this.searchData);
-        this.trigger_up('search-change', this.searchData)
+        this.searchData = {}
+        this.searchData.query = text;
+        this.searchData.values =  (await this.fetchSearchTicket(text));
+        this.loadSearchedTickets(this.searchData.values);
+        this.trigger_up('search-change', this.searchData);
     }
     _initSearchBar() {
         let self = this;
@@ -260,7 +285,7 @@ class Main extends Component {
             if (self.searchData){
                 self.searchResultRef.el.innerHTML = '';
                 self.searchResultRef.el.style.display = 'none';
-                self.loadSearchedTickets(self.searchData);
+                self.loadSearchedTickets(self.searchData.values);
                 event.stopImmediatePropagation();
             }
         })
@@ -1173,6 +1198,44 @@ class Main extends Component {
                     </div>
                     <div class="comment">
                         <textarea rows="1" type="text" class="tm-form-control" placeholder="Comment to log step/ log work" l-ref="comment-for-ticket" tabindex="1002"></textarea>
+                    </div>
+                </div>
+                <div class="space-segment log-history">
+                    <div class="log-group">
+                        <div class="log-heading">
+                            <div class="datetime">2022/07/26 </div>
+                            <div class="total-duration"> 24h 15m </div> 
+                        </div>
+                        <div class="log-segment">
+                            <div class="log">
+                                <span class="log-ticket">
+                                    NF-120
+                                </span>
+                                <input class="log-duration tm-form-control" >
+                                <input class="log-description tm-form-control" >
+                            </div>
+                            <div class="log">
+                                <span class="log-ticket">
+                                    MRS-1200
+                                </span>
+                                <input class="log-duration tm-form-control" >
+                                <input class="log-description tm-form-control" >
+                            </div>
+                            <div class="log">
+                                <span class="log-ticket">
+                                    NF-120
+                                </span>
+                                <input class="log-duration tm-form-control" >
+                                <input class="log-description tm-form-control" >
+                            </div>
+                            <div class="log">
+                                <span class="log-ticket">
+                                    NF-120
+                                </span>
+                                <input class="log-duration tm-form-control" >
+                                <input class="log-description tm-form-control" >
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
