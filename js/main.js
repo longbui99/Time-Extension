@@ -191,8 +191,25 @@ class Main extends Component {
         this.renderTimeActions();
         this.loadHistory();
     }
-    loadHistory(){
-            
+    async loadHistory(){
+        let response = (await this.do_invisible_request('GET', `${this.subEnv.serverURL}/management/ticket/work-log/history?unix=${0}&jwt=${this.subEnv.jwt}`));
+        let result = (await response.json());
+        if (true){
+            let historyByDate = {};
+            for (let record of result){
+                let date = new Date(record['start_date']+"Z");
+                let key = `${date.getFullYear()}/${date.getDate()}/${date.getMonth()+1}}`;
+                if (historyByDate[key]){
+                    historyByDate[key].values.push(record);
+                } else {
+                    historyByDate[key].values = [record];
+                }
+            }
+            for (let group of historyByDate){
+                
+            }
+            console.log(historyByDate)
+        }
     }
     async storeAndRenderTicket(refresh = false) {
         await this.renderContent()
