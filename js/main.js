@@ -188,7 +188,11 @@ class Main extends Component {
                 this.ticketData.timeStatus = "active";
             }
         }
-        this.renderTimeActions()
+        this.renderTimeActions();
+        this.loadHistory();
+    }
+    loadHistory(){
+            
     }
     async storeAndRenderTicket(refresh = false) {
         await this.renderContent()
@@ -253,6 +257,7 @@ class Main extends Component {
                 event.stopImmediatePropagation();
                 self.fetchSearchTicket(self.searchData.query).then(result=>{
                     self.searchData.values.push(...result);
+                    element.innerHTML = '';
                     self.loadSearchedTickets(self.searchData.values);
                     self.trigger_up('search-change', self.searchData);
                 });
@@ -382,9 +387,6 @@ class Main extends Component {
                 self.renderTimeActions();
             }
         })
-    }
-    resetRows() {
-
     }
     _initCommentEvent() {
         let self = this;
