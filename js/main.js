@@ -205,8 +205,15 @@ class Main extends Component {
         let result = (await response.json());
         if (true){
             let historyByDate = {};
+            let maxDate = this.unix[1] || 0, minDate = this.unix[0] || new Date().getTime();
             for (let record of result){
                 let date = new Date(record['start_date']+"Z");
+                let groupUnix = date.getTime()/1000;
+                if (groupUnix > maxDate){
+                    maxDate = groupUnix;
+                } else if (groupUnix < minDate){
+                    minDate = groupUnix;
+                }
                 let key = date.toISOString().substring(0, 10);
                 if (historyByDate[key]){
                     historyByDate[key].values.push(record);
@@ -214,6 +221,7 @@ class Main extends Component {
                     historyByDate[key] = {values: [record]}
                 }
             }
+            this.unix = [minDate, maxDate]
             let innerHTML = ''
             let globalTotal = 0;
             for (let group in historyByDate){
@@ -255,6 +263,9 @@ class Main extends Component {
             }
             this.logHistoryDateRangeTotalRef.el.innerHTML = secondToHour(globalTotal)
             this.logHistoryRef.el.innerHTML = innerHTML;
+            if (this.daterange){
+                this.daterange.setDate([new Date(this.unix[0]*1000), new Date(this.unix[1]*1000)]);
+            }
             function getLogDataGroup(target){
                 let parentNode = target.parentNode;
                 let group = parentNode.getAttribute('data-group');
