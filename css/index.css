@@ -857,7 +857,8 @@ svg:not(:root).tm-svg-inline--fa {
     margin-left: 5px;
 }
 .main-page .main-action-page .ticket.time-log .space-segment.log-history-navigator .log-history-navigator-action .filter-icon svg{
-    font-size: 1em;
+    width: 1em;
+    height: 1em;
 }
 .main-page .main-action-page .ticket.time-log .space-segment.log-history-navigator .log-history-navigator-action .total{
     width: 17%;
