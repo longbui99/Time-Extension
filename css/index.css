@@ -832,6 +832,54 @@ svg:not(:root).tm-svg-inline--fa {
     align-items: center;
 }
 
+.main-page .main-action-page .ticket.time-log .space-segment.log-history-navigator{
+    display: flex;
+    flex-flow: column;
+    margin-left: 10px;
+    width: 96%;
+}
+
+.main-page .main-action-page .ticket.time-log .space-segment.log-history-navigator .log-history-navigator-title{
+    font-weight: 700;
+    font-size: 1.5em;
+    margin-bottom: 5px;
+    color: var(--primary);
+}
+.main-page .main-action-page .ticket.time-log .space-segment.log-history-navigator .log-history-navigator-action{
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+.main-page .main-action-page .ticket.time-log .space-segment.log-history-navigator .log-history-navigator-action .filter-icon{
+    position: absolute;
+    font-size: 1.2em;
+    color: var(--primary);
+    margin-left: 5px;
+}
+.main-page .main-action-page .ticket.time-log .space-segment.log-history-navigator .log-history-navigator-action .filter-icon svg{
+    font-size: 1em;
+}
+.main-page .main-action-page .ticket.time-log .space-segment.log-history-navigator .log-history-navigator-action .total{
+    width: 17%;
+    font-size: 1.5em;
+    display: flex;
+    justify-content: space-between;
+}
+.main-page .main-action-page .ticket.time-log .space-segment.log-history-navigator .log-history-navigator-action .total div{
+    font-weight: 700;
+}
+
+.main-page .main-action-page .ticket.time-log .space-segment.log-history-navigator .log-history-navigator-input{
+    width: 40%;
+    border: solid 1px transparent;
+    font-size: 1.3em;
+    padding-left: 25px;
+}
+
+.main-page .main-action-page .ticket.time-log .space-segment.log-history-navigator .log-history-navigator-input:hover{
+    border: solid 1px lightgray;
+}
+
 .main-page .main-action-page .ticket.time-log .space-segment.log-history{
     margin-top: 5px;
     width: 100%;
@@ -841,7 +889,7 @@ svg:not(:root).tm-svg-inline--fa {
 .main-page .main-action-page .ticket.time-log .space-segment.log-history .log-group{
     background-color: #e4eaee;
     width: 100%;
-    margin-top: 20px;
+    margin-bottom: 20px;
 }
 .main-page .main-action-page .ticket.time-log .space-segment.log-history .log-group .log-heading{
     font-size: 1.4em;

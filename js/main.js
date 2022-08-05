@@ -32,6 +32,8 @@ class Main extends Component {
     removeToFavoriteRef = this.useRef('remove-to-favorite-ref')
     favoriteNavigatorRef = this.useRef('favorite-segment-ref')
     logHistoryRef = this.useRef('log-history')
+    logHistoryDateRangeRef = this.useRef('hisory-date-range')
+    logHistoryDateRangeTotalRef = this.useRef('log-history-total-range')
 
     constructor() {
         super(...arguments);
@@ -42,6 +44,7 @@ class Main extends Component {
         this.trigger_up("load_start", this.loadID)
         this.secondToString = parseSecondToString(this.subEnv.resource.hrs_per_day, this.subEnv.resource.days_per_week)
         this.openTicketNaviagor = this.openTicketNaviagor.bind(this);
+        this.onChangeRangeHistoryFilter = this.onChangeRangeHistoryFilter.bind(this);
     }
     _getDisplayName(record, length = 40000) {
         return `${record.key}: ${(record.name.length > length) ? record.name.substring(0, length) + "..." : record.name}`;
@@ -192,9 +195,13 @@ class Main extends Component {
         this.renderTimeActions();
         this.loadHistory();
     }
-    async loadHistory(){
+    async loadHistory(from_unix=0, unix=0){
+        if (this.unix && this.unix[0]=== from_unix && this.unix[1] === unix){
+            return
+        }
+        this.unix = [from_unix, unix]
         let self = this;
-        let response = (await this.do_invisible_request('GET', `${this.subEnv.serverURL}/management/ticket/work-log/history?unix=${0}&jwt=${this.subEnv.jwt}`));
+        let response = (await this.do_invisible_request('GET', `${this.subEnv.serverURL}/management/ticket/work-log/history?from_unix=${from_unix}&unix=${unix}&jwt=${this.subEnv.jwt}`));
         let result = (await response.json());
         if (true){
             let historyByDate = {};
@@ -208,6 +215,7 @@ class Main extends Component {
                 }
             }
             let innerHTML = ''
+            let globalTotal = 0;
             for (let group in historyByDate){
                 let tmpl = '';
                 let total_duration = 0;
@@ -228,13 +236,14 @@ class Main extends Component {
                     index++;
                 }
                 historyByDate[group].totalDuration = total_duration;
+                globalTotal += total_duration
                 if (tmpl.length){
                     innerHTML += `
                     <div class="log-group">
                         <div class="log-heading">
                             <div class="datetime"> ${group} </div>
                             <div>
-                                <div class="total-duration"> ${new Date(total_duration * 1000).toISOString().substring(11, 16)} </div> 
+                                <div class="total-duration"> ${secondToHour(total_duration)} </div> 
                             </div>
                         </div>
                         <div class="log-segment">
@@ -244,6 +253,7 @@ class Main extends Component {
                     `
                 }
             }
+            this.logHistoryDateRangeTotalRef.el.innerHTML = secondToHour(globalTotal)
             this.logHistoryRef.el.innerHTML = innerHTML;
             function getLogDataGroup(target){
                 let parentNode = target.parentNode;
@@ -275,8 +285,11 @@ class Main extends Component {
                         self.do_invisible_request('POST', `${self.subEnv.serverURL}/management/ticket/work-log/delete/${values.id}`, values);
                         let group = event.target.parentNode.getAttribute('data-group');
                         historyByDate[group].totalDuration -= data.duration;
-                        target.parentNode.parentNode.parentNode.querySelector('.total-duration').innerHTML = new Date(historyByDate[group].totalDuration * 1000).toISOString().substring(11, 16);
+                        target.parentNode.parentNode.parentNode.querySelector('.total-duration').innerHTML = secondToHour(historyByDate[group].totalDuration);
                         target.parentNode.remove()
+                        globalTotal -= data.duration;
+                        self.logHistoryDateRangeTotalRef.el.innerHTML = secondToHour(globalTotal)
+
                     } else {
                         self.ticketData.id = data.issue;
                         self.storeAndRenderTicket(false);
@@ -285,6 +298,11 @@ class Main extends Component {
                 })
             }
         }
+    }
+    onChangeRangeHistoryFilter(selectedDates, dateStr, instance){
+        let from_unix = selectedDates[0].getTime()/1000;
+        let to_unix = selectedDates[1].getTime()/1000;
+        this.loadHistory(from_unix, to_unix)
     }
     async storeAndRenderTicket(prefetch = true) {
         await this.renderContent(true, prefetch)
@@ -1130,6 +1148,9 @@ class Main extends Component {
         this._initCommentEvent();
         this._initIconRef();
         this.flatPickr = flatpickr(this.loggedDate.el,{defaultDate: new Date(),dateFormat: 'Y-m-d'});
+        this.daterange = flatpickr(this.logHistoryDateRangeRef.el,{mode: "range", defaultDate: [new Date(), new Date()], altInput: true, altFormat: "M j, Y",
+            onClose: self.onChangeRangeHistoryFilter
+        });
         window.addEventListener('keydown', event=>{
             if (event.keyCode === 13){
                 document.activeElement.click()               
@@ -1300,6 +1321,20 @@ class Main extends Component {
                         </div>
                         <div class="comment">
                             <textarea rows="1" type="text" class="tm-form-control" placeholder="Comment to log step/ log work" l-ref="comment-for-ticket" tabindex="1002"></textarea>
+                        </div>
+                    </div>
+                </div>
+                <div class="space-segment log-history-navigator"> 
+                    <div class="log-history-navigator-title">
+                        Filter
+                    </div>
+                    <div class="log-history-navigator-action">
+                        <span class="filter-icon">
+                            <svg class="svg-inline--fa fa-filter" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="filter" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" data-fa-i2svg=""><path fill="currentColor" d="M3.853 54.87C10.47 40.9 24.54 32 40 32H472C487.5 32 501.5 40.9 508.1 54.87C514.8 68.84 512.7 85.37 502.1 97.33L320 320.9V448C320 460.1 313.2 471.2 302.3 476.6C291.5 482 278.5 480.9 268.8 473.6L204.8 425.6C196.7 419.6 192 410.1 192 400V320.9L9.042 97.33C-.745 85.37-2.765 68.84 3.854 54.87L3.853 54.87z"></path></svg>
+                        </span>
+                        <input l-ref="hisory-date-range" class="log-history-navigator-input tm-form-control">
+                        <div class="total">
+                            Total: <div l-ref="log-history-total-range"></div>
                         </div>
                     </div>
                 </div>
