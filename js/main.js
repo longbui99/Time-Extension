@@ -273,7 +273,8 @@ class Main extends Component {
                 return historyByDate[group].values[index];
             }
             function exportLogData(target){
-                let data = getLogData(target)
+                let data = getLogDataGroup(target);
+                let parentNode = target.parentNode;
                 return {
                     id: data.id,
                     time: parentNode.querySelector('.log-duration').value,
