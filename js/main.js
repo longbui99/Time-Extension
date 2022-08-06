@@ -203,6 +203,8 @@ class Main extends Component {
         let self = this;
         let response = (await this.do_invisible_request('GET', `${this.subEnv.serverURL}/management/ticket/work-log/history?from_unix=${from_unix}&unix=${unix}&jwt=${this.subEnv.jwt}`));
         let result = (await response.json());
+        this.logHistoryDateRangeTotalRef.el.innerHTML = secondToHour(0)
+        this.logHistoryRef.el.innerHTML = '';
         if (result.length){
             let historyByDate = {};
             let maxDate = this.unix[1] || 0, minDate = this.unix[0] || new Date().getTime();
@@ -224,6 +226,8 @@ class Main extends Component {
             this.unix = [minDate, maxDate]
             let innerHTML = ''
             let globalTotal = 0;
+            this.logHistoryDateRangeTotalRef.el.innerHTML = secondToHour(globalTotal)
+            this.logHistoryRef.el.innerHTML = innerHTML;
             for (let group in historyByDate){
                 let tmpl = '';
                 let total_duration = 0;
