@@ -1346,7 +1346,7 @@ class Main extends Component {
                         </span>
                         <input l-ref="hisory-date-range" class="log-history-navigator-input tm-form-control">
                         <div class="total">
-                            Total: <div l-ref="log-history-total-range"></div>
+                            Total: <div l-ref="log-history-total-range">00:00</div>
                         </div>
                     </div>
                 </div>
