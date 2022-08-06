@@ -203,7 +203,7 @@ class Main extends Component {
         let self = this;
         let response = (await this.do_invisible_request('GET', `${this.subEnv.serverURL}/management/ticket/work-log/history?from_unix=${from_unix}&unix=${unix}&jwt=${this.subEnv.jwt}`));
         let result = (await response.json());
-        if (true){
+        if (result.length){
             let historyByDate = {};
             let maxDate = this.unix[1] || 0, minDate = this.unix[0] || new Date().getTime();
             for (let record of result){
