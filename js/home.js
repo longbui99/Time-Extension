@@ -15,7 +15,7 @@ class Home extends Component {
     'loading': this.onLoading,
     'error': this.onError,
     'session_errors': this.onSessionError,
-    'ticket-changed': this.onTicketChanged,
+    'issue-changed': this.onIssueChanged,
     'relative-updated': this.onRelativeUpdated,
     'load_start': this.onLoadStart,
     'load_done': this.onLoadDone,
@@ -141,15 +141,15 @@ class Home extends Component {
   onSessionError(){
     this.onAuthentication(this.payload,   false);
   }
-  async onTicketChanged(ticketData){
+  async onIssueChanged(issueData){
     if (chrome.storage){
       let data = (await chrome.storage.local.get(["timeLogStorage"]))?.timeLogStorage
-      data.ticketData = ticketData;
+      data.issueData = issueData;
       chrome.storage.local.set({'timeLogStorage': data})
-      this.flushDataToExtension({ticketUpdate: data.ticketData});
+      this.flushDataToExtension({issueUpdate: data.issueData});
     } else {
       let data = JSON.parse(localStorage.getItem(storage) || "{}");
-      data.ticketData = ticketData;
+      data.issueData = issueData;
       localStorage.setItem(storage, JSON.stringify(data));
     }
   }
@@ -176,20 +176,20 @@ class Home extends Component {
   flushDataToExtension(data){
     chrome.runtime.sendMessage(data);
   }
-  ticketUpdate(ticketData){
+  issueUpdate(issueData){
     if (this.subEnv.authenticated){
-      ticketData.broardcast = true;
-      this.component.ticketData = ticketData;
+      issueData.broardcast = true;
+      this.component.issueData = issueData;
       this.component.renderContent();
-      this.component.ticketData.broardcast = false;
+      this.component.issueData.broardcast = false;
     }
   }
   relativeActiveUpdate(relativeActives){
     if (this.subEnv.authenticated){
-      this.component.ticketData.broardcast = true;
-      this.component.relatedActiveTickets = relativeActives;
+      this.component.issueData.broardcast = true;
+      this.component.relatedActiveIssues = relativeActives;
       this.component.fetchRelativeActive();
-      this.component.ticketData.broardcast = false;
+      this.component.issueData.broardcast = false;
     }
   }
   searchedUpdate(searchData){

@@ -70,8 +70,8 @@ class PinPopup extends Component {
         })
         chrome.runtime.onMessage.addListener(
             function (request, sender, sendResponse) {
-                if (request.ticketUpdate){
-                    self.component.ticketUpdate(request.ticketUpdate);
+                if (request.issueUpdate){
+                    self.component.issueUpdate(request.issueUpdate);
                 }
                 if (request.relativeUpdate){
                     self.component.relativeActiveUpdate(request.relativeUpdate);
