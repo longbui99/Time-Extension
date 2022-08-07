@@ -1181,6 +1181,7 @@ lbwt .btn svg{
     display: flex;
     justify-content: flex-end;
     padding: 5px;
+    background-color:white;
 }
 .main-page .main-action-page .favorite-content .favorite-content-navigator .button-remove-favorite{
     display: none;
