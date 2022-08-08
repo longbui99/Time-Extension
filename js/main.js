@@ -343,11 +343,12 @@ class Main extends Component {
             let statusSpan = document.createElement('em')
             let sprints = (record.sprint && record.sprint.split(' ') || '')
             let sprintText = ((typeof sprints === 'string')? '' : "|" + sprints[sprints.length-1])
-            statusSpan.innerHTML = `${this._minifyString(record.status, 5)}<b>${sprintText} </b>`
+            statusSpan.innerHTML = `${this._minifyString(record.status, 13)}<b>${sprintText} </b>`
             let typeImg = document.createElement('img')
             typeImg.setAttribute('src', record.type_url)
             let textSpan = document.createElement('span')
             textSpan.innerText = record.displayName
+            p.classList.add(fetchSpecialClass(record))
             p.append(typeImg)
             p.append(textSpan)
             p.append(statusSpan)

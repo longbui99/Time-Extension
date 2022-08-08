@@ -17,8 +17,9 @@
 html {
     scroll-behavior: smooth;
 }
-.lbwt{
-
+lbwt .done-line{
+    /* text-decoration: line-through; */
+    color: #00acb3;
 }
 
 

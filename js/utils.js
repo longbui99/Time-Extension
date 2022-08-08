@@ -1,5 +1,10 @@
 const storage = "timeLogStorage"
-
+function fetchSpecialClass(record){
+    if (record.status_key === 'done' || record.status.startsWith('QA') || record.status.startsWith('UAT')){
+        return 'done-line'
+    }
+    return 'normal'
+}
 function secondToHour(second){
     let hour = String(parseInt(second/3600)).padStart(2, "0");
     let minute = String(parseInt(second%3600/60)).padStart(2, "0");

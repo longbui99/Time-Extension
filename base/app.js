@@ -1,0 +1,2 @@
+
+mount(Home, document.body);
