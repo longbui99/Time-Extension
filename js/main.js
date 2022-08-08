@@ -207,7 +207,7 @@ class Main extends Component {
         this.logHistoryRef.el.innerHTML = '';
         if (result.length){
             let historyByDate = {};
-            let maxDate = this.unix[1] || 0, minDate = this.unix[0] || new Date().getTime();
+            let maxDate = this.unix[1] || 0, minDate = this.unix[0] || new Date().getTime()/1000;
             for (let record of result){
                 let date = new Date(record['start_date']+"Z");
                 let groupUnix = date.getTime()/1000;
@@ -498,7 +498,8 @@ class Main extends Component {
             (await this.do_request('POST', `${this.subEnv.serverURL}/management/issue/work-log/manual`, params));
             this.manualLogref.el.value = '';
         }
-        this.renderIssueData(refresh)
+        this.renderIssueData(refresh);
+        this.loadHistory(this.unix[0]-1, this.unix[1])
     }
     _initDoneWorkLog() {
         let self = this;
