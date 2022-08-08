@@ -77,7 +77,7 @@ let replace_rule = {
     '\n': '<br/>'
 }
 
-function parseAC(text){
+function parseChecklist(text){
     for( let rule in replace_rule)
         text = text.replaceAll(rule, replace_rule[rule])
     let pivot = 0, index = 0, final = [''], final_key = 0;
