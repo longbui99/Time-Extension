@@ -235,16 +235,33 @@ class Main extends Component {
                 let values = historyByDate[group].values.sort(function (a,b){
                     return a.issue - b.issue
                 })
+                let checkpointKey = false;
+                let logHTML = '';
                 for (let log of values){
+                    if (log.key === checkpointKey || !checkpointKey){
+                        logHTML += `
+                            <div class="log-each">
+                                <input class="log-duration tm-form-control" value="${self.secondToString(log.duration)}">
+                                <input class="log-description tm-form-control" value="${log.description}">
+                            </div>
+                        `
+                    } else if (logHTML.length > 0) {
+                        tmpl += `
+                        <div class="log" data-group="${group}" data-index="${index-1}">
+                            <div class="log-title">
+                                <span class="log-issue">
+                                    ${log.key}
+                                </span>
+                                <span class="log-display-name">
+                                    ${log.issueName}
+                                </span>
+                            </div>
+                            ${logHTML}
+                        </div>`
+                        logHTML = ''
+                    }
+                    checkpointKey = log.key;
                     total_duration += log.duration;
-                    tmpl += `
-                    <div class="log" data-group="${group}" data-index="${index}">
-                        <span class="log-issue">
-                            ${log.key}
-                        </span>
-                        <input class="log-duration tm-form-control" value="${self.secondToString(log.duration)}">
-                        <input class="log-description tm-form-control" value="${log.description}">
-                    </div>`;
                     index++;
                 }
                 historyByDate[group].totalDuration = total_duration;
@@ -1060,8 +1077,8 @@ class Main extends Component {
                             ${record.name}
                         </div>
                         <div class="favorite-issue-action"  data-key=${record.key}>
-                            <button class="btn btn-thin btn-danger">
-                                <svg class="svg-inline--fa fa-eraser" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="eraser" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" data-fa-i2svg=""><path fill="currentColor" d="M480 416C497.7 416 512 430.3 512 448C512 465.7 497.7 480 480 480H150.6C133.7 480 117.4 473.3 105.4 461.3L25.37 381.3C.3786 356.3 .3786 315.7 25.37 290.7L258.7 57.37C283.7 32.38 324.3 32.38 349.3 57.37L486.6 194.7C511.6 219.7 511.6 260.3 486.6 285.3L355.9 416H480zM265.4 416L332.7 348.7L195.3 211.3L70.63 336L150.6 416L265.4 416z"></path></svg>
+                            <button class="btn btn-thin btn-highlight">
+                                <svg class="svg-inline--fa fa-star" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="star" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512" data-fa-i2svg=""><path fill="currentColor" d="M381.2 150.3L524.9 171.5C536.8 173.2 546.8 181.6 550.6 193.1C554.4 204.7 551.3 217.3 542.7 225.9L438.5 328.1L463.1 474.7C465.1 486.7 460.2 498.9 450.2 506C440.3 513.1 427.2 514 416.5 508.3L288.1 439.8L159.8 508.3C149 514 135.9 513.1 126 506C116.1 498.9 111.1 486.7 113.2 474.7L137.8 328.1L33.58 225.9C24.97 217.3 21.91 204.7 25.69 193.1C29.46 181.6 39.43 173.2 51.42 171.5L195 150.3L259.4 17.97C264.7 6.954 275.9-.0391 288.1-.0391C300.4-.0391 311.6 6.954 316.9 17.97L381.2 150.3z"></path></svg>
                             </button>
                         </div>
                     </div>`
