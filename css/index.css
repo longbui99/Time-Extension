@@ -982,7 +982,6 @@ svg:not(:root).tm-svg-inline--fa {
 }
 
 .main-page .main-action-page .issue.time-log .space-segment.log-history .log-group .log-segment .log .log-each .log-description{
-    margin-left: 5px;
     width: 60%;
     height: 20px;
     border: none;
@@ -1014,7 +1013,16 @@ svg:not(:root).tm-svg-inline--fa {
 .main-page .main-action-page .issue.time-log .space-segment.log-history .log-group .log-segment .log .log-each .wl-circle-decorator{
     font-size: 0.5em;
     color: #5ca2c5;
-    margin-left: 5px;
+    padding-left: 5px;
+    height: 20px;
+    padding-right: 5px;
+    cursor: pointer;
+    display: inline-block;
+    display: flex;
+    align-items: center;
+}
+.main-page .main-action-page .issue.time-log .space-segment.log-history .log-group .log-segment .log .log-each:hover .wl-circle-decorator{
+    color: var(--primary);
 }
 
 .main-page .main-action-page .issue.time-log .heading {
