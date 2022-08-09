@@ -205,6 +205,8 @@ class Main extends Component {
         let result = (await response.json());
         this.logHistoryDateRangeTotalRef.el.innerHTML = secondToHour(0)
         this.logHistoryRef.el.innerHTML = '';
+        let options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+        let detailOptions = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', hour: 'numeric', minute: 'numeric' };
         if (result.length){
             let historyByDate = {};
             let maxDate = this.unix[1] || 0, minDate = this.unix[0] || new Date().getTime()/1000;
@@ -216,7 +218,15 @@ class Main extends Component {
                 } else if (groupUnix < minDate){
                     minDate = groupUnix;
                 }
-                let key = date.toISOString().substring(0, 10);
+                let key = date.toLocaleDateString("en-US", options);
+                record['sequence'] = parseInt(Array.from(" " + record['key'])?.reduce(function(result, item){
+                    if (!isNaN(item)){
+                        result += item
+                    } else {
+                        result += item.charCodeAt(0)
+                    }
+                    return result
+                }))
                 if (historyByDate[key]){
                     historyByDate[key].values.push(record);
                 } else {
@@ -224,7 +234,7 @@ class Main extends Component {
                 }
             }
             this.unix = [minDate, maxDate]
-            let innerHTML = ''
+            let innerHTML = '', pageLog = {}
             let globalTotal = 0;
             this.logHistoryDateRangeTotalRef.el.innerHTML = secondToHour(globalTotal)
             this.logHistoryRef.el.innerHTML = innerHTML;
@@ -232,36 +242,36 @@ class Main extends Component {
                 let tmpl = '';
                 let total_duration = 0;
                 let index = 0 ;
-                let values = historyByDate[group].values.sort(function (a,b){
-                    return a.issue - b.issue
-                })
-                let checkpointKey = false;
-                let logHTML = '';
+                let values = historyByDate[group].values.sort(function(a,b){return b.sequence-a.sequence})
+                values.push({})
+                let checkpointKey = values[0]?.key, logHTML = '';
                 for (let log of values){
-                    if (log.key === checkpointKey || !checkpointKey){
-                        logHTML += `
-                            <div class="log-each">
-                                <input class="log-duration tm-form-control" value="${self.secondToString(log.duration)}">
-                                <input class="log-description tm-form-control" value="${log.description}">
-                            </div>
-                        `
-                    } else if (logHTML.length > 0) {
+                    let eachLogHTML =  `<div class="log-each" data-group="${group}" data-id="${log['id']}">
+                            <input class="log-duration tm-form-control" value="${self.secondToString(log.duration)}">
+                            <span class="wl-circle-decorator" title="${log.startDate?.toLocaleDateString("en-US", detailOptions) || ''}"><i class="fas fa-circle"></i></span>
+                            <input class="log-description tm-form-control" value="${log.description}">
+                            <span class="action-log-delete"><svg class="svg-inline--fa fa-xmark" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="xmark" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 512" data-fa-i2svg=""><path fill="currentColor" d="M310.6 361.4c12.5 12.5 12.5 32.75 0 45.25C304.4 412.9 296.2 416 288 416s-16.38-3.125-22.62-9.375L160 301.3L54.63 406.6C48.38 412.9 40.19 416 32 416S15.63 412.9 9.375 406.6c-12.5-12.5-12.5-32.75 0-45.25l105.4-105.4L9.375 150.6c-12.5-12.5-12.5-32.75 0-45.25s32.75-12.5 45.25 0L160 210.8l105.4-105.4c12.5-12.5 32.75-12.5 45.25 0s12.5 32.75 0 45.25l-105.4 105.4L310.6 361.4z"></path></svg><!-- <i class="fas fa-times"></i> Font Awesome fontawesome.com --></span>
+                        </div>
+                    `
+                    if (log.key !== checkpointKey){
+                        pageLog = values[index-1];
                         tmpl += `
-                        <div class="log" data-group="${group}" data-index="${index-1}">
+                        <div class="log" data-group="${group}" data-id="${pageLog['id']}">
                             <div class="log-title">
                                 <span class="log-issue">
-                                    ${log.key}
+                                    ${pageLog.key}
                                 </span>
-                                <span class="log-display-name">
-                                    ${log.issueName}
+                                <span class="log-display-name" title="${pageLog.issueName}">
+                                    ${pageLog.issueName}
                                 </span>
                             </div>
                             ${logHTML}
                         </div>`
-                        logHTML = ''
-                    }
+                        logHTML = '';
+                    } 
                     checkpointKey = log.key;
-                    total_duration += log.duration;
+                    logHTML += eachLogHTML
+                    total_duration += (log.duration || 0);
                     index++;
                 }
                 historyByDate[group].totalDuration = total_duration;
@@ -272,7 +282,7 @@ class Main extends Component {
                         <div class="log-heading">
                             <div class="datetime"> ${group} </div>
                             <div>
-                                <div class="total-duration"> ${secondToHour(total_duration)} </div> 
+                                Total: <div class="total-duration"> ${secondToHour(total_duration)} </div> 
                             </div>
                         </div>
                         <div class="log-segment">
@@ -290,8 +300,12 @@ class Main extends Component {
             function getLogDataGroup(target){
                 let parentNode = target.parentNode;
                 let group = parentNode.getAttribute('data-group');
-                let index = parseInt(parentNode.getAttribute('data-index'));
-                return historyByDate[group].values[index];
+                let id = parseInt(parentNode.getAttribute('data-id'));
+                let index = historyByDate[group].values.findIndex(e=>e.id === id)
+                if (index !== -1){
+                    return historyByDate[group].values[index];
+                }
+                return {};
             }
             function exportLogData(target){
                 let data = getLogDataGroup(target);
@@ -306,28 +320,31 @@ class Main extends Component {
             for (let element of this.logHistoryRef.el.querySelectorAll('.tm-form-control')){
                 element.addEventListener('change', event=>{
                     let values = exportLogData(event.target);
-                    self.do_invisible_request('POST', `${self.subEnv.serverURL}/management/issue/work-log/update`, values);
+                    (self.do_invisible_request('POST', `${self.subEnv.serverURL}/management/issue/work-log/update`, values));
                 })
             }
-            for (let element of this.logHistoryRef.el.querySelectorAll('.log-issue')){
+            function deleteLogData(target){
+                let data = getLogDataGroup(target)
+                    let values = exportLogData(target);
+                    self.do_invisible_request('POST', `${self.subEnv.serverURL}/management/issue/work-log/delete/${values.id}`, values);
+                    let group = target.parentNode.getAttribute('data-group');
+                    historyByDate[group].totalDuration -= data.duration;
+                    target.parentNode.parentNode.parentNode.parentNode.parentNode.querySelector('.total-duration').innerHTML = secondToHour(historyByDate[group].totalDuration);
+                    target.parentNode.remove()
+                    globalTotal -= data.duration;
+                    self.logHistoryDateRangeTotalRef.el.innerHTML = secondToHour(globalTotal)
+            }
+            for (let element of this.logHistoryRef.el.querySelectorAll('.log-title')){
                 element.addEventListener('click', event=>{
-                    let target = event.target;
-                    let data = getLogDataGroup(target)
-                    if (window.event.ctrlKey && window.event.altKey){
-                        let values = exportLogData(target);
-                        self.do_invisible_request('POST', `${self.subEnv.serverURL}/management/issue/work-log/delete/${values.id}`, values);
-                        let group = event.target.parentNode.getAttribute('data-group');
-                        historyByDate[group].totalDuration -= data.duration;
-                        target.parentNode.parentNode.parentNode.querySelector('.total-duration').innerHTML = secondToHour(historyByDate[group].totalDuration);
-                        target.parentNode.remove()
-                        globalTotal -= data.duration;
-                        self.logHistoryDateRangeTotalRef.el.innerHTML = secondToHour(globalTotal)
-
-                    } else {
-                        self.issueData.id = data.issue;
-                        self.storeAndRenderIssue(false);
-                        event.stopPropagation();
-                    }
+                    let data = getLogDataGroup(event.currentTarget)
+                    self.issueData.id = data.issue;
+                    self.storeAndRenderIssue(false);
+                    event.stopPropagation();
+                })
+            }
+            for (let element of this.logHistoryRef.el.querySelectorAll('.action-log-delete')){
+                element.addEventListener('click', event=>{
+                    deleteLogData(event.currentTarget)
                 })
             }
         }
@@ -1370,7 +1387,7 @@ class Main extends Component {
                 </div>
                 <div class="space-segment log-history-navigator"> 
                     <div class="log-history-navigator-title">
-                        Filter
+                        Tracking
                     </div>
                     <div class="log-history-navigator-action">
                         <span class="filter-icon">
