@@ -600,15 +600,19 @@ svg:not(:root).tm-svg-inline--fa {
     justify-content: space-between;
     position: relative;
 }
+.main-page .main-action-page .issue .input-group .icon-prepend{ 
+    position: absolute;
+    top: 9px;
+}
 
 .main-page .main-action-page .issue .input-group .issue-type {
     position: absolute;
-    left: 8px;
+    left: 25px;
 }
 
 .main-page .main-action-page .issue .input-group .input-s-issue {
     font-size: 15px;
-    padding-left: 30px;
+    padding-left: 45px;
     height: 30px;
     border: none;
     box-shadow: rgba(0, 0, 0, 0.2) 0px 3px 15px !important;
@@ -1143,6 +1147,28 @@ lbwt .btn.btn-danger:hover{
         rgba(187, 44, 44, 0.35) 0 8px 16px,
         rgba(187, 44, 44, 0.35) 0 16px 32px;
 }
+lbwt .btn.btn-secondary {
+    background-color: #ffffff;
+    color: #c2c2c2;
+}
+lbwt .btn.btn-secondary:hover{
+    box-shadow: none;
+    color: black;
+}
+lbwt .btn.btn-primary {
+    background-color: #ffffff;
+    color: var(--primary);
+}
+lbwt .btn.btn-primary:hover{
+    box-shadow: none;
+}
+lbwt .btn.btn-highlight {
+    background-color: #ffffff;
+    color: rgb(219, 216, 0);
+}
+lbwt .btn.btn-highlight:hover{
+    box-shadow: none;
+}
 lbwt .btn.btn-thin{
     padding: 3px;
 }
@@ -1184,13 +1210,16 @@ lbwt .btn svg{
     padding: 5px;
     background-color:white;
 }
-.main-page .main-action-page .favorite-content .favorite-content-navigator .button-remove-favorite{
+.button-add-favorite{
+    display: inline-block;
+}
+.button-remove-favorite{
     display: none;
 }
-.main-page .main-action-page .favorite-content .favorite-content-navigator.favorite .button-add-favorite{
+.favorite .button-add-favorite{
     display: none;
 }
-.main-page .main-action-page .favorite-content .favorite-content-navigator.favorite .button-remove-favorite{
+.favorite .button-remove-favorite{
     display: unset;
 }
 .main-page .main-action-page .favorite-list{
