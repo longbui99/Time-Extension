@@ -73,7 +73,7 @@ class Login extends Component {
                 </div>
             </div>
             <div class="nagivator-button">
-                <button type="button" class="btn btn-primary aquacolor" l-ref="actionSignIn">Sign In</button>
+                <button type="button" class="btn btn-start aquacolor" l-ref="actionSignIn">Sign In</button>
             </div>
         </div>
     </div>
