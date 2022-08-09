@@ -7,8 +7,7 @@
         "tabs",
         "storage",
         "scripting",
-        "activeTab",
-        "contextMenus"
+        "activeTab"
     ],
     "host_permissions": ["https://*/*", "http://*/*"],
     "action": {
