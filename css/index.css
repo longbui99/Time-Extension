@@ -719,7 +719,7 @@ svg:not(:root).tm-svg-inline--fa {
     height: 30px;
     background-color: white;
     display: flex;
-    justify-content: space-between;
+    justify-content: flex-start;
     margin-top: 20px;
     position: relative;
 }
@@ -759,13 +759,24 @@ svg:not(:root).tm-svg-inline--fa {
         height: 100%;
     }
 }
+@keyframes tm-tab-reset {
+    from {
+        height: 100%;
+    }
+
+    to {
+        height: 0%;
+    }
+}
 
 .main-page .main-action-page .tm-tab.left .tm-tab-background {
+    right: 0%;
     animation: tm-tab-left2right 0.3s;
     background-image: linear-gradient(to right, var(--primary) 80%, white);
 }
 
 .main-page .main-action-page .tm-tab.right .tm-tab-background {
+    left: 0%;
     animation: tm-tab-right2left 0.3s;
     background-image: linear-gradient(to left, var(--primary) 80%, white);
 }
@@ -775,7 +786,7 @@ svg:not(:root).tm-svg-inline--fa {
 }
 
 .main-page .main-action-page .tm-tab .tm-tab-action {
-    min-width: 25%;
+    min-width: 24%;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -785,16 +796,15 @@ svg:not(:root).tm-svg-inline--fa {
     cursor: pointer;
     color: var(--primary);
     font-size: 1.1em;
-    /* border-bottom-left-radius: 10px;
-    border-bottom-right-radius: 10px; */
     margin-bottom: 3px;
+    padding: 3px 3px 0px 3px;
 }
 
 .main-page .main-action-page .tm-tab .tm-tab-action.tm-active {
     border-bottom: none;
     border-top-right-radius: 10px;
     border-top-left-radius: 10px;
-    padding: 0px;
+    padding: 0px 0px 3px 0px;
     margin: 3px 3px 0px 3px;
     background-color: #ffffff;
 }

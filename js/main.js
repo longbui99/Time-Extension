@@ -1069,7 +1069,9 @@ class Main extends Component {
                 this.tabAtionElements[key][1].classList.remove('tm-close');
                 let parent = this.tabAtionElements[key][0].parentElement;
                 parent.classList.remove('right', 'left', 'middle');
-                parent.classList.add(this.tabAtionElements[key][0].getAttribute('data-action'));
+                setTimeout(()=>{
+                    parent.classList.add(this.tabAtionElements[key][0].getAttribute('data-action'));
+                }, 1)
             }
             else{
                 this.tabAtionElements[key][0].classList.remove('tm-active');
@@ -1417,7 +1419,7 @@ class Main extends Component {
             <div class="tm-tab-action" data-action="left" l-ref="time-log-heading"  title="Ctrl+Shift+1">
                 Clock
             </div>
-            <div class="tm-tab-action" data-action="left" l-ref="log-report-heading"  title="Ctrl+Shift+2">
+            <div class="tm-tab-action" data-action="middle" l-ref="log-report-heading"  title="Ctrl+Shift+2">
                 Tracking
             </div>
             <div class="tm-tab-action" data-action="middle" l-ref="ac-heading" title="Ctrl+Shift+3">
