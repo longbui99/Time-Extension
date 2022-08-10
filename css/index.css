@@ -21,7 +21,9 @@ lbwt .done-line{
     /* text-decoration: line-through; */
     color: #00acb3;
 }
-
+lbwt svg{
+    width: 1em;
+}
 
 @keyframes spin {
     0% {
@@ -843,6 +845,7 @@ svg:not(:root).tm-svg-inline--fa {
     display: flex;
     flex-flow: column;
     margin-left: 10px;
+    margin-top: 10px;
     width: 96%;
 }
 
