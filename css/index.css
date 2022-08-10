@@ -1021,6 +1021,11 @@ svg:not(:root).tm-svg-inline--fa {
     display: flex;
     align-items: center;
 }
+
+.main-page .main-action-page .issue.time-log .space-segment.log-history .log-group .log-segment .log .log-each .wl-circle-decorator svg{
+    width: 1em;
+}
+
 .main-page .main-action-page .issue.time-log .space-segment.log-history .log-group .log-segment .log .log-each:hover .wl-circle-decorator{
     color: var(--primary);
 }
