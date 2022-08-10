@@ -1168,19 +1168,20 @@ svg:not(:root).tm-svg-inline--fa {
 }
 
 .main-page .main-action-page .issue.time-log .time-action .manual-log {
-    width: 40%;
+    width: 50%;
     display: flex;
 }
 
 .main-page .main-action-page .issue.time-log .time-action .action-group {
     font-size: 1.5em;
-    width: 60%;
+    width: 50%;
     margin-left: 10px;
     color: var(--primary);
     display: flex;
     justify-content: space-between;
-    height: 32px;
+    height: 35px;
     position: relative;
+    align-items: center;
 }
 
 .main-page .main-action-page .issue.time-log .time-action .action-group .action:hover {
@@ -1201,91 +1202,70 @@ lbwt .page .input-segment{
     width: 90%;
     padding: 5%;
 }
+.button-31 {
+  background-color: #222;
+  border-radius: 4px;
+  border-style: none;
+  box-sizing: border-box;
+  color: #fff;
+  cursor: pointer;
+  display: inline-block;
+  font-family: "Farfetch Basis","Helvetica Neue",Arial,sans-serif;
+  font-size: 16px;
+  font-weight: 700;
+  line-height: 1.5;
+  margin: 0;
+  max-width: none;
+  min-height: 44px;
+  min-width: 10px;
+  outline: none;
+  overflow: hidden;
+  padding: 9px 20px 8px;
+  position: relative;
+  text-align: center;
+  text-transform: none;
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: manipulation;
+  width: 100%;
+}
+
 lbwt .btn {
-    background-color: #c2fbd7;
-    border-radius: 10%;
-    color: var(--primary);
+    background-color: var(--primary);
+    border-radius: 4px;
+    border-style: none;
+    box-sizing: border-box;
+    color: #fff;
     cursor: pointer;
-    padding: 7px 20px;
-    text-align: center;
-    text-decoration: none;
-    transition: all 250ms;
-    border: 0;
+    display: inline-block;
+    font-family: "Farfetch Basis","Helvetica Neue",Arial,sans-serif;
     font-size: 16px;
+    font-weight: 700;
+    padding: 5px 20px 4px;
+    position: relative;
+    text-align: center;
+    text-transform: none;
     user-select: none;
     -webkit-user-select: none;
     touch-action: manipulation;
-    font-weight: 500;
+    width: 100%;
+    border: solid 3px transparent;
 }
 lbwt .btn:hover {
-    box-shadow:
-        rgba(44, 187, 99, .35) 0 -25px 18px -14px inset,
-        rgba(44, 187, 99, .25) 0 1px 2px,
-        rgba(44, 187, 99, .25) 0 2px 4px,
-        rgba(44, 187, 99, .25) 0 4px 8px,
-        rgba(44, 187, 99, .25) 0 8px 16px,
-        rgba(44, 187, 99, .25) 0 16px 32px;
-    transform: scale(1.05) rotate(-1deg);
+    opacity: 0.75;
+}
+lbwt .btn.btn-resume {
+    background-color: #d9be48;
 }
 lbwt .btn.btn-pause {
-    background-color: #f7fbc2;
-    color: var(--third);
-}
-lbwt .btn.btn-pause:hover {
-    box-shadow:
-        rgba(187, 137, 44, 0.35) 0 -25px 18px -14px inset,
-        rgba(187, 137, 44, 0.35) 0 1px 2px,
-        rgba(187, 137, 44, 0.35) 0 2px 4px,
-        rgba(187, 137, 44, 0.35) 0 4px 8px,
-        rgba(187, 137, 44, 0.35) 0 8px 16px,
-        rgba(187, 137, 44, 0.35) 0 16px 32px;
-}
-lbwt .btn.btn-done {
-    background-color: #9eeffc;
-    color: #042f6e;
-}
-lbwt .btn.btn-done:hover{
-    box-shadow:
-        rgba(44, 111, 187, 0.35) 0 -25px 18px -14px inset,
-        rgba(44, 111, 187, 0.35) 0 1px 2px,
-        rgba(44, 111, 187, 0.35) 0 2px 4px,
-        rgba(44, 111, 187, 0.35) 0 4px 8px,
-        rgba(44, 111, 187, 0.35) 0 8px 16px,
-        rgba(44, 111, 187, 0.35) 0 16px 32px;
-}
-lbwt .btn.btn-done {
-    background-color: #9eeffc;
-    color: #042f6e;
-}
-lbwt .btn.btn-done:hover{
-    box-shadow:
-        rgba(44, 111, 187, 0.35) 0 -25px 18px -14px inset,
-        rgba(44, 111, 187, 0.35) 0 1px 2px,
-        rgba(44, 111, 187, 0.35) 0 2px 4px,
-        rgba(44, 111, 187, 0.35) 0 4px 8px,
-        rgba(44, 111, 187, 0.35) 0 8px 16px,
-        rgba(44, 111, 187, 0.35) 0 16px 32px;
+    background-color: #597eaa;
 }
 lbwt .btn.btn-danger {
-    background-color: #fc9e9e;
-    color: #6e0404;
-}
-lbwt .btn.btn-danger:hover{
-    box-shadow:
-        rgba(187, 44, 44, 0.35) 0 -25px 18px -14px inset,
-        rgba(187, 44, 44, 0.35) 0 1px 2px,
-        rgba(187, 44, 44, 0.35) 0 2px 4px,
-        rgba(187, 44, 44, 0.35) 0 4px 8px,
-        rgba(187, 44, 44, 0.35) 0 8px 16px,
-        rgba(187, 44, 44, 0.35) 0 16px 32px;
+    background-color: #f44336;
 }
 lbwt .btn.btn-secondary {
     background-color: #ffffff;
     color: #c2c2c2;
-}
-lbwt .btn.btn-secondary:hover{
-    box-shadow: none;
-    color: black;
 }
 lbwt .btn.btn-primary {
     background-color: #ffffff;

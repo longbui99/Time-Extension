@@ -9,6 +9,7 @@ class Main extends Component {
     commentRef = this.useRef('comment-for-issue')
     manualLogref = this.useRef('manual-log-text')
     actionAddRef = this.useRef('action-add')
+    actionResumeRef = this.useRef('action-resume')
     actionPauseRef = this.useRef('action-pause')
     actionStopRef = this.useRef('action-stop')
     relatedActiveRef = this.useRef("related-active")
@@ -61,22 +62,26 @@ class Main extends Component {
         if (this.issueData) {
             if (this.issueData.timeStatus === "active") {
                 this.actionAddRef.el.style.display = "none";
-                this.actionPauseRef.el.style.display = "inline-block";
-                this.actionStopRef.el.style.display = "inline-block";
+                this.actionResumeRef.el.style.display = "none";
+                this.actionPauseRef.el.style.display = "flex";
+                this.actionStopRef.el.style.display = "flex";
             }
             else if (this.issueData.timeStatus === "pause") {
-                this.actionAddRef.el.style.display = "inline-block";
+                this.actionAddRef.el.style.display = "none";
+                this.actionResumeRef.el.style.display = "flex";
                 this.actionPauseRef.el.style.display = "none";
-                this.actionStopRef.el.style.display = "inline-block";
+                this.actionStopRef.el.style.display = "flex";
             }
             else {
-                this.actionAddRef.el.style.display = "inline-block";
+                this.actionAddRef.el.style.display = "flex";
+                this.actionResumeRef.el.style.display = "none";
                 this.actionPauseRef.el.style.display = "none";
                 this.actionStopRef.el.style.display = "none";
             }
         }
         else {
             this.actionAddRef.el.style.display = "none";
+            this.actionResumeRef.el.style.display = "none";
             this.actionPauseRef.el.style.display = "none";
             this.actionStopRef.el.style.display = "none";
         }
@@ -586,6 +591,12 @@ class Main extends Component {
     _initAddWorkLog() {
         let self = this;
         this.actionAddRef.el.addEventListener('click', (event) => {
+            if (self.issueData.timeStatus !== "active") {
+                self.issueData.timeStatus = "active";
+                self._addWorkLog()
+            }
+        })
+        this.actionResumeRef.el.addEventListener('click', (event) => {
             if (self.issueData.timeStatus !== "active") {
                 self.issueData.timeStatus = "active";
                 self._addWorkLog()
@@ -1322,9 +1333,12 @@ class Main extends Component {
                 event.stopImmediatePropagation();
             }
             if (event.code === 'Digit2' && window.event.ctrlKey && window.event.shiftKey){
-                self.acHeadingRef.el.click();
+                self.logReportHeadingRef.el.click();
             }
             if (event.code === 'Digit3' && window.event.ctrlKey && window.event.shiftKey){
+                self.acHeadingRef.el.click();
+            }
+            if (event.code === 'Digit4' && window.event.ctrlKey && window.event.shiftKey){
                 self.favoriteHeadingRef.el.click();
             }
             if (event.code === 'KeyE' && window.event.ctrlKey && window.event.shiftKey){
@@ -1469,24 +1483,17 @@ class Main extends Component {
                                 <input id="start-date-selection" type="text" class="tm-form-control start-date" l-ref="start-date">
                             </div>
                             <div class="action-group">
-                                <div>
-                                    <div class="action add" l-ref="action-add" tabindex="1003">
-                                        <button class="btn btn-start">START</button>    
-                                    </div>
+                                <div class="action add" l-ref="action-add" tabindex="1003">
+                                    <button class="btn btn-start">START</button>    
                                 </div>
-                                <div>
-                                    <div class="action pause" l-ref="action-pause" tabindex="1004">
-                                    <span class="tm-icon-svg">
-                                        <button class="btn btn-pause">PAUSE</button>       
-                                    </span>
-                                    </div>
+                                <div class="action add" l-ref="action-resume" tabindex="1004">
+                                    <button class="btn btn-resume">RESUME</button>    
                                 </div>
-                                <div title="Ctrl+Enter">
-                                    <div class="action stop" l-ref="action-stop" tabindex="1005">
-                                    <span class="tm-icon-svg">
-                                        <button type="button"  class="btn btn-done">DONE</button>      
-                                    </span>
-                                    </div>
+                                <div class="action pause" l-ref="action-pause" tabindex="1005">
+                                    <button class="btn btn-pause">PAUSE</button>       
+                                </div>
+                                <div title="Ctrl+Enter" class="action stop" l-ref="action-stop" tabindex="1006">
+                                    <button type="button"  class="btn btn-done">DONE</button>      
                                 </div>
                             </div>
                         </div>
