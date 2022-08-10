@@ -850,6 +850,9 @@ svg:not(:root).tm-svg-inline--fa {
     justify-content: space-between;
     align-items: center;
 }
+.main-page .main-action-page .log-report {
+    min-height: 345px;
+}
 
 .main-page .main-action-page .log-report .space-segment.log-history-navigator{
     display: flex;
