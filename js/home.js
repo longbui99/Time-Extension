@@ -139,7 +139,7 @@ class Home extends Component {
     }
   }
   onSessionError(){
-    this.onAuthentication(this.payload,   false);
+    // this.onAuthentication(this.payload,   false);
   }
   async onIssueChanged(issueData){
     if (chrome.storage){

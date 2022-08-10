@@ -28,6 +28,8 @@ class Main extends Component {
     acSectionRef = this.useRef('tm-ac-section')
     favoriteSectionRef = this.useRef('tm-favorit-section')
     favoriteListRef = this.useRef('favorite-list')
+    logReportHeadingRef = this.useRef('log-report-heading')
+    logReportSectionRef = this.useRef('log-report-section')
     addToFavoriteRef = this.useRef('add-to-favorite-ref')
     removeToFavoriteRef = this.useRef('remove-to-favorite-ref')
     favoriteNavigatorRef = this.useRef('favorite-segment-ref')
@@ -195,6 +197,35 @@ class Main extends Component {
         this.renderTimeActions();
         this.loadHistory();
     }
+    toggleDatetimeSelection(configs, mode, callback){
+        let tmpl = `
+            <div class="page">
+                <div class="loading-layer"></div>
+                <div class="input-segment">
+                    <input class="date1">
+                    <input class="date2 d-none">
+                    <button class="btn btn-start">DONE</button>
+                </div>
+            </div>
+        `
+        let element = new DOMParser().parseFromString(tmpl, 'text/html').body.firstChild;
+        let date1 = element.querySelector('.date1');
+        let date1pickr = flatpickr(date1,{ enableTime: true, defaultDate: configs[0], altInput: true});
+        if (mode === 'range'){
+            element.querySelector('.date2').classList.remove('d-none');
+            let date2 = element.querySelector('.date2');
+            let date2pickr = flatpickr(date2,{ enableTime: true, defaultDate: configs[1], altInput: true});
+        }
+        element.querySelector('.btn').addEventListener('click', event=>{
+            let res = {
+                date1: new Date(date1.value),
+                date2: new Date(date2.value)
+            }
+            callback(res);
+            element.remove();
+        })
+        document.querySelector('.main-page').append(element);
+    }
     async loadHistory(from_unix=0, unix=0){
         if (this.unix && this.unix[0]=== from_unix && this.unix[1] === unix){
             return
@@ -219,7 +250,8 @@ class Main extends Component {
                     minDate = groupUnix;
                 }
                 let key = date.toLocaleDateString("en-US", options);
-                record['start_date'] = date.toLocaleDateString('en-US', detailOptions)
+                record['start_date'] = date;
+                record['date'] = date.toLocaleDateString('en-US', detailOptions)
                 record['sequence'] = parseInt(Array.from(" " + record['key'])?.reduce(function(result, item){
                     if (!isNaN(item)){
                         result += item
@@ -247,9 +279,9 @@ class Main extends Component {
                 values.push({})
                 let checkpointKey = values[0]?.key, logHTML = '';
                 for (let log of values){
-                    let eachLogHTML =  `<div class="log-each" data-group="${group}" data-id="${log['id']}">
+                    let eachLogHTML =  `<div class="log-each ${log.exported? '': 'unexported'}" data-group="${group}" data-id="${log['id']}">
                             <input class="log-duration tm-form-control" value="${self.secondToString(log.duration)}">
-                            <span class="wl-circle-decorator" title="${log.start_date || ''}"><svg class="svg-inline--fa fa-circle" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="circle" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" data-fa-i2svg=""><path fill="currentColor" d="M512 256C512 397.4 397.4 512 256 512C114.6 512 0 397.4 0 256C0 114.6 114.6 0 256 0C397.4 0 512 114.6 512 256z"></path></svg><!-- <i class="fas fa-circle"></i> Font Awesome fontawesome.com --></span>
+                            <span class="wl-circle-decorator" title="${log.date || ''}"><svg class="svg-inline--fa fa-circle" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="circle" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" data-fa-i2svg=""><path fill="currentColor" d="M512 256C512 397.4 397.4 512 256 512C114.6 512 0 397.4 0 256C0 114.6 114.6 0 256 0C397.4 0 512 114.6 512 256z"></path></svg><!-- <i class="fas fa-circle"></i> Font Awesome fontawesome.com --></span>
                             <input class="log-description tm-form-control" value="${log.description}">
                             <span class="action-log-delete" title="Remove this ${self.secondToString(log.duration)}log"><svg class="svg-inline--fa fa-xmark" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="xmark" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 512" data-fa-i2svg=""><path fill="currentColor" d="M310.6 361.4c12.5 12.5 12.5 32.75 0 45.25C304.4 412.9 296.2 416 288 416s-16.38-3.125-22.62-9.375L160 301.3L54.63 406.6C48.38 412.9 40.19 416 32 416S15.63 412.9 9.375 406.6c-12.5-12.5-12.5-32.75 0-45.25l105.4-105.4L9.375 150.6c-12.5-12.5-12.5-32.75 0-45.25s32.75-12.5 45.25 0L160 210.8l105.4-105.4c12.5-12.5 32.75-12.5 45.25 0s12.5 32.75 0 45.25l-105.4 105.4L310.6 361.4z"></path></svg><!-- <i class="fas fa-times"></i> Font Awesome fontawesome.com --></span>
                         </div>
@@ -259,9 +291,15 @@ class Main extends Component {
                         tmpl += `
                         <div class="log" data-group="${group}" data-id="${pageLog['id']}">
                             <div class="log-title">
-                                <span class="log-issue">
-                                    ${pageLog.key}
-                                </span>
+                                <div class="log-title-heading">
+                                    <span class="log-issue">
+                                        ${pageLog.key}
+                                    </span>
+                                    <span class="log-issue-export">
+                                        <i class="fa-solid fa-square-up-right"></i>
+                                    </span>
+                                </div>
+                                
                                 <span class="log-display-name" title="${pageLog.issueName}">
                                     ${pageLog.issueName}
                                 </span>
@@ -281,7 +319,12 @@ class Main extends Component {
                     innerHTML += `
                     <div class="log-group">
                         <div class="log-heading">
-                            <div class="datetime"> ${group} </div>
+                            <div class="log-heading-title">
+                                <span class="datetime"> ${group} </span>
+                                <span class="log-date-export" data-group="${group}">
+                                    <i class="fa-solid fa-square-up-right"></i>
+                                </span>
+                            </div>
                             <div>
                                 Total: <div class="total-duration"> ${secondToHour(total_duration)} </div> 
                             </div>
@@ -289,8 +332,7 @@ class Main extends Component {
                         <div class="log-segment">
                             ${tmpl}
                         </div>
-                    </div>
-                    `
+                    </div>`
                 }
             }
             this.logHistoryDateRangeTotalRef.el.innerHTML = secondToHour(globalTotal)
@@ -335,9 +377,9 @@ class Main extends Component {
                     globalTotal -= data.duration;
                     self.logHistoryDateRangeTotalRef.el.innerHTML = secondToHour(globalTotal)
             }
-            for (let element of this.logHistoryRef.el.querySelectorAll('.log-title')){
+            for (let element of this.logHistoryRef.el.querySelectorAll('.log-issue')){
                 element.addEventListener('click', event=>{
-                    let data = getLogDataGroup(event.currentTarget)
+                    let data = getLogDataGroup(event.currentTarget.parentNode.parentNode)
                     self.issueData.id = data.issue;
                     self.storeAndRenderIssue(false);
                     event.stopPropagation();
@@ -346,6 +388,55 @@ class Main extends Component {
             for (let element of this.logHistoryRef.el.querySelectorAll('.action-log-delete')){
                 element.addEventListener('click', event=>{
                     deleteLogData(event.currentTarget)
+                })
+            }
+            function updateLog(target){
+                let data = getLogDataGroup(target);
+                let startDate = data.start_date;
+                let endDate = new Date(startDate.getTime() + data.duration);
+                let config = [startDate, endDate]
+                function onSelectedLogchange(selectedDates){
+                    let date1 = selectedDates.date1;
+                    let date2 = selectedDates.date2;
+                    let newDuration = (date2.getTime()-date1.getTime())/1000;
+                    if (date1 && date2){
+                        if ((date1.toISOString().substring(0,10) !== startDate.toISOString().substring(0,10))
+                           ||
+                            newDuration !== duration
+                           ){
+                            // Doing something here
+                           }
+                    }
+                }
+                self.toggleDatetimeSelection(config, 'range', onSelectedLogchange)
+            }
+            for (let element of this.logHistoryRef.el.querySelectorAll('.wl-circle-decorator')){
+                element.addEventListener('click', event=>{
+                    // updateLog(event.currentTarget)
+                })
+            }
+            function exportLog(exportIds){
+                let res = {
+                    exportIds: exportIds,
+                    jwt: self.subEnv.jwt
+                };
+                (self.do_request('POST', `${self.subEnv.serverURL}/management/issue/work-log/export`, res));
+            }
+            for (let element of this.logHistoryRef.el.querySelectorAll('.log-date-export')){
+                element.addEventListener('click', event=>{
+                    let group = event.currentTarget.getAttribute('data-group');
+                    let exportIds = historyByDate[group].values.map(e=> e.id);
+                    exportLog(exportIds);
+                    self.loadHistory(self.unix[0], self.unix[1]);
+                })
+            }
+            for (let element of this.logHistoryRef.el.querySelectorAll('.log-issue-export')){
+                element.addEventListener('click', event=>{
+                    let group = event.currentTarget.parentNode.parentNode.parentNode.getAttribute('data-group');
+                    let data = getLogDataGroup(event.currentTarget.parentNode.parentNode)
+                    let exportIds = historyByDate[group].values.filter(e=> e.issue == data.issue).map(e=>e.id);
+                    exportLog(exportIds);
+                    self.loadHistory(self.unix[0], self.unix[1]);
                 })
             }
         }
@@ -534,7 +625,6 @@ class Main extends Component {
             this.manualLogref.el.value = '';
         }
         this.renderIssueData(refresh);
-        this.loadHistory(this.unix[0]-1, this.unix[1])
     }
     _initDoneWorkLog() {
         let self = this;
@@ -993,6 +1083,7 @@ class Main extends Component {
         } else{
             this.subEnv.contentState = {
                 showLog: true,
+                showLogReport: false,
                 showChecklist: false,
                 showFavorite: false
             }
@@ -1016,6 +1107,13 @@ class Main extends Component {
             if (!self.subEnv.contentState.showLog){
                 resetContentState();
                 self.subEnv.contentState.showLog = true;
+                self.triggerContentType()
+            }
+        })
+        this.logReportHeadingRef.el.addEventListener('click', ()=>{
+            if (!self.subEnv.contentState.showLogReport){
+                resetContentState();
+                self.subEnv.contentState.showLogReport = true;
                 self.triggerContentType()
             }
         })
@@ -1180,6 +1278,9 @@ class Main extends Component {
         if (this.subEnv.contentState.showChecklist) {
             await this.initChecklists();
         }
+        if (this.subEnv.contentState.showLogReport){
+            await this.loadHistory()
+        }
         if (refreshRelated){
             await this.fetchRelativeActive()
         }
@@ -1254,6 +1355,7 @@ class Main extends Component {
     initGeneral(){
         this.tabAtionElements = {
             'showLog': [this.timeLogHeadingRef.el, this.timeLogSectionRef.el],
+            'showLogReport': [this.logReportHeadingRef.el, this.logReportSectionRef.el],
             'showChecklist': [this.acHeadingRef.el, this.acSectionRef.el],
             'showFavorite': [this.favoriteHeadingRef.el, this.favoriteSectionRef.el]
         }
@@ -1313,10 +1415,13 @@ class Main extends Component {
             <div class="tm-tab-action" data-action="left" l-ref="time-log-heading"  title="Ctrl+Shift+1">
                 Clock
             </div>
-            <div class="tm-tab-action" data-action="middle" l-ref="ac-heading" title="Ctrl+Shift+2">
+            <div class="tm-tab-action" data-action="left" l-ref="log-report-heading"  title="Ctrl+Shift+2">
+                Log Report
+            </div>
+            <div class="tm-tab-action" data-action="middle" l-ref="ac-heading" title="Ctrl+Shift+3">
                 Checklists
             </div>
-            <div class="tm-tab-action" data-action="right" l-ref="favorite-heading" title="Ctrl+Shift+3">
+            <div class="tm-tab-action" data-action="right" l-ref="favorite-heading" title="Ctrl+Shift+4">
                 Favorites
             </div>
         </div>
@@ -1386,10 +1491,9 @@ class Main extends Component {
                         </div>
                     </div>
                 </div>
+            </div>
+            <div class="log-report tm-close" l-ref="log-report-section">
                 <div class="space-segment log-history-navigator"> 
-                    <div class="log-history-navigator-title">
-                        Tracking
-                    </div>
                     <div class="log-history-navigator-action">
                         <span class="filter-icon">
                             <svg class="svg-inline--fa fa-filter" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="filter" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" data-fa-i2svg=""><path fill="currentColor" d="M3.853 54.87C10.47 40.9 24.54 32 40 32H472C487.5 32 501.5 40.9 508.1 54.87C514.8 68.84 512.7 85.37 502.1 97.33L320 320.9V448C320 460.1 313.2 471.2 302.3 476.6C291.5 482 278.5 480.9 268.8 473.6L204.8 425.6C196.7 419.6 192 410.1 192 400V320.9L9.042 97.33C-.745 85.37-2.765 68.84 3.854 54.87L3.853 54.87z"></path></svg>
