@@ -1255,7 +1255,10 @@ lbwt .btn {
     border: solid 3px transparent;
 }
 lbwt .btn:hover {
-    opacity: 0.75;
+    opacity: 0.8;
+}
+lbwt .btn:focus {
+    opacity: 0.3;
 }
 lbwt .btn.btn-resume {
     background-color: #d9be48;
