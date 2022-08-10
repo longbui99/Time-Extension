@@ -415,19 +415,20 @@ class Main extends Component {
                     // updateLog(event.currentTarget)
                 })
             }
-            function exportLog(exportIds){
+            async function exportLog(exportIds){
                 let res = {
                     exportIds: exportIds,
                     jwt: self.subEnv.jwt
                 };
-                (self.do_request('POST', `${self.subEnv.serverURL}/management/issue/work-log/export`, res));
+                return self.do_request('POST', `${self.subEnv.serverURL}/management/issue/work-log/export`, res);
             }
             for (let element of this.logHistoryRef.el.querySelectorAll('.log-date-export')){
                 element.addEventListener('click', event=>{
                     let group = event.currentTarget.getAttribute('data-group');
                     let exportIds = historyByDate[group].values.map(e=> e.id);
-                    exportLog(exportIds);
-                    self.loadHistory(self.unix[0], self.unix[1]);
+                    exportLog(exportIds).then(e=>{
+                        self.loadHistory(self.unix[0]-1, self.unix[1]);
+                    });
                 })
             }
             for (let element of this.logHistoryRef.el.querySelectorAll('.log-issue-export')){
@@ -435,8 +436,9 @@ class Main extends Component {
                     let group = event.currentTarget.parentNode.parentNode.parentNode.getAttribute('data-group');
                     let data = getLogDataGroup(event.currentTarget.parentNode.parentNode)
                     let exportIds = historyByDate[group].values.filter(e=> e.issue == data.issue).map(e=>e.id);
-                    exportLog(exportIds);
-                    self.loadHistory(self.unix[0], self.unix[1]);
+                    exportLog(exportIds).then(e=>{
+                        self.loadHistory(self.unix[0]-1, self.unix[1]);
+                    });
                 })
             }
         }

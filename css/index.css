@@ -1064,7 +1064,7 @@ svg:not(:root).tm-svg-inline--fa {
 }
 
 .main-page .main-action-page .log-report .space-segment.log-history .log-group .log-segment .log .log-each .wl-circle-decorator svg{
-    width: 1em;
+    width: 1.3em;
 }
 
 .main-page .main-action-page .log-report .space-segment.log-history .log-group .log-segment .log .log-each:hover .wl-circle-decorator{
