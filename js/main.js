@@ -1483,16 +1483,16 @@ class Main extends Component {
                                 <input id="start-date-selection" type="text" class="tm-form-control start-date" l-ref="start-date">
                             </div>
                             <div class="action-group">
-                                <div class="action add" l-ref="action-add" tabindex="1003">
+                                <div class="action add" l-ref="action-add" tabindex="1003" style="display:none">
                                     <button class="btn btn-start">START</button>    
                                 </div>
-                                <div class="action add" l-ref="action-resume" tabindex="1004">
+                                <div class="action add" l-ref="action-resume" tabindex="1004"  style="display:none">
                                     <button class="btn btn-resume">RESUME</button>    
                                 </div>
-                                <div class="action pause" l-ref="action-pause" tabindex="1005">
+                                <div class="action pause" l-ref="action-pause" tabindex="1005"  style="display:none">
                                     <button class="btn btn-pause">PAUSE</button>       
                                 </div>
-                                <div title="Ctrl+Enter" class="action stop" l-ref="action-stop" tabindex="1006">
+                                <div title="Ctrl+Enter" class="action stop" l-ref="action-stop" tabindex="1006"  style="display:none">
                                     <button type="button"  class="btn btn-done">DONE</button>      
                                 </div>
                             </div>
