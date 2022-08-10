@@ -1416,7 +1416,7 @@ class Main extends Component {
                 Clock
             </div>
             <div class="tm-tab-action" data-action="left" l-ref="log-report-heading"  title="Ctrl+Shift+2">
-                Log Report
+                Tracking
             </div>
             <div class="tm-tab-action" data-action="middle" l-ref="ac-heading" title="Ctrl+Shift+3">
                 Checklists
