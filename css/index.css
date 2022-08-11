@@ -713,10 +713,11 @@ svg:not(:root).tm-svg-inline--fa {
 }
 
 .main-page .main-action-page .issue.search-bar .search-bar-result p span {
-    max-width: 75%;
-    overflow-x: hidden;
+    overflow: hidden;
     white-space: nowrap;
     text-overflow: ellipsis;
+    max-width: 80%;
+    display: inline-block;
 }
 
 .main-page .main-action-page .issue.search-bar .search-bar-result p em {

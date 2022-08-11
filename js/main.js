@@ -503,6 +503,7 @@ class Main extends Component {
             p.append(textSpan)
             p.append(statusSpan)
             p.setAttribute('tabindex', 10+i)
+            p.setAttribute('title', data[i].displayName)
             p.addEventListener('click', () => {
                 self.chooseIssue(i);
             })
