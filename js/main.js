@@ -72,7 +72,13 @@ class Main extends Component {
                 this.actionPauseRef.el.style.display = "none";
                 this.actionStopRef.el.style.display = "flex";
             }
-            else {
+            else if (this.issueData.timeStatus === "force"){
+                this.actionAddRef.el.style.display = "flex";
+                this.actionResumeRef.el.style.display = "none";
+                this.actionPauseRef.el.style.display = "none";
+                this.actionStopRef.el.style.display = "flex";
+            }
+            else{
                 this.actionAddRef.el.style.display = "flex";
                 this.actionResumeRef.el.style.display = "none";
                 this.actionPauseRef.el.style.display = "none";
@@ -191,14 +197,17 @@ class Main extends Component {
             if (record.active_duration > 0) {
                 this.issueData.timeStatus = "pause";
             }
-            if (record.last_start) {
+            else if (record.last_start) {
                 let pivotTime = new Date().getTime();
                 this.currentInterval = setInterval(() => {
                     this.activeDurationRef.el.innerText =this.secondToString(parseInt(record.active_duration + (new Date().getTime() - pivotTime) / 1000));
                 }, 500)
                 this.issueData.timeStatus = "active";
+            } 
+            else {
+                this.issueData.timeStatus = "none";
             }
-        }
+        } 
         this.renderTimeActions();
         this.loadHistory();
     }
@@ -649,7 +658,7 @@ class Main extends Component {
         let self = this;
         this.manualLogref.el.addEventListener('keyup', event => {
             if (!['pause', 'active'].includes(self.issueData?.timeStatus)) {
-                self.issueData.timeStatus = "pause";
+                self.issueData.timeStatus = "force";
                 self.renderTimeActions();
             }
         })
