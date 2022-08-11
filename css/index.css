@@ -612,9 +612,15 @@ svg:not(:root).tm-svg-inline--fa {
     justify-content: space-between;
     position: relative;
 }
-.main-page .main-action-page .issue .input-group .icon-prepend{ 
+.main-page .main-action-page .issue .input-group .icon-prepend{     
     position: absolute;
-    top: 9px;
+    background-color: white;
+    margin-left: 2px;
+    margin-top: 1px;
+}
+.main-page .main-action-page .issue .input-group .icon-prepend button{
+    outline: none;
+    border: none;
 }
 
 .main-page .main-action-page .issue .input-group .issue-type {
@@ -1311,7 +1317,7 @@ lbwt .btn.btn-highlight:hover{
     box-shadow: none;
 }
 lbwt .btn.btn-thin{
-    padding: 3px;
+    padding: 1px;
 }
 lbwt .btn svg{
     width: 1em;
