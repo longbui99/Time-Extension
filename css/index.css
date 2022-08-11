@@ -884,10 +884,21 @@ svg:not(:root).tm-svg-inline--fa {
     height: 1em;
 }
 .main-page .main-action-page .log-report .space-segment.log-history-navigator .log-history-navigator-action .total{
-    width: 17%;
+    width: 50px;
     font-size: 1.5em;
     display: flex;
     justify-content: space-between;
+}
+.main-page .main-action-page .log-report .space-segment.log-history-navigator .log-history-navigator-action .duration-description{
+    margin-left: 10px;
+    width: 10%;
+    display: flex;
+    justify-content: space-around;
+    font-size: 1.2em;
+}
+.main-page .main-action-page .log-report .space-segment.log-history-navigator .log-history-navigator-action .duration-description svg{
+    width: 0.4em;
+    color: lightgray;
 }
 .main-page .main-action-page .log-report .space-segment.log-history-navigator .log-history-navigator-action .total div{
     font-weight: 700;
@@ -1130,6 +1141,10 @@ svg:not(:root).tm-svg-inline--fa {
     font-size: 1.7em;
 }
 
+.main-page .main-action-page .issue.time-log .duration .duration-page {
+    display: flex;
+    justify-content: space-between;
+}
 .main-page .main-action-page .issue.time-log .duration .total-duration {
     width: max-content;
 }

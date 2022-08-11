@@ -37,6 +37,7 @@ class Main extends Component {
     logHistoryRef = this.useRef('log-history')
     logHistoryDateRangeRef = this.useRef('hisory-date-range')
     logHistoryDateRangeTotalRef = this.useRef('log-history-total-range')
+    durationUnexportedRef = this.useRef('duration-unexpored')
 
     constructor() {
         super(...arguments);
@@ -282,7 +283,7 @@ class Main extends Component {
             }
             this.unix = [minDate, maxDate]
             let innerHTML = '', pageLog = {}
-            let globalTotal = 0;
+            let globalTotal = 0, exportedTotal=0;
             this.logHistoryDateRangeTotalRef.el.innerHTML = secondToHour(globalTotal)
             this.logHistoryRef.el.innerHTML = innerHTML;
             for (let group in historyByDate){
@@ -293,6 +294,9 @@ class Main extends Component {
                 values.push({})
                 let checkpointKey = values[0]?.key, logHTML = '';
                 for (let log of values){
+                    if (log.exported){
+                        exportedTotal += log.duration;
+                    }
                     let eachLogHTML =  `<div class="log-each ${log.exported? '': 'unexported'}" data-group="${group}" data-id="${log['id']}">
                             <input class="log-duration tm-form-control" value="${self.secondToString(log.duration)}">
                             <span class="wl-circle-decorator" title="${log.date || ''}"><svg class="svg-inline--fa fa-circle" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="circle" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" data-fa-i2svg=""><path fill="currentColor" d="M512 256C512 397.4 397.4 512 256 512C114.6 512 0 397.4 0 256C0 114.6 114.6 0 256 0C397.4 0 512 114.6 512 256z"></path></svg><!-- <i class="fas fa-circle"></i> Font Awesome fontawesome.com --></span>
@@ -350,6 +354,7 @@ class Main extends Component {
                 }
             }
             this.logHistoryDateRangeTotalRef.el.innerHTML = secondToHour(globalTotal)
+            this.durationUnexportedRef.el.innerHTML = secondToHour(globalTotal - exportedTotal)
             this.logHistoryRef.el.innerHTML = innerHTML;
             if (this.daterange){
                 this.daterange.setDate([new Date(this.unix[0]*1000), new Date(this.unix[1]*1000)]);
@@ -1519,8 +1524,18 @@ class Main extends Component {
                             <svg class="svg-inline--fa fa-filter" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="filter" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" data-fa-i2svg=""><path fill="currentColor" d="M3.853 54.87C10.47 40.9 24.54 32 40 32H472C487.5 32 501.5 40.9 508.1 54.87C514.8 68.84 512.7 85.37 502.1 97.33L320 320.9V448C320 460.1 313.2 471.2 302.3 476.6C291.5 482 278.5 480.9 268.8 473.6L204.8 425.6C196.7 419.6 192 410.1 192 400V320.9L9.042 97.33C-.745 85.37-2.765 68.84 3.854 54.87L3.853 54.87z"></path></svg>
                         </span>
                         <input l-ref="hisory-date-range" class="log-history-navigator-input tm-form-control">
+                        <div style="margin-left:auto"></div>
+                        <div class="duration-description">
+                            <span>    
+                                <svg class="svg-inline--fa fa-circle" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="circle" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" data-fa-i2svg=""><path fill="currentColor" d="M512 256C512 397.4 397.4 512 256 512C114.6 512 0 397.4 0 256C0 114.6 114.6 0 256 0C397.4 0 512 114.6 512 256z"></path></svg>
+                            </span>
+                            <span l-ref="duration-unexpored">
+                                00:00
+                            </span>
+                            /
+                        </div>
                         <div class="total">
-                            Total: <div l-ref="log-history-total-range">00:00</div>
+                            <div l-ref="log-history-total-range">00:00</div>
                         </div>
                     </div>
                 </div>
