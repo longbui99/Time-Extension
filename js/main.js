@@ -395,6 +395,9 @@ class Main extends Component {
                     target.parentNode.remove()
                     globalTotal -= data.duration;
                     self.logHistoryDateRangeTotalRef.el.innerHTML = secondToHour(globalTotal)
+                    if (!values.exported){
+                        this.durationUnexportedRef.el.innerHTML = secondToHour(globalTotal - exportedTotal)
+                    }
             }
             for (let element of this.logHistoryRef.el.querySelectorAll('.log-issue')){
                 element.addEventListener('click', event=>{
