@@ -994,7 +994,6 @@ svg:not(:root).tm-svg-inline--fa {
     font-size: 1.1em;
     max-width: inherit;
     color: var(--primary);
-    box-shadow: rgba(0, 0, 0, 0.16) 0px 3px 6px, rgba(0, 0, 0, 0.23) 0px 3px 6px;
 }
 .main-page .main-action-page .log-report .space-segment.log-history .log-group .log-segment .log .log-title .log-title-heading{ 
     display: flex;
