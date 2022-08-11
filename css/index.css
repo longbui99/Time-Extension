@@ -315,6 +315,14 @@ svg:not(:root).tm-svg-inline--fa {
     position: relative;
 }
 
+.main-page .main-action-page .reload-issue{    
+    position: absolute;
+    top: -10px;
+    color: var(--primary);
+    cursor: pointer;
+    visibility: hidden;
+}
+
 .main-page .main-action-page .issue-active {
     display: none;
     margin-bottom: 10px;
