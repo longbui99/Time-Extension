@@ -210,7 +210,7 @@ class Main extends Component {
             }
         } 
         this.renderTimeActions();
-        this.loadHistory();
+        this.trigger_up('issue-changed', this.issueData);
     }
     toggleDatetimeSelection(configs, mode, callback){
         let tmpl = `
@@ -472,7 +472,6 @@ class Main extends Component {
     }
     async storeAndRenderIssue(prefetch = true) {
         await this.renderContent(true, prefetch)
-        this.trigger_up('issue-changed', this.issueData)
     }
     async chooseIssue(index) {
         // if (this.issueData) this._pauseWorkLog(this.issueData.id, false);
@@ -655,6 +654,7 @@ class Main extends Component {
             (await this.do_request('POST', `${this.subEnv.serverURL}/management/issue/work-log/manual`, params));
             this.manualLogref.el.value = '';
         }
+        self.issueData.timeStatus = "normal";
         this.renderIssueData(refresh);
     }
     _initDoneWorkLog() {
@@ -702,6 +702,7 @@ class Main extends Component {
                     "jwt": self.subEnv.jwt,
                     "payload": payload
                 }
+                self.issueData.timeStatus = "normal";
                 await self.do_invisible_request('POST', `${self.subEnv.serverURL}/management/issue/work-log/cancel`, params);
                 self.renderIssueData(true);
             }
