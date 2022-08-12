@@ -406,6 +406,9 @@ class Main extends Component {
             for (let element of this.logHistoryRef.el.querySelectorAll('.log-issue')){
                 element.addEventListener('click', event=>{
                     let data = getLogDataGroup(event.currentTarget.parentNode.parentNode)
+                    if (!self.issueData){
+                        self.issueData = {};
+                    }
                     self.issueData.id = data.issue;
                     self.storeAndRenderIssue(false);
                     event.stopPropagation();
