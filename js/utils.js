@@ -1,6 +1,6 @@
 const storage = "timeLogStorage"
 function fetchSpecialClass(record){
-    if (record.status_key === 'done' || record.status.startsWith('QA') || record.status.startsWith('UAT')){
+    if (record.status_key === 'done' || (typeof record.status === 'string' && (record.status.startsWith('QA') || record.status.startsWith('UAT')))){
         return 'done-line'
     }
     return 'normal'

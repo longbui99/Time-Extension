@@ -1305,7 +1305,7 @@ class Main extends Component {
         } else {
             this.el.querySelector('.issue-navigation').style.display = "none";
         }
-        if (this.subEnv.contentState.showLog){
+        if (this.subEnv.contentState.showLog || !prefetch){
             await this.renderIssueData(true);
         } 
         if (this.subEnv.contentState.showChecklist) {
