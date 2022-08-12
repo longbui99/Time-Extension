@@ -675,7 +675,7 @@ class Main extends Component {
             (await this.do_request('POST', `${this.subEnv.serverURL}/management/issue/work-log/manual`, params));
             this.manualLogref.el.value = '';
         }
-        self.issueData.timeStatus = "normal";
+        self.issueData.timeStatus = null;
         this.renderIssueData(refresh);
     }
     _initDoneWorkLog() {
