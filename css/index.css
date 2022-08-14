@@ -867,6 +867,7 @@ svg:not(:root).tm-svg-inline--fa {
 }
 .main-page .main-action-page .log-report {
     min-height: 345px;
+    width: 100%;
 }
 
 .main-page .main-action-page .log-report .space-segment.log-history-navigator{
