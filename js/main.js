@@ -196,7 +196,7 @@ class Main extends Component {
             this.pointRef.el.innerText = record.point + (record.estimate_unit !== "general"? `(${record.estimate_unit})`:'');
             this.assingneeRef.el.innerText = record.assignee || 'Unset';
             this.testerRef.el.innerText = record.tester || 'Unset'
-            this.commentRef.el.innerText = record.comment || '';
+            this.commentRef.el.innerText = record.comment || record.localComment || '';
             this.commentRef.el.setAttribute("rows", ((record.comment !== "" && record.comment) ? record.comment.split("\n").length : 1));
             if (record.active_duration > 0) {
                 this.issueData.timeStatus = "pause";
@@ -297,7 +297,7 @@ class Main extends Component {
                     if (log.exported){
                         exportedTotal += log.duration;
                     }
-                    let eachLogHTML =  `<div class="log-each ${log.exported? '': 'unexported'}" data-group="${group}" data-id="${log['id']}">
+                    let eachLogHTML =  `<div class="log-each ${log.exported? '': 'unexported'}" data-export="${log.exported}" data-group="${group}" data-id="${log['id']}">
                             <input class="log-duration tm-form-control" value="${self.secondToString(log.duration)}" data-origin="${self.secondToString(log.duration)}">
                             <span class="wl-circle-decorator" title="${log.date || ''}"><svg class="svg-inline--fa fa-circle" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="circle" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" data-fa-i2svg=""><path fill="currentColor" d="M512 256C512 397.4 397.4 512 256 512C114.6 512 0 397.4 0 256C0 114.6 114.6 0 256 0C397.4 0 512 114.6 512 256z"></path></svg><!-- <i class="fas fa-circle"></i> Font Awesome fontawesome.com --></span>
                             <input class="log-description tm-form-control" value="${log.description}" data-origin="${log.description}">
@@ -473,7 +473,7 @@ class Main extends Component {
             function checkUnexported(element){
                 if (element.value !== element.getAttribute('data-origin')){
                     element.parentNode.classList.add('unexported');
-                } else {
+                } else if (element.parentNode.getAttribute('data-exported') === "true"){
                     element.parentNode.classList.remove('unexported');
                 }
             }
@@ -707,8 +707,6 @@ class Main extends Component {
                 let value = self.commentRef.el.value;
                 self.commentRef.el.setAttribute("rows", ((value !== "") ? value.split("\n").length : 1));
             }
-        })
-        this.commentRef.el.addEventListener("change", event=>{
             self.issueData.localComment = self.commentRef.el.value;
             self.trigger_up('issue-changed', self.issueData)
         })
