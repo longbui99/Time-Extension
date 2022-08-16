@@ -473,7 +473,7 @@ class Main extends Component {
             function checkUnexported(element){
                 if (element.value !== element.getAttribute('data-origin')){
                     element.parentNode.classList.add('unexported');
-                } else if (element.parentNode.getAttribute('data-exported') === "true"){
+                } else if (element.parentNode.getAttribute('data-export') === "true"){
                     element.parentNode.classList.remove('unexported');
                 }
             }
