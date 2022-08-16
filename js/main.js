@@ -1544,7 +1544,7 @@ class Main extends Component {
                             </div>
                         </div>
                         <div class="comment">
-                            <textarea rows="1" type="text" class="tm-form-control" placeholder="Comment to log step/ log work" l-ref="comment-for-issue" tabindex="1002"></textarea>
+                            <textarea rows="1" type="text" class="tm-form-control" placeholder="What are you doing?" l-ref="comment-for-issue" tabindex="1002"></textarea>
                         </div>
                     </div>
                 </div>
