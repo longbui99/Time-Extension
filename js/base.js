@@ -72,6 +72,16 @@ class Component {
             this.parent.event(event, data)
         }
     }
+    blockHandling(){
+        for (let element of document.querySelectorAll('button')){
+            element.setAttribute("disabled", "disabled")
+        }
+    }
+    unblockHandling(){
+        for (let element of document.querySelectorAll('button')){
+            element.removeAttribute("disabled")
+        }
+    }
     async do_request(method='GET', url, content) {
         try {
             let json = {
@@ -83,7 +93,9 @@ class Component {
             }
             this.trigger_up('error', {})
             this.trigger_up('loading', true);
+            this.blockHandling();
             let res = (await fetch(url, json));
+            this.unblockHandling();
             if (res.ok){
                 return res
             }
