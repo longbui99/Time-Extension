@@ -384,8 +384,10 @@ class Main extends Component {
                     let values = exportLogData(event.target);
                     if (element.parentNode.classList.contains('unexported')){
                         (self.do_invisible_request('POST', `${self.subEnv.serverURL}/management/issue/work-log/update`, values));
-                        element.parentNode.classList.remove('unexported');
                         element.setAttribute('data-origin', element.value)
+                        if (element.parentNode.getAttribute('data-export') === "true"){
+                            element.parentNode.classList.remove('unexported');
+                        }
                     }
                 })
             }
