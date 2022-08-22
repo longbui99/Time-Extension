@@ -24,6 +24,9 @@ lbwt .done-line{
 lbwt svg{
     width: 1em;
 }
+lbwt button{
+    border: none;
+}
 
 @keyframes spin {
     0% {

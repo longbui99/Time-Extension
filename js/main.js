@@ -219,7 +219,7 @@ class Main extends Component {
                 <div class="input-segment">
                     <input class="date1">
                     <input class="date2 d-none">
-                    <button class="btn btn-start">DONE</button>
+                    <button type="button" class="btn btn-start">DONE</button>
                 </div>
             </div>
         `
@@ -301,7 +301,9 @@ class Main extends Component {
                             <input class="log-duration tm-form-control" value="${self.secondToString(log.duration)}" data-origin="${self.secondToString(log.duration)}">
                             <span class="wl-circle-decorator" title="${log.date || ''}"><svg class="svg-inline--fa fa-circle" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="circle" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" data-fa-i2svg=""><path fill="currentColor" d="M512 256C512 397.4 397.4 512 256 512C114.6 512 0 397.4 0 256C0 114.6 114.6 0 256 0C397.4 0 512 114.6 512 256z"></path></svg><!-- <i class="fas fa-circle"></i> Font Awesome fontawesome.com --></span>
                             <input class="log-description tm-form-control" value="${log.description}" data-origin="${log.description}">
-                            <span class="action-log-delete" title="Remove this ${self.secondToString(log.duration)}log"><svg class="svg-inline--fa fa-xmark" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="xmark" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 512" data-fa-i2svg=""><path fill="currentColor" d="M310.6 361.4c12.5 12.5 12.5 32.75 0 45.25C304.4 412.9 296.2 416 288 416s-16.38-3.125-22.62-9.375L160 301.3L54.63 406.6C48.38 412.9 40.19 416 32 416S15.63 412.9 9.375 406.6c-12.5-12.5-12.5-32.75 0-45.25l105.4-105.4L9.375 150.6c-12.5-12.5-12.5-32.75 0-45.25s32.75-12.5 45.25 0L160 210.8l105.4-105.4c12.5-12.5 32.75-12.5 45.25 0s12.5 32.75 0 45.25l-105.4 105.4L310.6 361.4z"></path></svg><!-- <i class="fas fa-times"></i> Font Awesome fontawesome.com --></span>
+                            <span class="action-log-delete" title="Remove this ${self.secondToString(log.duration)}log">
+                                <svg class="svg-inline--fa fa-xmark" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="xmark" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 512" data-fa-i2svg=""><path fill="currentColor" d="M310.6 361.4c12.5 12.5 12.5 32.75 0 45.25C304.4 412.9 296.2 416 288 416s-16.38-3.125-22.62-9.375L160 301.3L54.63 406.6C48.38 412.9 40.19 416 32 416S15.63 412.9 9.375 406.6c-12.5-12.5-12.5-32.75 0-45.25l105.4-105.4L9.375 150.6c-12.5-12.5-12.5-32.75 0-45.25s32.75-12.5 45.25 0L160 210.8l105.4-105.4c12.5-12.5 32.75-12.5 45.25 0s12.5 32.75 0 45.25l-105.4 105.4L310.6 361.4z"></path></svg><!-- <i class="fas fa-times"></i> Font Awesome fontawesome.com -->
+                            </span>
                         </div>
                     `
                     if (log.key !== checkpointKey){
@@ -310,12 +312,12 @@ class Main extends Component {
                         <div class="log" data-group="${group}" data-id="${pageLog['id']}">
                             <div class="log-title">
                                 <div class="log-title-heading">
-                                    <span class="log-issue">
+                                    <button type="button" class="log-issue">
                                         ${pageLog.key}
-                                    </span>
-                                    <span class="log-issue-export">
-                                    <svg class="svg-inline--fa fa-square-up-right" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="square-up-right" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" data-fa-i2svg=""><path fill="currentColor" d="M384 32H64C28.65 32 0 60.65 0 96v320c0 35.34 28.65 64 64 64h320c35.35 0 64-28.66 64-64V96C448 60.65 419.3 32 384 32zM330.5 323.9c0 6.473-3.889 12.3-9.877 14.78c-5.979 2.484-12.86 1.105-17.44-3.469l-45.25-45.25l-67.92 67.92c-12.5 12.5-32.72 12.46-45.21-.0411l-22.63-22.63C109.7 322.7 109.6 302.5 122.1 289.1l67.92-67.92L144.8 176.8C140.2 172.2 138.8 165.3 141.3 159.4c2.477-5.984 8.309-9.875 14.78-9.875h158.4c8.835 0 15.1 7.163 15.1 15.1V323.9z"></path></svg>
-                                    </span>
+                                    </button>
+                                    <button type="button" class="log-issue-export">
+                                        <svg class="svg-inline--fa fa-square-up-right" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="square-up-right" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" data-fa-i2svg=""><path fill="currentColor" d="M384 32H64C28.65 32 0 60.65 0 96v320c0 35.34 28.65 64 64 64h320c35.35 0 64-28.66 64-64V96C448 60.65 419.3 32 384 32zM330.5 323.9c0 6.473-3.889 12.3-9.877 14.78c-5.979 2.484-12.86 1.105-17.44-3.469l-45.25-45.25l-67.92 67.92c-12.5 12.5-32.72 12.46-45.21-.0411l-22.63-22.63C109.7 322.7 109.6 302.5 122.1 289.1l67.92-67.92L144.8 176.8C140.2 172.2 138.8 165.3 141.3 159.4c2.477-5.984 8.309-9.875 14.78-9.875h158.4c8.835 0 15.1 7.163 15.1 15.1V323.9z"></path></svg>
+                                    </button>
                                 </div>
                                 
                                 <span class="log-display-name" title="${pageLog.issueName}">
@@ -339,9 +341,9 @@ class Main extends Component {
                         <div class="log-heading">
                             <div class="log-heading-title">
                                 <span class="datetime"> ${group} </span>
-                                <span class="log-date-export" data-group="${group}">
-                                <svg class="svg-inline--fa fa-square-up-right" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="square-up-right" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" data-fa-i2svg=""><path fill="currentColor" d="M384 32H64C28.65 32 0 60.65 0 96v320c0 35.34 28.65 64 64 64h320c35.35 0 64-28.66 64-64V96C448 60.65 419.3 32 384 32zM330.5 323.9c0 6.473-3.889 12.3-9.877 14.78c-5.979 2.484-12.86 1.105-17.44-3.469l-45.25-45.25l-67.92 67.92c-12.5 12.5-32.72 12.46-45.21-.0411l-22.63-22.63C109.7 322.7 109.6 302.5 122.1 289.1l67.92-67.92L144.8 176.8C140.2 172.2 138.8 165.3 141.3 159.4c2.477-5.984 8.309-9.875 14.78-9.875h158.4c8.835 0 15.1 7.163 15.1 15.1V323.9z"></path></svg>
-                                </span>
+                                <button type="button" class="log-date-export" data-group="${group}">
+                                    <svg class="svg-inline--fa fa-square-up-right" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="square-up-right" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" data-fa-i2svg=""><path fill="currentColor" d="M384 32H64C28.65 32 0 60.65 0 96v320c0 35.34 28.65 64 64 64h320c35.35 0 64-28.66 64-64V96C448 60.65 419.3 32 384 32zM330.5 323.9c0 6.473-3.889 12.3-9.877 14.78c-5.979 2.484-12.86 1.105-17.44-3.469l-45.25-45.25l-67.92 67.92c-12.5 12.5-32.72 12.46-45.21-.0411l-22.63-22.63C109.7 322.7 109.6 302.5 122.1 289.1l67.92-67.92L144.8 176.8C140.2 172.2 138.8 165.3 141.3 159.4c2.477-5.984 8.309-9.875 14.78-9.875h158.4c8.835 0 15.1 7.163 15.1 15.1V323.9z"></path></svg>
+                                </button>
                             </div>
                             <div>
                                 Total: <div class="total-duration"> ${secondToHour(total_duration)} </div> 
@@ -1240,18 +1242,18 @@ class Main extends Component {
                     issues += `
                     <div class="favorite-issue">
                         <div class="favorite-issue-start"  data-key=${record.key} style="margin-right: 5px">
-                            <button class="btn btn-thin btn-primary">
+                            <button type="button" class="btn btn-thin btn-primary">
                                 <svg class="svg-inline--fa fa-play" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="play" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512" data-fa-i2svg=""><path fill="currentColor" d="M361 215C375.3 223.8 384 239.3 384 256C384 272.7 375.3 288.2 361 296.1L73.03 472.1C58.21 482 39.66 482.4 24.52 473.9C9.377 465.4 0 449.4 0 432V80C0 62.64 9.377 46.63 24.52 38.13C39.66 29.64 58.21 29.99 73.03 39.04L361 215z"></path></svg>                           
                             </button>
                         </div>
-                        <div class="favorite-issue-key" data-key=${record.key}>
+                        <button type="button" class="favorite-issue-key" data-key=${record.key}>
                             ${record.key}
-                        </div>
+                        </button>
                         <div class="favorite-issue-name">
                             ${record.name}
                         </div>
                         <div class="favorite-issue-action"  data-key=${record.key}>
-                            <button class="btn btn-thin btn-highlight">
+                            <button type="button" class="btn btn-thin btn-highlight">
                                 <svg class="svg-inline--fa fa-star" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="star" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512" data-fa-i2svg=""><path fill="currentColor" d="M381.2 150.3L524.9 171.5C536.8 173.2 546.8 181.6 550.6 193.1C554.4 204.7 551.3 217.3 542.7 225.9L438.5 328.1L463.1 474.7C465.1 486.7 460.2 498.9 450.2 506C440.3 513.1 427.2 514 416.5 508.3L288.1 439.8L159.8 508.3C149 514 135.9 513.1 126 506C116.1 498.9 111.1 486.7 113.2 474.7L137.8 328.1L33.58 225.9C24.97 217.3 21.91 204.7 25.69 193.1C29.46 181.6 39.43 173.2 51.42 171.5L195 150.3L259.4 17.97C264.7 6.954 275.9-.0391 288.1-.0391C300.4-.0391 311.6 6.954 316.9 17.97L381.2 150.3z"></path></svg>
                             </button>
                         </div>
@@ -1432,22 +1434,22 @@ class Main extends Component {
         return res;
     }
     template = `<div class="main-action-page show">
-        <div class="reload-issue" l-ref="reload-issue" tabindex="999" title="Reload From The Original Server">
+        <button type="button" class="reload-issue" l-ref="reload-issue" tabindex="999" title="Reload From The Original Server">
             <span class="tm-icon-svg">
                 <svg class="svg-inline--fa fa-arrow-rotate-right" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="arrow-rotate-right" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" data-fa-i2svg=""><path fill="currentColor" d="M496 48V192c0 17.69-14.31 32-32 32H320c-17.69 0-32-14.31-32-32s14.31-32 32-32h63.39c-29.97-39.7-77.25-63.78-127.6-63.78C167.7 96.22 96 167.9 96 256s71.69 159.8 159.8 159.8c34.88 0 68.03-11.03 95.88-31.94c14.22-10.53 34.22-7.75 44.81 6.375c10.59 14.16 7.75 34.22-6.375 44.81c-39.03 29.28-85.36 44.86-134.2 44.86C132.5 479.9 32 379.4 32 256s100.5-223.9 223.9-223.9c69.15 0 134 32.47 176.1 86.12V48c0-17.69 14.31-32 32-32S496 30.31 496 48z"></path></svg>                        
             </span>
-        </div>
+        </button>
         <div class="issue search-bar">
             <div class="input-group justify-content-between">
                 <span class="icon-prepend" l-ref="reload-issue" tabindex="999" title="Reload From The Original Server">
                     <div class="tm-icon-svg button-segment" l-ref="favorite-segment-ref">
                         <div class="button-add-favorite" l-ref="add-to-favorite-ref">
-                            <button class="btn btn-thin btn-secondary">
+                            <button type="button" class="btn btn-thin btn-secondary">
                                 <svg class="svg-inline--fa fa-star" aria-hidden="true" focusable="false" data-prefix="far" data-icon="star" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512" data-fa-i2svg=""><path fill="currentColor" d="M287.9 0C297.1 0 305.5 5.25 309.5 13.52L378.1 154.8L531.4 177.5C540.4 178.8 547.8 185.1 550.7 193.7C553.5 202.4 551.2 211.9 544.8 218.2L433.6 328.4L459.9 483.9C461.4 492.9 457.7 502.1 450.2 507.4C442.8 512.7 432.1 513.4 424.9 509.1L287.9 435.9L150.1 509.1C142.9 513.4 133.1 512.7 125.6 507.4C118.2 502.1 114.5 492.9 115.1 483.9L142.2 328.4L31.11 218.2C24.65 211.9 22.36 202.4 25.2 193.7C28.03 185.1 35.5 178.8 44.49 177.5L197.7 154.8L266.3 13.52C270.4 5.249 278.7 0 287.9 0L287.9 0zM287.9 78.95L235.4 187.2C231.9 194.3 225.1 199.3 217.3 200.5L98.98 217.9L184.9 303C190.4 308.5 192.9 316.4 191.6 324.1L171.4 443.7L276.6 387.5C283.7 383.7 292.2 383.7 299.2 387.5L404.4 443.7L384.2 324.1C382.9 316.4 385.5 308.5 391 303L476.9 217.9L358.6 200.5C350.7 199.3 343.9 194.3 340.5 187.2L287.9 78.95z"></path></svg>
                             </button>
                         </div>
                         <div class="button-remove-favorite" l-ref="remove-to-favorite-ref">
-                            <button class="btn btn-thin btn-highlight">
+                            <button type="button" class="btn btn-thin btn-highlight">
                                 <svg class="svg-inline--fa fa-star" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="star" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512" data-fa-i2svg=""><path fill="currentColor" d="M381.2 150.3L524.9 171.5C536.8 173.2 546.8 181.6 550.6 193.1C554.4 204.7 551.3 217.3 542.7 225.9L438.5 328.1L463.1 474.7C465.1 486.7 460.2 498.9 450.2 506C440.3 513.1 427.2 514 416.5 508.3L288.1 439.8L159.8 508.3C149 514 135.9 513.1 126 506C116.1 498.9 111.1 486.7 113.2 474.7L137.8 328.1L33.58 225.9C24.97 217.3 21.91 204.7 25.69 193.1C29.46 181.6 39.43 173.2 51.42 171.5L195 150.3L259.4 17.97C264.7 6.954 275.9-.0391 288.1-.0391C300.4-.0391 311.6 6.954 316.9 17.97L381.2 150.3z"></path></svg>
                             </button>
                         </div>
@@ -1460,11 +1462,11 @@ class Main extends Component {
                 <div class="issue-navigation">
                     <div class="navigation-group"> 
                         <div class="issue-status" l-ref="status-ref"></div>
-                        <span l-ref="open-issue" tabindex="998" title="Ctrl+Shift+E or Ctrl+Alt+Click: Export To The Original Server">
+                        <button type="button" l-ref="open-issue" tabindex="998" title="Ctrl+Shift+E or Ctrl+Alt+Click: Export To The Original Server">
                             <span class="tm-icon-svg">
                                 <svg class="tm-svg-inline--fa" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="square-arrow-up-right" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" data-fa-i2svg=""><path fill="currentColor" d="M384 32H64C28.65 32 0 60.66 0 96v320c0 35.34 28.65 64 64 64h320c35.35 0 64-28.66 64-64V96C448 60.66 419.3 32 384 32zM344 312c0 17.69-14.31 32-32 32s-32-14.31-32-32V245.3l-121.4 121.4C152.4 372.9 144.2 376 136 376s-16.38-3.125-22.62-9.375c-12.5-12.5-12.5-32.75 0-45.25L234.8 200H168c-17.69 0-32-14.31-32-32s14.31-32 32-32h144c17.69 0 32 14.31 32 32V312z"></path></svg>                            
                             </span>
-                        </span>
+                        </button>
                     </div>  
                 </div>
             </div>
@@ -1515,9 +1517,9 @@ class Main extends Component {
                                 <small l-ref="total-duration">0m</small>
                             </div>
                             <div class="active-duration">
-                                <span l-ref="active-duration-icon" class="avt" title="Ctrl+Alt+Click: To delete current tracking">
+                                <button type="button" l-ref="active-duration-icon" class="avt" title="Ctrl+Alt+Click: To delete current tracking">
                                     <span class="tm-icon-svg"><svg class="svg-inline--fa fa-stopwatch" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="stopwatch" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" data-fa-i2svg=""><path fill="currentColor" d="M272 0C289.7 0 304 14.33 304 32C304 49.67 289.7 64 272 64H256V98.45C293.5 104.2 327.7 120 355.7 143L377.4 121.4C389.9 108.9 410.1 108.9 422.6 121.4C435.1 133.9 435.1 154.1 422.6 166.6L398.5 190.8C419.7 223.3 432 262.2 432 304C432 418.9 338.9 512 224 512C109.1 512 16 418.9 16 304C16 200 92.32 113.8 192 98.45V64H176C158.3 64 144 49.67 144 32C144 14.33 158.3 0 176 0L272 0zM248 192C248 178.7 237.3 168 224 168C210.7 168 200 178.7 200 192V320C200 333.3 210.7 344 224 344C237.3 344 248 333.3 248 320V192z"></path></svg>
-                                </span>
+                                </button>
                                 </span> <span l-ref="active-duration">0m</span>
                             </div>
                         </div>
@@ -1532,21 +1534,21 @@ class Main extends Component {
                             </div>
                             <div class="action-group">
                                 <div class="action add" l-ref="action-add" tabindex="1003" style="display:none">
-                                    <button class="btn btn-start">START</button>    
+                                    <button type="button" class="btn btn-start">START</button>    
                                 </div>
                                 <div class="action add" l-ref="action-resume" tabindex="1004"  style="display:none">
-                                    <button class="btn btn-resume">RESUME</button>    
+                                    <button type="button" class="btn btn-resume">RESUME</button>    
                                 </div>
                                 <div class="action pause" l-ref="action-pause" tabindex="1005"  style="display:none">
-                                    <button class="btn btn-pause">PAUSE</button>       
+                                    <button type="button" class="btn btn-pause">PAUSE</button>       
                                 </div>
                                 <div title="Ctrl+Enter" class="action stop" l-ref="action-stop" tabindex="1006"  style="display:none">
-                                    <button type="button"  class="btn btn-done">DONE</button>      
+                                    <button type="button" type="button"  class="btn btn-done">DONE</button>      
                                 </div>
                             </div>
                         </div>
                         <div class="comment">
-                            <textarea rows="1" type="text" class="tm-form-control" placeholder="Comment to log step/ log work" l-ref="comment-for-issue" tabindex="1002"></textarea>
+                            <textarea rows="1" type="text" class="tm-form-control" placeholder="What are you doing?" l-ref="comment-for-issue" tabindex="1002"></textarea>
                         </div>
                     </div>
                 </div>
