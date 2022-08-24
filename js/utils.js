@@ -1,4 +1,14 @@
 const storage = "timeLogStorage"
+
+function _getDisplayName(record, length = 40000) {
+    return `${record.key}: ${(record.name.length > length) ? record.name.substring(0, length) + "..." : record.name}`;
+}
+function _minifyString(string, length){
+    if (string.length >= length){
+        string = string.split(" ").map(e => e[0].toUpperCase()).join("")
+    }
+    return string
+}
 function fetchSpecialClass(record){
     if (record.status_key === 'done' || (typeof record.status === 'string' && (record.status.startsWith('QA') || record.status.startsWith('UAT')))){
         return 'done-line'

@@ -27,7 +27,9 @@ class Home extends Component {
     this.payload = {};
     // this.onAuthentication = this.onAuthentication.bind(this);
     this.subEnv = {};
-    this.load = {}
+    this.load = {};
+    this.env.subscribe('issueData', this.onIssueChanged.bind(this));
+    this.env.subscribe('searchData', this.searchChanged.bind(this));
   }
   async loadAuthentication() {
     if (Object.keys(this.subEnv).length === 0){
@@ -39,7 +41,8 @@ class Home extends Component {
         result = JSON.parse(localStorage.getItem("timeLogStorage"))
       }
       self.payload = result;
-      self.subEnv = this.payload;
+      self.subEnv = result;
+      self.env.origin = result;
     } else{
       this.payload = this.subEnv
     }

@@ -1,4 +1,31 @@
-
+var env = {
+    channels: {},
+    set origin(updatedValues){
+        for (let key in updatedValues){
+            this[key] = updatedValues[key];
+            if (this.channels[key]){
+                for (let callback of this.channels[key]){
+                    callback(updatedValues[key])
+                }
+            }
+        }
+    },
+    update(key, value){
+        this[key] = value;
+        if (this.channels[key]){
+            for (let callback of this.channels[key]){
+                callback(value)
+            }
+        }
+    },
+    subscribe(key, callback){
+        if (this.channels[key]){
+            this.channels[key].push(callback)
+        } else {
+            this.channels[key] = [callback]
+        }
+    }
+}
 class Component {
     custom_events = {}
     ref = []
@@ -9,6 +36,7 @@ class Component {
         this.params = params;
         this.childrens = [];
         this.subEnv = {};
+        this.env = env;
         if (this.parent) {
             this.parent.childrens.push(this);
             this.subEnv = this.parent.subEnv;
@@ -32,6 +60,7 @@ class Component {
     mount(element) {
         let self = this;
         this.willStart().then(self.render(element).then(self.mounted()));
+        return this;
     }
     willStart() {
         return new Promise(() => { });
@@ -81,6 +110,9 @@ class Component {
         for (let element of document.querySelectorAll('button')){
             element.removeAttribute("disabled")
         }
+    }
+    destroy(){
+        this.el.remove();
     }
     async do_request(method='GET', url, content) {
         try {
