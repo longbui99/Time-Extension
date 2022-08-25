@@ -1,4 +1,6 @@
-class Login extends Component {
+
+import {mount, Component} from "./base.js"
+export class Login extends Component {
     constructor() {
         super(...arguments);
         this.popupRef = this.useRef('sign-in-tooltip');
@@ -8,7 +10,7 @@ class Login extends Component {
         this.signInRef = this.useRef('actionSignIn');
 
         this.actionSignIn = this.actionSignIn.bind(this);
-
+        
     }
     _prepareValues() {
         let data = {
@@ -42,7 +44,7 @@ class Login extends Component {
     mounted() {
         let res = super.mounted();
         this.signInRef.el.addEventListener('click', this.actionSignIn)
-        this.serverURLRef.el.value = this.subEnv.serverURL;
+        this.serverURLRef.el.value = this.env.serverURL;
         return res
     }
 

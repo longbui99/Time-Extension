@@ -1,27 +1,27 @@
 const storage = "timeLogStorage"
 
-function _getDisplayName(record, length = 40000) {
+export function _getDisplayName(record, length = 40000) {
     return `${record.key}: ${(record.name.length > length) ? record.name.substring(0, length) + "..." : record.name}`;
 }
-function _minifyString(string, length){
+export function _minifyString(string, length){
     if (string.length >= length){
         string = string.split(" ").map(e => e[0].toUpperCase()).join("")
     }
     return string
 }
-function fetchSpecialClass(record){
+export function fetchSpecialClass(record){
     if (record.status_key === 'done' || (typeof record.status === 'string' && (record.status.startsWith('QA') || record.status.startsWith('UAT')))){
         return 'done-line'
     }
     return 'normal'
 }
-function secondToHour(second){
+export function secondToHour(second){
     let hour = String(parseInt(second/3600)).padStart(2, "0");
     let minute = String(parseInt(second%3600/60)).padStart(2, "0");
     return `${hour}:${minute}`
 }
 
-function debounce(func, timeout = 500) {
+export function debounce(func, timeout = 500) {
     let timer;
     return (...args) => {
         clearTimeout(timer);
@@ -29,11 +29,11 @@ function debounce(func, timeout = 500) {
     };
 }
 
-function uniqueID(key=""){
+export function uniqueID(key=""){
     return '_' + Math.random().toString(36).substring(2, 9) + key;
 }
 
-function parseJSONRequest(jsonData) {
+export function parseJSONRequest(jsonData) {
     return {
         "jsonrpc": "2.0",
         "method": "call",
@@ -41,7 +41,7 @@ function parseJSONRequest(jsonData) {
         "id": null
     }
 }
-function _mapParams(jsonData) {
+export function _mapParams(jsonData) {
     let params = false;
     let keys = []
     for (let key in jsonData) {
@@ -51,7 +51,7 @@ function _mapParams(jsonData) {
         params = keys.join("\&")
     return params
 }
-function _pushParams(serverURL, jsonData) {
+export function _pushParams(serverURL, jsonData) {
     params = _mapParams(jsonData)
     if (params) {
         serverURL += "?" + params
@@ -59,7 +59,7 @@ function _pushParams(serverURL, jsonData) {
     return serverURL
 }
 
-function parseSecondToString(hpd=8, dpw=5){
+export function parseSecondToString(hpd=8, dpw=5){
     return function secondToString(time) {
         let data = [{ 'key': 'w', 'duration': dpw*hpd*3600 },
         { 'key': 'd', 'duration': hpd*3600 },
@@ -92,7 +92,7 @@ let replace_rule = {
     '\n': '<br/>'
 }
 
-function parseChecklist(text){
+export function parseChecklist(text){
     for( let rule in replace_rule)
         text = text.replaceAll(rule, replace_rule[rule])
     let pivot = 0, index = 0, final = [''], final_key = 0;

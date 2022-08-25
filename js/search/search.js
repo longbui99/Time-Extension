@@ -1,4 +1,7 @@
-class SearchBar extends Component {
+
+import * as util from "../utils/utils.js"
+import {mount, Component} from "../base.js"
+export class SearchBar extends Component {
         
     searchRef = this.useRef('search-bar-issue')
     reloadIssueRef = this.useRef("reload-issue")
@@ -13,12 +16,30 @@ class SearchBar extends Component {
     constructor() {
         super(...arguments);
         this.env.subscribe('issueData', this.renderIssueSearch.bind(this));
+        this.env.subscribe('loadIssueData', this.loadIssue.bind(this));
+        this.env.subscribe('favorite', this.favoriteChanged.bind(this));
         this.openIssueNaviagor = this.openIssueNaviagor.bind(this);
+    }
+    favoriteChanged(isFavorite){
+        if (isFavorite){
+            this.favoriteNavigatorRef.el.classList.add('favorite');
+        } else{
+            this.favoriteNavigatorRef.el.classList.remove('favorite');
+        }
+    }
+    async loadIssue(){
+        if (!this.env.issueData?.broardcast) {
+            let response = (await this.do_invisible_request('GET', `${this.env.serverURL}/management/issue/get/${this.env.issueData.id}?jwt=${this.env.jwt}`));
+            let result = (await response.json());
+            let values = this.env.issueData;
+            for (let key of Object.keys(result)) { values[key] = result[key]; }
+            this.env.update('issueData', this.env.issueData)
+        }
     }
     renderIssueSearch(data){
         this.typeRef.el.innerHTML = `<img src="${data.type_url}"/>`;
         this.statusRef.el.innerText = data.status || '';
-        this.searchRef.el.value = _getDisplayName(data);
+        this.searchRef.el.value = util._getDisplayName(data);
     }
     async chooseIssue(index) {
         this.searchResultRef.el.style.display = 'none';
@@ -26,7 +47,7 @@ class SearchBar extends Component {
     }
     async fetchSearchIssue(text){
         let offset = this.searchData?.values?.length || 0;
-        let result = (await this.do_request('GET', `${this.subEnv.serverURL}/management/issue/search/${text}?offset=${offset}&jwt=${this.subEnv.jwt}`));
+        let result = (await this.do_request('GET', `${this.env.serverURL}/management/issue/search/${text}?offset=${offset}&jwt=${this.env.jwt}`));
         return (await result.json());
     }
     loadSearchedIssues(data) {
@@ -38,16 +59,16 @@ class SearchBar extends Component {
         for (let i = 0; i < data.length; i++) {
             record = data[i];
             let p = document.createElement('p');
-            data[i].displayName = _getDisplayName(record);
+            data[i].displayName = util._getDisplayName(record);
             let statusSpan = document.createElement('em')
             let sprints = (record.sprint && record.sprint.split(' ') || '')
             let sprintText = ((typeof sprints === 'string')? '' : "|" + sprints[sprints.length-1])
-            statusSpan.innerHTML = `${_minifyString(record.status, 13)}<b>${sprintText} </b>`
+            statusSpan.innerHTML = `${util._minifyString(record.status, 13)}<b>${sprintText} </b>`
             let typeImg = document.createElement('img')
             typeImg.setAttribute('src', record.type_url)
             let textSpan = document.createElement('span')
             textSpan.innerText = record.displayName
-            p.classList.add(fetchSpecialClass(record))
+            p.classList.add(util.fetchSpecialClass(record))
             p.append(typeImg)
             p.append(textSpan)
             p.append(statusSpan)
@@ -97,10 +118,13 @@ class SearchBar extends Component {
         this.searchData.query = text;
         this.searchData.values =  (await this.fetchSearchIssue(text));
         this.loadSearchedIssues(this.searchData.values);
-        this.trigger_up('search-change', this.searchData);
+        this.env.update('searchData', this.searchData);
     }
     _initSearchBar() {
         let self = this;
+        if (this.env.searchData){
+            this.searchData = this.env.searchData;
+        }
         this.searchRef.el.addEventListener('change', (event) => {
             self.searchResultRef.el.innerHTML = '';
             self.searchResultRef.el.style.display = 'none';
@@ -115,6 +139,9 @@ class SearchBar extends Component {
                 self.loadSearchedIssues(self.searchData.values);
                 event.stopImmediatePropagation();
             }
+        })
+        window.addEventListener('click', (e)=>{
+            self.searchResultRef.el.style.display = 'none';
         })
     }
     openIssueNaviagor(event){
@@ -160,6 +187,13 @@ class SearchBar extends Component {
             this.renderIssueSearch(this.env.issueData);
             this.el.querySelector('.issue-navigation').style.display = "inline-block";
         }
+        let self = this;
+        window.addEventListener('keydown', event=>{
+            if (event.key === "Escape"){
+                self.searchResultRef.el.style.display = 'none';
+                self.flatPickr.close();
+            }
+        })
     }
     mounted() {
         let res = super.mounted();

@@ -1,5 +1,17 @@
+const storage = "WorkTrackingStorage";
 var env = {
+    sync: true,
+    mustSync: false,
+    raw: {},
     channels: {},
+    saveChannels: {},
+    async saveLocal(){
+        if (chrome.storage){
+            chrome.storage.local.set(this.raw)
+        } else {
+            localStorage.setItem(storage, JSON.stringify(this.raw));
+        }
+    },
     set origin(updatedValues){
         for (let key in updatedValues){
             this[key] = updatedValues[key];
@@ -8,7 +20,25 @@ var env = {
                     callback(updatedValues[key])
                 }
             }
+            if (this.saveChannels[key]){
+                this.raw[key] = updatedValues[key];
+                this.mustSync = true;
+            }
         }
+        if (this.mustSync){
+            this.saveLocal();
+            this.mustSync = false;
+        }
+    },
+    syncAll(data){
+        for (let key in data){
+            this.raw[key] = data[key];
+        }
+        this.saveLocal();
+    },
+    syncOne(key, value){
+        this.raw[key] = value;
+        this.saveLocal();
     },
     update(key, value){
         this[key] = value;
@@ -17,6 +47,10 @@ var env = {
                 callback(value)
             }
         }
+        if (this.saveChannels[key]){
+            this.raw[key] = value;
+            this.saveLocal();
+        }
     },
     subscribe(key, callback){
         if (this.channels[key]){
@@ -24,9 +58,28 @@ var env = {
         } else {
             this.channels[key] = [callback]
         }
+    },
+    syncChannel(keys){
+        if (typeof keys === 'string'){
+            keys = [keys];
+        }
+        for (let key of keys){
+            this.saveChannels[key] = true;
+        }
     }
 }
-class Component {
+async function loadLocal(){
+    let result = {};
+    if (chrome.storage){
+      result = (await chrome.storage.local.get([storage]));
+      result = result[storage];
+    } else {
+      result = JSON.parse(localStorage.getItem(storage))
+    }
+    env.raw = env.origin = result;
+}
+loadLocal();
+export class Component {
     custom_events = {}
     ref = []
     refs = {}
@@ -173,8 +226,10 @@ class Component {
     }
 }
 
-function mount(object, element, params={}) {
+export function mount(object, element, params={}) {
     let component = new object(null, params);
     component.mount(element);
     return component
 }
+
+

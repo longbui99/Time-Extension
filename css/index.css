@@ -422,9 +422,9 @@ svg:not(:root).tm-svg-inline--fa {
     display: inline-block;
 }
 
-.main-page .main-action-page .acceptance-criteria .space-segment {
+/* .main-page .main-action-page .acceptance-criteria .space-segment {
     display: none;
-}
+} */
 
 .main-page .main-action-page .acceptance-criteria .heading {
     padding: 2px 5px;
@@ -855,13 +855,9 @@ svg:not(:root).tm-svg-inline--fa {
     width: 92%;
 }
 
-.main-page .main-action-page .issue.time-log.open .space-segment {
-    display: inline-block;
-}
-
-.main-page .main-action-page .issue.time-log .space-segment {
+/* .main-page .main-action-page .issue.time-log .space-segment {
     display: none;
-}
+} */
 
 .main-page .main-action-page .issue.time-log .space-segment .issue-content {
     display: flex;
