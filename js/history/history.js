@@ -1,6 +1,6 @@
 
 import * as util from "../utils/utils.js"
-import { mount, Component } from "../base.js"
+import { Component } from "../base.js"
 import { LogByDate } from "./historyByDate.js"
 export class LogReport extends Component {
 

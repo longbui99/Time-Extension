@@ -1,6 +1,6 @@
 
 import * as util from "../utils/utils.js"
-import { mount, Component } from "../base.js"
+import { Component } from "../base.js"
 class Log extends Component{
     secondToString = util.parseSecondToString(this.env.resource?.hrs_per_day || 8, this.env.resource?.days_per_week || 5)
     constructor() {

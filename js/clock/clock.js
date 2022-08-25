@@ -1,6 +1,6 @@
 
 import * as util from "../utils/utils.js"
-import { mount, Component } from "../base.js"
+import { Component } from "../base.js"
 export class Clock extends Component {
 
     timeLogSectionRef = this.useRef('time-log-section')

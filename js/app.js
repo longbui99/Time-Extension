@@ -1,6 +1,6 @@
 import {Main} from "./main.js"
 import {Login} from "./login.js"
-import {mount, Component} from "./base.js"
+import {loadEnvironment, mount, Component} from "./base.js"
 import * as chrome from "./background/chrome.js"
 export class App extends Component {
   serverActionRef = this.useRef('server-open')
@@ -202,4 +202,4 @@ export class App extends Component {
 }
 
 
-mount(App, document.body);
+loadEnvironment().then(() => mount(App, document.body))

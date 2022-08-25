@@ -1,5 +1,5 @@
 
-import {mount, Component} from "./base.js"
+import {Component} from "./base.js"
 export class Login extends Component {
     constructor() {
         super(...arguments);

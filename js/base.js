@@ -82,7 +82,7 @@ var env = {
         }
     }
 }
-async function loadLocal(){
+export async function loadEnvironment(){
     let result = {};
     if (chrome.storage){
         result = (await chrome.storage.local.get([storage]));
@@ -94,7 +94,6 @@ async function loadLocal(){
     Object.assign(env.raw, result)
     env.origin = result;
 }
-loadLocal();
 export class Component {
     custom_events = {}
     ref = []

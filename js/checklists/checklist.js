@@ -1,6 +1,6 @@
 
 import * as util from "../utils/utils.js"
-import { mount, Component } from "../base.js"
+import { Component } from "../base.js"
 export class CheckList extends Component {
     acSectionRef = this.useRef('tm-ac-section')
     acContainerRef = this.useRef("ac-content")

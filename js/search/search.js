@@ -1,6 +1,6 @@
 
 import * as util from "../utils/utils.js"
-import {mount, Component} from "../base.js"
+import {Component} from "../base.js"
 export class SearchBar extends Component {
         
     searchRef = this.useRef('search-bar-issue')
@@ -40,6 +40,7 @@ export class SearchBar extends Component {
         this.typeRef.el.innerHTML = `<img src="${data.type_url}"/>`;
         this.statusRef.el.innerText = data.status || '';
         this.searchRef.el.value = util._getDisplayName(data);
+        this.el.querySelector('.issue-navigation').style.display = "inline-block";
     }
     async chooseIssue(index) {
         this.searchResultRef.el.style.display = 'none';
@@ -185,7 +186,6 @@ export class SearchBar extends Component {
     renderOverview(){
         if (this.env.issueData){
             this.renderIssueSearch(this.env.issueData);
-            this.el.querySelector('.issue-navigation').style.display = "inline-block";
         }
         let self = this;
         window.addEventListener('keydown', event=>{
