@@ -80,8 +80,8 @@ export class App extends Component {
   async onAuthentication(data, authenticated = true) {
     if (data.jwt) {
       data['authenticated'] = authenticated;
-      this.env.syncAll(data);
-      this.env.reload();
+      await this.env.syncAll(data);
+      await this.env.reload();
       this.processMainRef.el.innerHTML = '';
       this.loadUI();
     }

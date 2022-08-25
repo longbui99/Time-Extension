@@ -88,7 +88,6 @@ export class Clock extends Component {
             }
         }
         this.renderTimeActions();
-        this.env.syncOne("issueData", this.env.issueData);
     }
     async _pauseWorkLog(id = false, refresh = true) {
         let params = {

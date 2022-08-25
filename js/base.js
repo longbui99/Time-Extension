@@ -19,7 +19,9 @@ var env = {
     },
     async saveLocal(){
         if (chrome.storage){
-            chrome.storage.local.set(this.raw)
+            let data = {};
+            data[storage] = this.raw
+            await chrome.storage.local.set(data)
         } else {
             localStorage.setItem(storage, JSON.stringify(this.raw));
         }
