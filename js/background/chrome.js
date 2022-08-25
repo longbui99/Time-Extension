@@ -7,16 +7,11 @@ const CSSFILE = [
 ]
 const JSFILE = [
     'libs/datepicker.js',
-    'js/utils.js',
-    'js/api.js',
-    'js/base.js',
-    'js/login.js',
-    'js/main.js',
-    'js/home.js',
-    'js/embedded.js',
+    'js/app.js',
+    'js/background/embedded.js',
 ]
 
-async function injectFile(params) {
+export async function injectFile(params) {
     params.extensionID = chrome.runtime.id;
     function injectFunction(pr){
       let tm = document.getElementsByTagName('lbwt')[0]

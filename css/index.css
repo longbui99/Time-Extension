@@ -267,6 +267,9 @@ svg:not(:root).tm-svg-inline--fa {
     display: flex;
     flex-flow: column;
 }
+.main-page .title .title-group .title-description .server-open{
+    cursor: pointer;
+}
 
 .main-page .title .pin-action {
     position: absolute;
@@ -422,9 +425,9 @@ svg:not(:root).tm-svg-inline--fa {
     display: inline-block;
 }
 
-.main-page .main-action-page .acceptance-criteria .space-segment {
+/* .main-page .main-action-page .acceptance-criteria .space-segment {
     display: none;
-}
+} */
 
 .main-page .main-action-page .acceptance-criteria .heading {
     padding: 2px 5px;
@@ -855,13 +858,9 @@ svg:not(:root).tm-svg-inline--fa {
     width: 92%;
 }
 
-.main-page .main-action-page .issue.time-log.open .space-segment {
-    display: inline-block;
-}
-
-.main-page .main-action-page .issue.time-log .space-segment {
+/* .main-page .main-action-page .issue.time-log .space-segment {
     display: none;
-}
+} */
 
 .main-page .main-action-page .issue.time-log .space-segment .issue-content {
     display: flex;
@@ -1230,13 +1229,15 @@ lbwt .page{
     top: 0;
     left: 0;
     width: 100%;
-    max-width: inherit;
 }
 lbwt .page .input-segment{
+    position: absolute;
     display: flex;
     justify-content:space-around;
-    width: 90%;
-    padding: 5%;
+    width: 100%;
+    padding: 10px;
+    max-width: 600px;
+    box-shadow: rgba(0, 0, 0, 0.16) 0px 3px 6px, rgba(0, 0, 0, 0.23) 0px 3px 6px;
 }
 .button-31 {
   background-color: #222;

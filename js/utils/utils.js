@@ -1,0 +1,176 @@
+const storage = "timeLogStorage"
+
+export function _getDisplayName(record, length = 40000) {
+    return `${record.key}: ${(record.name.length > length) ? record.name.substring(0, length) + "..." : record.name}`;
+}
+export function _minifyString(string, length) {
+    if (string.length >= length) {
+        string = string.split(" ").map(e => e[0].toUpperCase()).join("")
+    }
+    return string
+}
+export function fetchSpecialClass(record) {
+    if (record.status_key === 'done' || (typeof record.status === 'string' && (record.status.startsWith('QA') || record.status.startsWith('UAT')))) {
+        return 'done-line'
+    }
+    return 'normal'
+}
+export function secondToHour(second) {
+    let hour = String(parseInt(second / 3600)).padStart(2, "0");
+    let minute = String(parseInt(second % 3600 / 60)).padStart(2, "0");
+    return `${hour}:${minute}`
+}
+
+export function debounce(func, timeout = 500) {
+    let timer;
+    return (...args) => {
+        clearTimeout(timer);
+        timer = setTimeout(() => { func.apply(this, args); }, timeout);
+    };
+}
+
+export function uniqueID(key = "") {
+    return '_' + Math.random().toString(36).substring(2, 9) + key;
+}
+
+export function parseJSONRequest(jsonData) {
+    return {
+        "jsonrpc": "2.0",
+        "method": "call",
+        "params": jsonData,
+        "id": null
+    }
+}
+export function _mapParams(jsonData) {
+    let params = false;
+    let keys = []
+    for (let key in jsonData) {
+        keys.push(`${key}=${jsonData[key]}`)
+    }
+    if (keys.length)
+        params = keys.join("\&")
+    return params
+}
+export function _pushParams(serverURL, jsonData) {
+    params = _mapParams(jsonData)
+    if (params) {
+        serverURL += "?" + params
+    }
+    return serverURL
+}
+
+export function parseSecondToString(hpd = 8, dpw = 5) {
+    return function secondToString(time) {
+        let data = [{ 'key': 'w', 'duration': dpw * hpd * 3600 },
+        { 'key': 'd', 'duration': hpd * 3600 },
+        { 'key': 'h', 'duration': 3600 },
+        { 'key': 'm', 'duration': 60 },
+        { 'key': 's', 'duration': 1 }]
+        let response = ""
+        for (let segment of data) {
+            let duration = segment['duration'];
+            if (time >= duration) {
+                response += `${parseInt(time / duration)}${segment['key']} `
+                time -= (parseInt(time / duration) * duration)
+            }
+        }
+        if (!response.length) {
+            response = "0s"
+        }
+        return response
+    }
+}
+
+let ac_rules = {
+    '**': ['<b>', '</b>'],
+    '*': ['<em>', '</em>'],
+}
+let replace_rule = {
+    '\r\n\r\n': '<br/>',
+    '\n\r\n': '<br/>',
+    '\r\n': '<br/>',
+    '\n': '<br/>'
+}
+
+export function parseChecklist(text) {
+    for (let rule in replace_rule)
+        text = text.replaceAll(rule, replace_rule[rule])
+    let pivot = 0, index = 0, final = [''], final_key = 0;
+    let length = text.length;
+    let res = "";
+    while (index < length) {
+        for (let key in ac_rules) {
+            if (index + key.length <= length) {
+                if (text.substring(index, index + key.length) === key) {
+                    if (final[final_key].length > 0) {
+                        if (key.length <= final[final_key].length) {
+                            let substring = text.substring(pivot, index)
+                            if (substring.length) {
+                                res = `${ac_rules[key][0]}${substring}${ac_rules[key][1]}`
+                            } else {
+                                res = key + key
+                            }
+                            final.push(res)
+                            final[final_key] = final[final_key].substring(0, final[final_key].length - key.length)
+                        } else {
+                            final[final_key] += key
+                        }
+                    } else {
+                        final.push(text.substring(pivot, index))
+                        final.push(key)
+                        final_key = final.length - 1
+                    }
+                    index += key.length - 1
+                    pivot = index + 1
+                    break
+                }
+            }
+        }
+        index++
+    }
+    if (pivot !== index) {
+        final.push(text.substring(pivot, index))
+    }
+    return final.join("")
+}
+export function getLogDataGroup(target) {
+    let parentNode = target.parentNode;
+    let group = parentNode.getAttribute('data-group');
+    let id = parseInt(parentNode.getAttribute('data-id'));
+    let index = this.env.historyByDate[group].values.findIndex(e => e.id === id)
+    if (index !== -1) {
+        return this.env.historyByDate[group].values[index];
+    }
+    return {};
+}
+export function exportLogData(target) {
+    let data = getLogDataGroup.bind(this)(target);
+    let parentNode = target.parentNode;
+    return {
+        id: data.id,
+        time: parentNode.querySelector('.log-duration').value,
+        description: parentNode.querySelector('.log-description').value,
+        jwt: this.env.jwt
+    }
+}
+export function deleteLogData(target) {
+    let data = getLogDataGroup.bind(this)(target)
+    let values = exportLogData.bind(this)(target);
+    this.do_invisible_request('POST', `${this.env.serverURL}/management/issue/work-log/delete/${values.id}`, values);
+    let group = target.parentNode.getAttribute('data-group');
+    this.env.historyByDate[group].totalDuration -= data.duration;
+    target.parentNode.parentNode.parentNode.parentNode.parentNode.querySelector('.total-duration').innerHTML = secondToHour(this.env.historyByDate[group].totalDuration);
+    target.parentNode.remove();
+    this.env.globalTotal -= data.duration;
+    if (values.exported) {
+        this.env.exportedTotal -= data.duration;
+    }
+    this.env.update('setGlobalData', null)
+}
+export async function exportLog(exportIds) {
+    let res = {
+        exportIds: exportIds,
+        jwt: this.env.jwt
+    };
+    return this.do_request('POST', `${this.env.serverURL}/management/issue/work-log/export`, res);
+}

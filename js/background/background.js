@@ -20,16 +20,16 @@ function removeExistedElement() {
   return true;
 }
 
-async function checkExistedElement() {
-  let element = await document.querySelector('.popup-container');
-  let condition = { el: element === null, func: typeof (PinPopup) === "undefined" }
-  return condition
-}
 async function injectFile(params) {
   params.extensionID = chrome.runtime.id;
   function injectFunction(pr) {
     mount(PinPopup, document.body, pr);
     document.body.click();
+  }
+  async function checkExistedElement() {
+    let element = await document.querySelector('.popup-container');
+    let condition = { el: element === null, func: typeof (PinPopup) === "undefined" }
+    return condition
   }
   let [tab] = await chrome.tabs.query({ active: !0, currentWindow: !0 });
   chrome.scripting.executeScript({
@@ -72,8 +72,8 @@ async function injectFile(params) {
 
 chrome.runtime.onMessage.addListener(
   async function (request, sender, sendResponse) {
-    if (request.subEnv) {
-      chrome.storage.local.set({ "timeLogStorage": request.subEnv })
+    if (request.env) {
+      chrome.storage.local.set({ "timeLogStorage": request.env })
     }
     if (request.pinHTML) {
       let data = (await chrome.storage.local.get(["timeLogStorage"]))?.timeLogStorage
@@ -129,18 +129,18 @@ chrome.runtime.onMessage.addListener(
 );
 
 chrome.tabs.onActivated.addListener(async function (activeInfo) {
-  let subEnv = (await chrome.storage.local.get(["timeLogStorage"]))?.timeLogStorage;
-  if (subEnv.pinHTML) {
-    injectFile({ subEnv: subEnv })
+  let env = (await chrome.storage.local.get(["timeLogStorage"]))?.timeLogStorage;
+  if (env.pinHTML) {
+    injectFile({ env: env })
   }
 });
 
 chrome.tabs.onUpdated.addListener(async function (tabId, changeInfo, tab) {
   if (tab.url.startsWith('http')) {
-    let subEnv = (await chrome.storage.local.get(["timeLogStorage"]))?.timeLogStorage;
+    let env = (await chrome.storage.local.get(["timeLogStorage"]))?.timeLogStorage;
     if (changeInfo.status == 'complete') {
-      if (subEnv.pinHTML) {
-        injectFile({ subEnv: subEnv })
+      if (env.pinHTML) {
+        injectFile({ env: env })
       }
     }
   }

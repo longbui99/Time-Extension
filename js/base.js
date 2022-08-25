@@ -1,5 +1,99 @@
-
-class Component {
+const storage = "WorkTrackingStorage";
+var env = {
+    sync: true,
+    mustSync: false,
+    raw: {},
+    channels: {},
+    saveChannels: {},
+    async reload(){
+        let result = {};
+        if (chrome.storage){
+            result = (await chrome.storage.local.get([storage]));
+            result = result[storage];
+        } else {
+            result = JSON.parse(localStorage.getItem(storage));
+        }
+        for(let key in result){
+            this[key] = result[key];
+        }
+    },
+    async saveLocal(){
+        if (chrome.storage){
+            chrome.storage.local.set(this.raw)
+        } else {
+            localStorage.setItem(storage, JSON.stringify(this.raw));
+        }
+    },
+    set origin(updatedValues){
+        for (let key in updatedValues){
+            this[key] = updatedValues[key];
+            if (this.channels[key]){
+                for (let callback of this.channels[key]){
+                    callback(updatedValues[key])
+                }
+            }
+            if (this.saveChannels[key]){
+                this.raw[key] = updatedValues[key];
+                this.mustSync = true;
+            }
+        }
+        if (this.mustSync){
+            this.saveLocal();
+            this.mustSync = false;
+        }
+    },
+    syncAll(data){
+        for (let key in data){
+            this.raw[key] = data[key];
+        }
+        this.saveLocal();
+    },
+    syncOne(key, value){
+        this.raw[key] = value;
+        this.saveLocal();
+    },
+    update(key, value){
+        this[key] = value;
+        if (this.channels[key]){
+            for (let callback of this.channels[key]){
+                callback(value)
+            }
+        }
+        if (this.saveChannels[key]){
+            this.raw[key] = value;
+            this.saveLocal();
+        }
+    },
+    subscribe(key, callback){
+        if (this.channels[key]){
+            this.channels[key].push(callback)
+        } else {
+            this.channels[key] = [callback]
+        }
+    },
+    syncChannel(keys){
+        if (typeof keys === 'string'){
+            keys = [keys];
+        }
+        for (let key of keys){
+            this.saveChannels[key] = true;
+        }
+    }
+}
+async function loadLocal(){
+    let result = {};
+    if (chrome.storage){
+        result = (await chrome.storage.local.get([storage]));
+        result = result[storage];
+    } else {
+        result = JSON.parse(localStorage.getItem(storage))
+    }
+    result = result || {};
+    Object.assign(env.raw, result)
+    env.origin = result;
+}
+loadLocal();
+export class Component {
     custom_events = {}
     ref = []
     refs = {}
@@ -9,6 +103,7 @@ class Component {
         this.params = params;
         this.childrens = [];
         this.subEnv = {};
+        this.env = env;
         if (this.parent) {
             this.parent.childrens.push(this);
             this.subEnv = this.parent.subEnv;
@@ -32,6 +127,19 @@ class Component {
     mount(element) {
         let self = this;
         this.willStart().then(self.render(element).then(self.mounted()));
+        return this;
+    }
+    reload(){
+        let parent = this.parent, afterNode=this.el.nextSibling, parentNode = this.el.parentNode, self = this;
+        setTimeout(()=>{
+            self.el.remove();
+            let tempoClass = (new self.constructor(parent, self.params))
+            let newTemplate = tempoClass.template;
+            self.baseHTML = new DOMParser().parseFromString(newTemplate, 'text/html');
+            self.el = self.baseHTML.body.firstChild;
+            parentNode.insertBefore(self.el, afterNode);
+            this.mounted();
+        }, 1)
     }
     willStart() {
         return new Promise(() => { });
@@ -81,6 +189,14 @@ class Component {
         for (let element of document.querySelectorAll('button')){
             element.removeAttribute("disabled")
         }
+    }
+    destroy(){
+        setTimeout(()=>{
+            for(let child of this.childrens){
+                child.destroy();
+            }
+        }, 1)
+        this.el.remove();
     }
     async do_request(method='GET', url, content) {
         try {
@@ -141,8 +257,10 @@ class Component {
     }
 }
 
-function mount(object, element, params={}) {
+export function mount(object, element, params={}) {
     let component = new object(null, params);
     component.mount(element);
     return component
 }
+
+

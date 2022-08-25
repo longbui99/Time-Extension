@@ -10,7 +10,7 @@ class PinPopup extends Component {
 
     constructor() {
         super(...arguments);
-        this.subEnv.pinToHTML = true;
+        this.env.pinToHTML = true;
     }
     loadUI() {
         this.component = new Home(this);
@@ -58,11 +58,11 @@ class PinPopup extends Component {
                 }
             }
         })
-        if (this.subEnv.pinHTML) {
+        if (this.env.pinHTML) {
             this.pinHTML.el.classList.add('pinned');
         }
         this.pinHTML.el.addEventListener('click', async event => {
-            self.subEnv.pinHTML = true;
+            self.env.pinHTML = true;
             if (chrome.runtime) {
                 chrome.runtime.sendMessage({ pinHTML: true });
             }
