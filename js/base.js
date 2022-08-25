@@ -5,6 +5,18 @@ var env = {
     raw: {},
     channels: {},
     saveChannels: {},
+    async reload(){
+        let result = {};
+        if (chrome.storage){
+            result = (await chrome.storage.local.get([storage]));
+            result = result[storage];
+        } else {
+            result = JSON.parse(localStorage.getItem(storage));
+        }
+        for(let key in result){
+            this[key] = result[key];
+        }
+    },
     async saveLocal(){
         if (chrome.storage){
             chrome.storage.local.set(this.raw)
@@ -71,12 +83,14 @@ var env = {
 async function loadLocal(){
     let result = {};
     if (chrome.storage){
-      result = (await chrome.storage.local.get([storage]));
-      result = result[storage];
+        result = (await chrome.storage.local.get([storage]));
+        result = result[storage];
     } else {
-      result = JSON.parse(localStorage.getItem(storage))
+        result = JSON.parse(localStorage.getItem(storage))
     }
-    env.raw = env.origin = result;
+    result = result || {};
+    Object.assign(env.raw, result)
+    env.origin = result;
 }
 loadLocal();
 export class Component {
@@ -114,6 +128,18 @@ export class Component {
         let self = this;
         this.willStart().then(self.render(element).then(self.mounted()));
         return this;
+    }
+    reload(){
+        let parent = this.parent, afterNode=this.el.nextSibling, parentNode = this.el.parentNode, self = this;
+        setTimeout(()=>{
+            self.el.remove();
+            let tempoClass = (new self.constructor(parent, self.params))
+            let newTemplate = tempoClass.template;
+            self.baseHTML = new DOMParser().parseFromString(newTemplate, 'text/html');
+            self.el = self.baseHTML.body.firstChild;
+            parentNode.insertBefore(self.el, afterNode);
+            this.mounted();
+        }, 1)
     }
     willStart() {
         return new Promise(() => { });
@@ -165,6 +191,11 @@ export class Component {
         }
     }
     destroy(){
+        setTimeout(()=>{
+            for(let child of this.childrens){
+                child.destroy();
+            }
+        }, 1)
         this.el.remove();
     }
     async do_request(method='GET', url, content) {

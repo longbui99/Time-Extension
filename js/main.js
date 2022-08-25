@@ -18,14 +18,26 @@ export class Main extends Component {
 
     constructor() {
         super(...arguments);
-        this.issueData = this.env.issueData || null;
-        this.searchData = this.env.searchData || null;
         this.loadID = util.uniqueID();
+        this.secondToString = util.parseSecondToString(this.env.resource?.hrs_per_day || 8, this.env.resource?.days_per_week || 5);
         this.trigger_up("load_start", this.loadID)
         this.env.syncChannel(['contentState']);
+        this.env.subscribe('issueData', this.issueDataChange.bind(this))
+        this.env.subscribe('relativeAdd', this.relativeAdd.bind(this))
     }
     custom_events = {
         'action-export': this.actionExportToOriginalServer
+    }
+    async relativeAdd(data){
+        let params = {
+            "id": data.id,
+            "jwt": this.env.jwt,
+            "payload": {
+                'source': 'Extension'
+            }
+        }
+        await this.do_request('POST', `${this.env.serverURL}/management/issue/work-log/add`, params);
+        this.fetchRelativeActive();
     }
     renderRelatedActiveData() {
         let template = ""
@@ -51,9 +63,9 @@ export class Main extends Component {
         let progressLog = []
         for (let index = 0; index < elements.length; index++) {
             elements[index].addEventListener('click', event => {
-                if (self.issueData) self._pauseWorkLog(this.issueData.id, false);
-                self.issueData = self.relatedActiveIssues[index];
-                self.storeAndRenderIssue(true)
+                self.env.issueData = self.relatedActiveIssues[index];
+                this.env.update('loadIssueData', null);
+                // self.env.update('issueData', self.env.issueData)
             })
             if (self.relatedActiveIssues[index].last_start){
                 progressLog.push({el:elements[index].parentNode.querySelector('.duration'), active_duration: self.relatedActiveIssues[index].active_duration})
@@ -73,10 +85,30 @@ export class Main extends Component {
         if (this.relatedActiveIssues.length){
             this.relatedActiveRef.el.parentNode.style.display = "block";
         }
-
     }
+    async fetchRelativeActive(){
+        this.relatedActiveRef.el.parentNode.style.display = "none";
+        if (!this.env.issueData?.broardcast){
+            let params = JSON.stringify({
+                "except": this.env.issueData?.id,
+                "limit": 6,
+                "source": "Extension"
+            }), self = this;
+            let response = (await this.do_invisible_request('GET', `${this.env.serverURL}/management/issue/my-active?jwt=${this.env.jwt}&payload=${params}`))
+            let result = (await response.json());
+            this.relatedActiveIssues = result;
+            setTimeout(()=>{
+                self.trigger_up('relative-updated', result);
+            },200)
+        }
+        this.renderRelatedActiveData()
+    }
+    issueDataChange(){
+        this.fetchRelativeActive();
+    }
+
     async actionExportToOriginalServer(){
-        this.issueData.timeStatus = null;
+        this.env.issueData.timeStatus = null;
         let payload = {
             'source': 'Extension',
             'mode': {
@@ -85,7 +117,7 @@ export class Main extends Component {
             }
         }
         let params = {
-            "id": this.issueData.id,
+            "id": this.env.issueData.id,
             "jwt": this.env.jwt,
             "payload": payload
         }
@@ -200,36 +232,8 @@ export class Main extends Component {
             }
         })
     }
-    async fetchRelativeActive(){
-        this.relatedActiveRef.el.parentNode.style.display = "none";
-        if (!this.issueData?.broardcast){
-            let params = JSON.stringify({
-                "except": this.issueData?.id,
-                "limit": 6,
-                "source": "Extension"
-            }), self = this;
-            let response = (await this.do_invisible_request('GET', `${this.env.serverURL}/management/issue/my-active?jwt=${this.env.jwt}&payload=${params}`))
-            let result = (await response.json());
-            this.relatedActiveIssues = result;
-            setTimeout(()=>{
-                self.trigger_up('relative-updated', result);
-            },200)
-        }
-        this.renderRelatedActiveData()
-    }
-    
     initEvent() {
         let self = this;
-        this._initPause();
-        this._initAddWorkLog();
-        this._initDoneWorkLog();
-        this._initManualChange();
-        this._initCommentEvent();
-        this._initIconRef();
-        this.flatPickr = flatpickr(this.loggedDate.el,{defaultDate: new Date(),dateFormat: 'Y-m-d'});
-        this.daterange = flatpickr(this.logHistoryDateRangeRef.el,{mode: "range", defaultDate: [new Date(), new Date()], altInput: true, altFormat: "M j, Y",
-            onClose: self.onChangeRangeHistoryFilter
-        });
         window.addEventListener('keydown', event=>{
             if (event.keyCode === 13){
                 document.activeElement.click()               
@@ -267,9 +271,11 @@ export class Main extends Component {
     }
     mounted() {
         let res = super.mounted();
+        this.initEvent();
         this.initGeneral();
         this.initContentState();
         this.initContentEvent();
+        this.fetchRelativeActive();
         return res;
     }
     template = `<div class="main-action-page show">

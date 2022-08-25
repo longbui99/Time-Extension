@@ -21,7 +21,8 @@ export class Clock extends Component {
 
     constructor() {
         super(...arguments);
-        this.secondToString = util.parseSecondToString(this.env.resource?.hrs_per_day || 8, this.env.resource?.days_per_week || 5)
+        this.secondToString = util.parseSecondToString(this.env.resource?.hrs_per_day || 8, this.env.resource?.days_per_week || 5);
+        this.env.subscribe('issueData', this.renderClockData.bind(this))
     }
 
     async renderTimeActions() {
@@ -63,12 +64,9 @@ export class Clock extends Component {
             clearInterval(this.currentInterval)
         }
         if (this.env.issueData) {
-            // if (refresh && !this.env.issueData?.broardcast) {
-            //     let response = (await this.do_invisible_request('GET', `${this.env.serverURL}/management/issue/get/${this.env.issueData.id}?jwt=${this.env.jwt}`));
-            //     let result = (await response.json());
-            //     let values = this.env.issueData;
-            //     for (let key of Object.keys(result)) { values[key] = result[key]; }
-            // }
+            if (refresh === true){
+                this.env.update('loadIssueData', null);
+            }
             let record = this.env.issueData;
             this.totalDurationRef.el.innerText = this.secondToString(record.total_duration);
             this.myTotalDurationRef.el.innerText = this.secondToString(record.my_total_duration);
@@ -90,7 +88,6 @@ export class Clock extends Component {
             }
         }
         this.renderTimeActions();
-        // this.trigger_up('issue-changed', this.env.issueData);
         this.env.syncOne("issueData", this.env.issueData);
     }
     async _pauseWorkLog(id = false, refresh = true) {
@@ -103,8 +100,7 @@ export class Clock extends Component {
             }
         }
         let result = (await this.do_invisible_request('POST', `${this.env.serverURL}/management/issue/work-log/pause`, params));
-        if (refresh)
-            this.renderClockData(true);
+        this.renderClockData(true);
     }
 
     _initPause() {
@@ -251,7 +247,7 @@ export class Clock extends Component {
     }
     mounted() {
         let res = super.mounted();
-        this.renderClockData();
+        this.renderClockData(true);
         this._initEvent();
         return res
     }

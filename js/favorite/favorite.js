@@ -91,13 +91,6 @@ export class Favorite extends Component {
                 elements[index].addEventListener('click', async (event)=>{
                     let data = findIssue(event.currentTarget.getAttribute('data-key'));
                     self.env.update('relativeAdd', data)
-                    // if (self.relatedActiveIssues.findIndex(e=>e.key===data.key) === -1){
-                    //     let backupIssueData = self.env.issueData;
-                    //     self.env.issueData = data;
-                    //     await self._addWorkLog(false);
-                    //     self.env.issueData = backupIssueData;
-                    //     self.fetchRelativeActive();
-                    // }
                     event.stopPropagation();
                 })
             }

@@ -267,6 +267,9 @@ svg:not(:root).tm-svg-inline--fa {
     display: flex;
     flex-flow: column;
 }
+.main-page .title .title-group .title-description .server-open{
+    cursor: pointer;
+}
 
 .main-page .title .pin-action {
     position: absolute;
