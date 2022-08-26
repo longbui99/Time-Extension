@@ -256,8 +256,9 @@ export class Component {
             })
         }
     }
+    showDialog(request){
+    }
 }
-
 export function mount(object, element, params={}) {
     let component = new object(null, params);
     component.mount(element);

@@ -1,4 +1,3 @@
-const storage = "timeLogStorage"
 
 export function _getDisplayName(record, length = 40000) {
     return `${record.key}: ${(record.name.length > length) ? record.name.substring(0, length) + "..." : record.name}`;
