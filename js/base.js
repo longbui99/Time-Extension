@@ -98,6 +98,7 @@ export class Component {
     custom_events = {}
     ref = []
     refs = {}
+    subscribedChannels = []
     template = null
     constructor(parent, params = {}) {
         this.parent = parent;
@@ -115,6 +116,13 @@ export class Component {
         if (params.extensionID){
             this.subEnv.extensionID = params.extensionID;
         }
+    }
+    subscribe(channel, callback) {
+        this.env.subscribe(channel, callback);
+        this.subscribedChannels.push({'channel': callback})
+    }
+    update(channel, value){
+        this.env.update(channel, value);
     }
     useRef(name) {
         let self = this;

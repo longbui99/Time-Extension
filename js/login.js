@@ -1,5 +1,3 @@
-
-
 import {Component} from "./base.js"
 export class Login extends Component {
     constructor() {

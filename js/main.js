@@ -1,5 +1,4 @@
 
-
 import {Component} from "./base.js"
 import * as util from "./utils/utils.js"
 import {SearchBar} from "./search/search.js"
@@ -23,8 +22,8 @@ export class Main extends Component {
         this.secondToString = util.parseSecondToString(this.env.resource?.hrs_per_day || 8, this.env.resource?.days_per_week || 5);
         this.trigger_up("load_start", this.loadID)
         this.env.syncChannel(['contentState']);
-        this.env.subscribe('issueData', this.issueDataChange.bind(this))
-        this.env.subscribe('relativeAdd', this.relativeAdd.bind(this))
+        this.subscribe('issueData', this.issueDataChange.bind(this))
+        this.subscribe('relativeAdd', this.relativeAdd.bind(this))
     }
     custom_events = {
         'action-export': this.actionExportToOriginalServer
@@ -65,7 +64,7 @@ export class Main extends Component {
         for (let index = 0; index < elements.length; index++) {
             elements[index].addEventListener('click', event => {
                 self.env.issueData = self.relatedActiveIssues[index];
-                this.env.update('loadIssueData', null);
+                this.update('loadIssueData', null);
                 // self.env.update('issueData', self.env.issueData)
             })
             if (self.relatedActiveIssues[index].last_start){
@@ -189,13 +188,13 @@ export class Main extends Component {
                 showChecklist: false,
                 showFavorite: false
             }
-            this.env.update('contentState', this.env.contentState)
+            this.update('contentState', this.env.contentState)
             this.initContentState();
         }
     }
     triggerContentType(){
         this.initContentState();
-        this.env.update('contentState', this.env.contentState)
+        this.update('contentState', this.env.contentState)
     }
     initContentEvent(){
         let self = this;
@@ -238,10 +237,6 @@ export class Main extends Component {
         window.addEventListener('keydown', event=>{
             if (event.keyCode === 13){
                 document.activeElement.click()               
-            }
-            if (event.code === 'KeyF' && window.event.ctrlKey && window.event.shiftKey){
-                self.searchRef.el.click();
-                self.searchRef.el.focus();
             }
             if (event.code === 'Digit1' && window.event.ctrlKey && window.event.shiftKey){
                 self.timeLogHeadingRef.el.click();

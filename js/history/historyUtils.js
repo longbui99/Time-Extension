@@ -1,4 +1,5 @@
 
+import * as util from "../utils/utils.js"
 export function getLogDataGroup(target) {
     let parentNode = target.parentNode;
     let group = parentNode.getAttribute('data-group');
@@ -25,13 +26,13 @@ export function deleteLogData(target) {
     this.do_invisible_request('POST', `${this.env.serverURL}/management/issue/work-log/delete/${values.id}`, values);
     let group = target.parentNode.getAttribute('data-group');
     this.env.historyByDate[group].totalDuration -= data.duration;
-    target.parentNode.parentNode.parentNode.parentNode.parentNode.querySelector('.total-duration').innerHTML = secondToHour(this.env.historyByDate[group].totalDuration);
+    target.parentNode.parentNode.parentNode.parentNode.parentNode.querySelector('.total-duration').innerHTML = util.secondToHour(this.env.historyByDate[group].totalDuration);
     target.parentNode.remove();
     this.env.globalTotal -= data.duration;
     if (values.exported) {
         this.env.exportedTotal -= data.duration;
     }
-    this.env.update('setGlobalData', null)
+    this.update('setGlobalData', null)
 }
 export async function exportLog(exportIds) {
     let res = {

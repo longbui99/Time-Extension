@@ -17,9 +17,6 @@
         "48": "./static/logo.png",
        "128": "./static/logo.png" 
     },
-    "background":{
-        "service_worker": "./js/background/background.js"
-    },
     "commands": {
         "_execute_action": {
             "suggested_key": {
