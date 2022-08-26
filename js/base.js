@@ -19,7 +19,9 @@ var env = {
     },
     async saveLocal(){
         if (chrome.storage){
-            chrome.storage.local.set(this.raw)
+            let data = {};
+            data[storage] = this.raw
+            await chrome.storage.local.set(data)
         } else {
             localStorage.setItem(storage, JSON.stringify(this.raw));
         }
@@ -80,7 +82,7 @@ var env = {
         }
     }
 }
-async function loadLocal(){
+export async function loadEnvironment(){
     let result = {};
     if (chrome.storage){
         result = (await chrome.storage.local.get([storage]));
@@ -92,7 +94,6 @@ async function loadLocal(){
     Object.assign(env.raw, result)
     env.origin = result;
 }
-loadLocal();
 export class Component {
     custom_events = {}
     ref = []
@@ -196,7 +197,7 @@ export class Component {
                 child.destroy();
             }
         }, 1)
-        this.el.remove();
+        this.el?.remove();
     }
     async do_request(method='GET', url, content) {
         try {

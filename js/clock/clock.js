@@ -1,6 +1,6 @@
 
 import * as util from "../utils/utils.js"
-import { mount, Component } from "../base.js"
+import { Component } from "../base.js"
 export class Clock extends Component {
 
     timeLogSectionRef = this.useRef('time-log-section')
@@ -88,7 +88,6 @@ export class Clock extends Component {
             }
         }
         this.renderTimeActions();
-        this.env.syncOne("issueData", this.env.issueData);
     }
     async _pauseWorkLog(id = false, refresh = true) {
         let params = {
@@ -232,6 +231,7 @@ export class Clock extends Component {
         this._initManualChange();
         this._initCommentEvent();
         this._initIconRef();
+        let self = this;
         this.flatPickr = flatpickr(this.loggedDate.el,{defaultDate: new Date(),dateFormat: 'Y-m-d'});
         window.addEventListener('keydown', event=>{
             if (window.event.ctrlKey && event.keyCode == 13){

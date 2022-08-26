@@ -1,5 +1,6 @@
 
-import {mount, Component} from "./base.js"
+
+import {Component} from "./base.js"
 import * as util from "./utils/utils.js"
 import {SearchBar} from "./search/search.js"
 import {Clock} from "./clock/clock.js"
