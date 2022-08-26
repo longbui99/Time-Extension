@@ -1,6 +1,7 @@
 import {Main} from "./main.js"
 import {Login} from "./login.js"
-import {loadEnvironment, mount, Component} from "./base.js"
+import { loadEnvironment, mount, Component} from "./base.js"
+import { BaseDialog } from "./dialog/dialog.js";
 import * as chrome from "./background/chrome.js"
 export class App extends Component {
   serverActionRef = this.useRef('server-open')
