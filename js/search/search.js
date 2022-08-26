@@ -32,6 +32,7 @@ export class SearchBar extends Component {
             let response = (await this.do_invisible_request('GET', `${this.env.serverURL}/management/issue/get/${this.env.issueData.id}?jwt=${this.env.jwt}`));
             let result = (await response.json());
             let values = this.env.issueData;
+            this.env.issueData.timeStatus = false;
             for (let key of Object.keys(result)) { values[key] = result[key]; }
             this.env.update('issueData', this.env.issueData)
         }
