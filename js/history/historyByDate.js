@@ -97,10 +97,14 @@ class LogByIssue extends Component{
             element.addEventListener('click', event=>{
                 let group = event.currentTarget.parentNode.parentNode.parentNode.getAttribute('data-group');
                 let data = hUtil.getLogDataGroup.bind(self)(event.currentTarget.parentNode.parentNode)
-                let exportIds = self.env.historyByDate[group].values.filter(e=> e.issue == data.issue).map(e=>e.id);
+                let exports = self.env.historyByDate[group].values.filter(e=> e.issue == data.issue);
+                let total_duration = exports.reduce((x,y)=>x.duration+y.duration);
+                this.env.exportedTotal -= total_duration;
+                let exportIds = exports.map(e=>e.id)
                 hUtil.exportLog.bind(self)(exportIds).then(function(response){
                     response.json().then(result=>{
                         self.params.logs = result.sort(function(a,b){return b.sequence-a.sequence});
+                        self.env.update('setGlobalData', null)
                         self.reload();
                     })
                 });
