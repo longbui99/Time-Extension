@@ -231,6 +231,7 @@ export class Clock extends Component {
         this._initManualChange();
         this._initCommentEvent();
         this._initIconRef();
+        let self = this;
         this.flatPickr = flatpickr(this.loggedDate.el,{defaultDate: new Date(),dateFormat: 'Y-m-d'});
         window.addEventListener('keydown', event=>{
             if (window.event.ctrlKey && event.keyCode == 13){

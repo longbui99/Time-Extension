@@ -128,20 +128,20 @@ chrome.runtime.onMessage.addListener(
   }
 );
 
-chrome.tabs.onActivated.addListener(async function (activeInfo) {
-  let env = (await chrome.storage.local.get(["timeLogStorage"]))?.timeLogStorage;
-  if (env.pinHTML) {
-    injectFile({ env: env })
-  }
-});
+// chrome.tabs.onActivated.addListener(async function (activeInfo) {
+//   let env = (await chrome.storage.local.get(["timeLogStorage"]))?.timeLogStorage;
+//   if (env.pinHTML) {
+//     injectFile({ env: env })
+//   }
+// });
 
-chrome.tabs.onUpdated.addListener(async function (tabId, changeInfo, tab) {
-  if (tab.url.startsWith('http')) {
-    let env = (await chrome.storage.local.get(["timeLogStorage"]))?.timeLogStorage;
-    if (changeInfo.status == 'complete') {
-      if (env.pinHTML) {
-        injectFile({ env: env })
-      }
-    }
-  }
-});
+// chrome.tabs.onUpdated.addListener(async function (tabId, changeInfo, tab) {
+//   if (tab.url.startsWith('http')) {
+//     let env = (await chrome.storage.local.get(["timeLogStorage"]))?.timeLogStorage;
+//     if (changeInfo.status == 'complete') {
+//       if (env.pinHTML) {
+//         injectFile({ env: env })
+//       }
+//     }
+//   }
+// });

@@ -1,5 +1,6 @@
 
 import * as util from "../utils/utils.js"
+import * as hUtil from "./historyUtils.js"
 import { Component } from "../base.js"
 class Log extends Component{
     secondToString = util.parseSecondToString(this.env.resource?.hrs_per_day || 8, this.env.resource?.days_per_week || 5)
@@ -11,7 +12,7 @@ class Log extends Component{
         let self = this;
         for (let element of this.el.querySelectorAll('.tm-form-control')){
             element.addEventListener('change', async event=>{
-                let values = util.exportLogData.bind(this)(event.target);
+                let values = hUtil.exportLogData.bind(this)(event.target);
                 if (element.parentNode.classList.contains('unexported')){
                     let response = (await self.do_invisible_request('POST', `${self.env.serverURL}/management/issue/work-log/update`, values));
                     let result = (await response.json())
@@ -24,7 +25,7 @@ class Log extends Component{
         }
         for (let element of this.el.querySelectorAll('.action-log-delete')){
             element.addEventListener('click', event=>{
-                util.deleteLogData.bind(this)(event.currentTarget)
+                hUtil.deleteLogData.bind(this)(event.currentTarget)
                 if (this.parent.params.logs.length == 1){
                     this.parent.destroy();
                 }
@@ -76,20 +77,33 @@ class LogByIssue extends Component{
     mounted() {
         let res = super.mounted();
         let element = this.el;
-        let group = this.params.group;
+        let group = this.params.group, self = this;
         for(let log of this.params.logs){
             log['group'] = group;
             new Log(this, log).mount(element)
         }
         for (let element of this.el.querySelectorAll('.log-issue')){
             element.addEventListener('click', event=>{
-                let data = util.getLogDataGroup(event.currentTarget.parentNode.parentNode)
+                let data = hUtil.getLogDataGroup.bind(this)(event.currentTarget.parentNode.parentNode)
                 if (!self.env.issueData){
                     self.env.issueData = {};
                 }
                 self.env.issueData.id = data.issue;
                 self.env.update('loadIssueData', false)
                 event.stopPropagation();
+            })
+        }
+        for (let element of this.el.querySelectorAll('.log-issue-export')){
+            element.addEventListener('click', event=>{
+                let group = event.currentTarget.parentNode.parentNode.parentNode.getAttribute('data-group');
+                let data = hUtil.getLogDataGroup.bind(self)(event.currentTarget.parentNode.parentNode)
+                let exportIds = self.env.historyByDate[group].values.filter(e=> e.issue == data.issue).map(e=>e.id);
+                hUtil.exportLog.bind(self)(exportIds).then(function(response){
+                    response.json().then(result=>{
+                        self.params.logs = result.sort(function(a,b){return b.sequence-a.sequence});
+                        self.reload();
+                    })
+                });
             })
         }
         return res
@@ -128,18 +142,8 @@ export class LogByDate extends Component {
             element.addEventListener('click', event=>{
                 let group = event.currentTarget.getAttribute('data-group');
                 let exportIds = historyByDate[group].values.map(e=> e.id);
-                util.exportLog(exportIds).bind(this).then(e=>{
-                    self.loadHistory(self.unix[0]-1, self.unix[1]);
-                });
-            })
-        }
-        for (let element of this.el.querySelectorAll('.log-issue-export')){
-            element.addEventListener('click', event=>{
-                let group = event.currentTarget.parentNode.parentNode.parentNode.getAttribute('data-group');
-                let data = getLogDataGroup(event.currentTarget.parentNode.parentNode)
-                let exportIds = historyByDate[group].values.filter(e=> e.issue == data.issue).map(e=>e.id);
-                util.exportLog(exportIds).bind(this).then(e=>{
-                    self.loadHistory(self.unix[0]-1, self.unix[1]);
+                hUtil.exportLog(exportIds).bind(this).then(e=>{
+                    self.parent.loadHistory(this.parent.unix[0]-1, this.parent.unix[1])
                 });
             })
         }

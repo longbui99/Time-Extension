@@ -20,8 +20,8 @@ export class LogReport extends Component {
         let to_unix = selectedDates[1].getTime()/1000;
         this.loadHistory(from_unix, to_unix)
     }
-    async loadHistory(from_unix=0, unix=0){
-        if (this.unix && this.unix[0]=== from_unix && this.unix[1] === unix){
+    async loadHistory(from_unix=0, unix=0, refresh=false){
+        if ((this.unix && this.unix[0]=== from_unix && this.unix[1] === unix) || refresh){
             return
         }
         this.unix = [from_unix, unix]

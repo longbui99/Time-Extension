@@ -197,7 +197,7 @@ export class Component {
                 child.destroy();
             }
         }, 1)
-        this.el.remove();
+        this.el?.remove();
     }
     async do_request(method='GET', url, content) {
         try {
