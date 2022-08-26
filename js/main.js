@@ -232,23 +232,6 @@ export class Main extends Component {
             }
         })
     }
-    async fetchRelativeActive(){
-        this.relatedActiveRef.el.parentNode.style.display = "none";
-        if (!this.issueData?.broardcast){
-            let params = JSON.stringify({
-                "except": this.issueData?.id,
-                "limit": 6,
-                "source": "Extension"
-            }), self = this;
-            let response = (await this.do_invisible_request('GET', `${this.env.serverURL}/management/issue/my-active?jwt=${this.env.jwt}&payload=${params}`))
-            let result = (await response.json());
-            this.relatedActiveIssues = result;
-            setTimeout(()=>{
-                self.trigger_up('relative-updated', result);
-            },200)
-        }
-        this.renderRelatedActiveData()
-    }
     
     initEvent() {
         let self = this;
