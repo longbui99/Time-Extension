@@ -22,7 +22,7 @@ export class Clock extends Component {
     constructor() {
         super(...arguments);
         this.secondToString = util.parseSecondToString(this.env.resource?.hrs_per_day || 8, this.env.resource?.days_per_week || 5);
-        this.env.subscribe('issueData', this.renderClockData.bind(this))
+        this.subscribe('issueData', this.renderClockData.bind(this))
     }
 
     async renderTimeActions() {
@@ -65,7 +65,7 @@ export class Clock extends Component {
         }
         if (this.env.issueData) {
             if (refresh === true){
-                this.env.update('loadIssueData', null);
+                this.update('loadIssueData', null);
             }
             let record = this.env.issueData;
             this.totalDurationRef.el.innerText = this.secondToString(record.total_duration);
@@ -165,14 +165,12 @@ export class Clock extends Component {
         }
 
         if (triggerServer) {
-            this.env.issueData.timeStatus = false;
             (await this.do_request('POST', `${this.env.serverURL}/management/issue/work-log/done`, params));
         }
         else {
             (await this.do_request('POST', `${this.env.serverURL}/management/issue/work-log/manual`, params));
             this.manualLogref.el.value = '';
         }
-        this.env.issueData.timeStatus = null;
         this.renderClockData(refresh);
     }
     _initDoneWorkLog() {

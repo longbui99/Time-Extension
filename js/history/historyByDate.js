@@ -26,8 +26,12 @@ class Log extends Component{
         for (let element of this.el.querySelectorAll('.action-log-delete')){
             element.addEventListener('click', event=>{
                 hUtil.deleteLogData.bind(this)(event.currentTarget)
-                if (this.parent.params.logs.length == 1){
-                    this.parent.destroy();
+                let index = self.parent.params.logs.findIndex(e=>e.id == self.params.id);
+                if (index !== -1){
+                    self.parent.params.logs.splice(index, 1);
+                }
+                if (self.parent.params.logs.length == 0){
+                    self.parent.destroy();
                 }
             })
         }

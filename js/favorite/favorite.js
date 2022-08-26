@@ -6,17 +6,17 @@ export class Favorite extends Component {
     favoriteListRef = this.useRef('favorite-list')
     constructor() {
         super(...arguments);
-        this.env.subscribe('issueData', this.initFavorites.bind(this));
+        this.subscribe('issueData', this.initFavorites.bind(this));
     }
     renderFavoriteIssues(){
         if (this.favoriteIssues){
             let self = this;
             let tmpl = "";
-            this.env.update('favorite', false);
+            this.update('favorite', false);
             for (let index = 0; index < this.favoriteIssues.length; index++){
                 if (this.favoriteIssues[index].key === this.env.issueData?.key){
                     this.favoriteIssues.splice(index, 1);
-                    this.env.update('favorite', true);
+                    this.update('favorite', true);
                     break;
                 }
             }

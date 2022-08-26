@@ -15,9 +15,9 @@ export class SearchBar extends Component {
 
     constructor() {
         super(...arguments);
-        this.env.subscribe('issueData', this.renderIssueSearch.bind(this));
-        this.env.subscribe('loadIssueData', this.loadIssue.bind(this));
-        this.env.subscribe('favorite', this.favoriteChanged.bind(this));
+        this.subscribe('issueData', this.renderIssueSearch.bind(this));
+        this.subscribe('loadIssueData', this.loadIssue.bind(this));
+        this.subscribe('favorite', this.favoriteChanged.bind(this));
         this.openIssueNaviagor = this.openIssueNaviagor.bind(this);
     }
     favoriteChanged(isFavorite){
@@ -33,7 +33,8 @@ export class SearchBar extends Component {
             let result = (await response.json());
             let values = this.env.issueData;
             for (let key of Object.keys(result)) { values[key] = result[key]; }
-            this.env.update('issueData', this.env.issueData)
+            values.timeStatus = false;
+            this.update('issueData', this.env.issueData)
         }
     }
     renderIssueSearch(data){
@@ -41,10 +42,11 @@ export class SearchBar extends Component {
         this.statusRef.el.innerText = data.status || '';
         this.searchRef.el.value = util._getDisplayName(data);
         this.el.querySelector('.issue-navigation').style.display = "inline-block";
+        this.favoriteChanged(false);
     }
     async chooseIssue(index) {
         this.searchResultRef.el.style.display = 'none';
-        this.env.update('issueData', this.searchData.values[index]);
+        this.update('issueData', this.searchData.values[index]);
     }
     async fetchSearchIssue(text){
         let offset = this.searchData?.values?.length || 0;
@@ -119,7 +121,7 @@ export class SearchBar extends Component {
         this.searchData.query = text;
         this.searchData.values =  (await this.fetchSearchIssue(text));
         this.loadSearchedIssues(this.searchData.values);
-        this.env.update('searchData', this.searchData);
+        this.update('searchData', this.searchData);
     }
     _initSearchBar() {
         let self = this;
@@ -156,7 +158,7 @@ export class SearchBar extends Component {
     async fetchIssueFromServer(){
         let response = (await this.do_request('GET', `${this.env.serverURL}/management/issue/fetch/${this.env.issueData.id}?jwt=${this.env.jwt}`));
         let data = (await response.json())
-        this.env.update('issueData', data);
+        this.update('issueData', data);
     }
     _initNavigator() {
         let self = this;

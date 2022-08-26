@@ -12,7 +12,7 @@ export class LogReport extends Component {
 
     constructor() {
         super(...arguments);
-        this.env.subscribe('setGlobalData', this.setGlobalData.bind(this));
+        this.subscribe('setGlobalData', this.setGlobalData.bind(this));
         this.secondToString = util.parseSecondToString(this.env.resource?.hrs_per_day || 8, this.env.resource?.days_per_week || 5)
     }
     onChangeRangeHistoryFilter(selectedDates, dateStr, instance){

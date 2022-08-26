@@ -317,7 +317,7 @@ export class CheckList extends Component {
             let payload = {};
             payload.sequence = parseInt(clientTags[currentPosition-1]?.el.getAttribute("sequence")) || -1;
             payload.float_sequence = 1;
-            params.id = util.parseInt(acElement.querySelector('.tm-form-check-input').value) || 0
+            params.id = parseInt(acElement.querySelector('.tm-form-check-input').value) || 0
             params.payload = payload
             self.do_invisible_request('POST', `${self.env.serverURL}/management/ac?`, params);
             for (let index = 0; index < clientTags.length; index++){

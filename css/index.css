@@ -150,7 +150,7 @@ svg:not(:root).tm-svg-inline--fa {
     background-color: lightgrey;
     min-width: inherit;
     height: inherit;
-    z-index: 2017483647;
+    z-index: 2000000001;
     top: 0;
     left: 0;
     width: 100%;
@@ -503,7 +503,7 @@ svg:not(:root).tm-svg-inline--fa {
 .dragging {
     background-color: white;
     position: fixed !important;
-    z-index: 2017483647;
+    z-index: 2000000001;
     box-shadow: rgba(50, 50, 93, 0.25) 0px 50px 100px -20px, rgba(0, 0, 0, 0.3) 0px 30px 60px -30px, rgba(10, 37, 64, 0.35) 0px -2px 6px 0px inset !important;
     -webkit-user-select: none;
     -ms-user-select: none;
@@ -705,7 +705,7 @@ svg:not(:root).tm-svg-inline--fa {
     color: grey;
     max-height: 70%;
     overflow-y: auto;
-    z-index: 2017483647;
+    z-index: 2000000001;
     display: none;
 }
 
@@ -1225,7 +1225,7 @@ svg:not(:root).tm-svg-inline--fa {
 }
 lbwt .page{
     position: absolute;
-    z-index: 2017483647;
+    z-index: 2000000000;
     top: 0;
     left: 0;
     width: 100%;
