@@ -238,10 +238,6 @@ export class Main extends Component {
             if (event.keyCode === 13){
                 document.activeElement.click()               
             }
-            if (event.code === 'KeyF' && window.event.ctrlKey && window.event.shiftKey){
-                self.searchRef.el.click();
-                self.searchRef.el.focus();
-            }
             if (event.code === 'Digit1' && window.event.ctrlKey && window.event.shiftKey){
                 self.timeLogHeadingRef.el.click();
                 event.stopImmediatePropagation();

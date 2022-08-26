@@ -195,6 +195,10 @@ export class SearchBar extends Component {
                 self.searchResultRef.el.style.display = 'none';
                 self.flatPickr.close();
             }
+            else if (event.code === 'KeyF' && window.event.ctrlKey && window.event.shiftKey){
+                self.searchRef.el.click();
+                self.searchRef.el.focus();
+            }
         })
     }
     mounted() {
