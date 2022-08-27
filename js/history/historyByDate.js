@@ -14,12 +14,18 @@ class Log extends Component{
             element.addEventListener('change', async event=>{
                 let values = hUtil.exportLogData.bind(this)(event.target);
                 if (element.parentNode.classList.contains('unexported')){
-                    let response = (await self.do_invisible_request('POST', `${self.env.serverURL}/management/issue/work-log/update`, values));
-                    let result = (await response.json())
-                    for (let key in result){
-                        self.params[key] = result[key]
+                    let result = {}
+                    try {
+                        let response = (await self.do_invisible_request('POST', `${self.env.serverURL}/management/issue/work-log/update`, values));
+                        result = (await response.json());
+                    } catch {
+                        result = self.params;
+                    } finally {
+                        for (let key in result){
+                            self.params[key] = result[key]
+                        }
+                        self.reload();
                     }
-                    self.reload();
                 }
             })
         }
