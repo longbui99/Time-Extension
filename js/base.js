@@ -214,18 +214,18 @@ export class Component {
                 return res
             }
             else{
-                let key = "errpor";
+                let key = "error";
                 if (res.status === 403){
                     key = 'session_errors'
                 }
                 this.trigger_up(key, {
                     'message': (await res.text()),
                 })
-                return false
+                return falses
             }
         }
         catch (erros) {
-            this.trigger_up('session_errors', {
+            this.trigger_up('error', {
                 'message': erros.message
             })
             return false
@@ -248,7 +248,7 @@ export class Component {
                 return res
             }
             else{
-                let key = "errpor";
+                let key = "error";
                 if (res.status === 403){
                     key = 'session_errors'
                 }
@@ -259,7 +259,7 @@ export class Component {
             }
         }
         catch (erros) {
-            this.trigger_up('session_errors', {
+            this.trigger_up('error', {
                 'message': erros.message
             })
             return false
