@@ -1,7 +1,7 @@
 import {Main} from "./main.js"
 import {Login} from "./login.js"
 import { loadEnvironment, mount, Component} from "./base.js"
-import { BaseDialog } from "./dialog/dialog.js";
+import { ErrorDialog } from "./dialog/errorDialog.js";
 import * as chrome from "./background/chrome.js"
 export class App extends Component {
   serverActionRef = this.useRef('server-open')
@@ -14,7 +14,9 @@ export class App extends Component {
 
   custom_events = {
     'authentication': this.onAuthentication,
-    'loading': this.onLoading
+    'loading': this.onLoading,
+    'session_errors': this.onSessionError,
+    'error': this.onError
   }
   constructor() {
     super(...arguments);
@@ -65,11 +67,11 @@ export class App extends Component {
       this.pinRef.el.remove();
     }
     this.component.mount(this.processMainRef.el)
-    this.pinRef.el.addEventListener("click", async event => {
-      this.showDialog({
-        'type': 'base'
-      })
-    })
+    // this.pinRef.el.addEventListener("click", async event => {
+    //   this.showDialog({
+    //     'type': 'base'
+    //   })
+    // })
     this.initGeneralEvent();
   }
   loadUI() {
@@ -93,16 +95,16 @@ export class App extends Component {
     this.loadingBannerRef.el.style.display = (display?"inline-block": "none");
   }
   onError(data){
-    if (data.error){
-      this.errorRef.el.innerHTML = data.error
-      this.errorRef.el.style.display = 'inline-block';
-    }
-    else{
-      this.errorRef.el.style.display = 'none';
-    }
+    this.showDialog({
+      'type': 'error'
+    }, data)
+    
   }
-  onSessionError(){
-    // this.onAuthentication(this.payload,   false);
+  onSessionError(data){
+    this.showDialog({
+      'type': 'error'
+    }, data)
+    this.onAuthentication(this.env.raw, false);
   }
   async onIssueChanged(issueData){
     if (chrome.storage){
@@ -171,13 +173,21 @@ export class App extends Component {
     }
     this.componentReady()
   }
-  showDialog(request){
-    if (request.type === 'base'){
-        let element = document.getElementsByTagName('lbwt')[0].firstElementChild;
-        if (element){
-            let popup = new BaseDialog(this);
-            popup.mount(element);
-        }
+  showDialog(request, params={}){
+    let element = document.getElementsByTagName('lbwt')[0].firstElementChild;
+    if (element){
+      let popup = null;
+      if (this.popup){
+        this.popup.destroy();
+      }
+      if (request.type === 'base'){
+        popup = new ErrorDialog(this, params);
+        popup.mount(element);
+      } else if (request.type === "error"){
+        popup = new ErrorDialog(this, params);
+        popup.mount(element);
+      }
+      this.popup = popup
     }
   }
   template = `

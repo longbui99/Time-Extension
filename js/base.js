@@ -208,24 +208,27 @@ export class Component {
             if (!['GET'].includes(method)){
                 json.body = JSON.stringify(content)
             }
-            this.trigger_up('error', {})
             this.trigger_up('loading', true);
-            this.blockHandling();
             let res = (await fetch(url, json));
-            this.unblockHandling();
             if (res.ok){
                 return res
             }
             else{
-                this.trigger_up('error', {
-                    'error': (await res.text())
+                let key = "errpor";
+                if (res.status === 403){
+                    key = 'session_errors'
+                }
+                this.trigger_up(key, {
+                    'message': (await res.text()),
                 })
+                return false
             }
         }
         catch (erros) {
             this.trigger_up('session_errors', {
-                'error': erros.message
+                'message': erros.message
             })
+            return false
         }
         finally {
             this.trigger_up('loading', false);
@@ -245,15 +248,21 @@ export class Component {
                 return res
             }
             else{
-                this.trigger_up('error', {
-                    'error': (await res.text())
+                let key = "errpor";
+                if (res.status === 403){
+                    key = 'session_errors'
+                }
+                this.trigger_up(key, {
+                    'message': (await res.text()),
                 })
+                return false
             }
         }
         catch (erros) {
             this.trigger_up('session_errors', {
-                'error': erros.message
+                'message': erros.message
             })
+            return false
         }
     }
     showDialog(request){

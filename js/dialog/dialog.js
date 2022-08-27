@@ -2,6 +2,7 @@ import { Component } from "../base.js";
 
 export class BaseDialog extends Component{
     dialogClose = this.useRef('dialog-close');
+    dialogContent = this.useRef('dialog-content');
     constructor(){
         super(...arguments);
         if (this.parent.dialogEnv){
@@ -36,7 +37,7 @@ export class BaseDialog extends Component{
                         x
                     </div>
                 </div>
-                <div class="dialog-content">
+                <div class="dialog-content" l-ref="dialog-content">
                     ${this.innerTemplate}
                 </div>
                 <div class="dialog-footer">

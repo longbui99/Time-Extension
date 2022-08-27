@@ -20,9 +20,12 @@ lbwt-dialog .dialog-main{
     height: 83%;
     width: 90%;
     position: absolute!important;
-    margin: 7% 5% 5% 5%;
+    margin: 5% 3% 3% 3%;
     background-color: white;
     box-shadow: rgba(0, 0, 0, 0.16) 0px 3px 6px, rgba(0, 0, 0, 0.23) 0px 3px 6px;
+    padding: 2%;
+    overflow: auto;
+    height: 250px;
 }
 lbwt-dialog .dialog-main .dialog-header{
     display: flex;
@@ -39,4 +42,7 @@ lbwt-dialog .dialog-main .dialog-header .dialog-close{
 }
 lbwt-dialog .dialog-main .dialog-header .dialog-close:hover{
     color: black;
+}
+lbwt-dialog .dialog-main .error-content{
+    color: red;
 }
