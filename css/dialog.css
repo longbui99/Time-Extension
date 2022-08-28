@@ -28,9 +28,9 @@ lbwt-dialog .dialog-panner{
 lbwt-dialog .dialog-main{
     z-index: 2000000004;
     height: fit-content;
-    width: 90%;
+    width: 91%;
     position: absolute!important;
-    margin: 5% 3% 3% 3%;
+    margin: 2% 3% 3% 3%;
     background-color: white;
     box-shadow: rgba(0, 0, 0, 0.16) 0px 3px 6px, rgba(0, 0, 0, 0.23) 0px 3px 6px;
     padding: 10px;
@@ -45,7 +45,7 @@ lbwt-dialog .dialog-main .dialog-header{
     width: 100%;
     justify-content: space-between;
     height: 10%;
-    margin-bottom: 25px;
+    margin-bottom: 10px;
 }
 lbwt-dialog .dialog-main .dialog-header .dialog-title{
     font-size: 1.5em;
@@ -82,9 +82,16 @@ lbwt-dialog .dialog-main .dialog-content .dialog-issue-content .log-range{
     justify-content: space-around;
     width: 100%;
     align-items: center;
+    margin-bottom: 10px;
 }
 lbwt-dialog .dialog-main .dialog-content .dialog-issue-content .log-range svg{
     font-size: 1.5em;
     color: var(--primary);
     margin: 0px 10px;
+}
+lbwt-dialog .dialog-main .dialog-content .dialog-issue-content textarea{
+    font-size: 1.1em;
+}
+lbwt-dialog button{
+    font-weight: 500!important;
 }

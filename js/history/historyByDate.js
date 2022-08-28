@@ -25,6 +25,7 @@ class Log extends Component{
                         for (let key in result){
                             self.params[key] = result[key]
                         }
+                        self.params.start_date = new Date(result['start_date']+"Z");
                         self.reload();
                     }
                 }
@@ -61,10 +62,11 @@ class Log extends Component{
                     console.log(data)
                 }
                 self.showDialog(IssueSubsitution, {
-                    title: "Change Work Log", 
+                    title: "Edit Log", 
                     startDate: this.params.start_date,
                     endDate: new Date(this.params.start_date.getTime()+this.params.duration*1000),
-                    callback: callback})
+                    comment: this.params.description,
+                    successCallback: callback})
             })
         }
         return res

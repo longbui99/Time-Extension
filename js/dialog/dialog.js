@@ -2,6 +2,7 @@ import { Component, generateEnvironment } from "../base.js";
 export class BaseDialog extends Component{
     dialogClose = this.useRef('dialog-close');
     dialogContent = this.useRef('dialog-content');
+    dialogCancel = this.useRef('button-cancel')
     constructor(){
         super(...arguments);
         this.response = {};
@@ -45,8 +46,14 @@ export class BaseDialog extends Component{
         let res = super.mounted();
         
         this.dialogClose.el.addEventListener('click', e=>{
-            if (this.params.callback){
-                this.params.callback(this.response);
+            if (this.params.closeCallback){
+                this.params.closeCallback(this.response);
+            }
+            this.destroy();
+        })
+        this.dialogCancel?.el.addEventListener('click', e=>{
+            if (this.params.cancelCallback){
+                this.params.cancelCallback(this.response);
             }
             this.destroy();
         })
