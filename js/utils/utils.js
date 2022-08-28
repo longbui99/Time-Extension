@@ -132,3 +132,11 @@ export function parseChecklist(text) {
     }
     return final.join("")
 }
+export function getTimezoneOffset() {
+    let offset = String(-new Date().getTimezoneOffset() / 60)
+    if (offset.length === 1) {
+        offset = "+" + offset
+    }
+    offset = offset[0] + offset[1].padStart(2, '0')
+    return offset
+}

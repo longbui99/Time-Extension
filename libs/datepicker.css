@@ -32,7 +32,7 @@
 
 .flatpickr-calendar.open {
     display: inline-block;
-    z-index: 2000000001;
+    z-index: 2000000005;
 }
 
 .flatpickr-calendar.animate.open {
@@ -52,7 +52,7 @@
 }
 
 .flatpickr-calendar.static.open {
-    z-index: 999;
+    z-index: 2000000005;
     display: block
 }
 
@@ -195,7 +195,7 @@
     top: 0;
     height: 34px;
     padding: 10px;
-    z-index: 3;
+    z-index: 2000000005;
     color: rgba(0, 0, 0, 0.9);
     fill: rgba(0, 0, 0, 0.9)
 }

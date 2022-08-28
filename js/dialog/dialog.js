@@ -1,49 +1,55 @@
-import { Component } from "../base.js";
-
+import { Component, generateEnvironment } from "../base.js";
 export class BaseDialog extends Component{
     dialogClose = this.useRef('dialog-close');
     dialogContent = this.useRef('dialog-content');
     constructor(){
         super(...arguments);
-        if (this.parent.dialogEnv){
-            this.dialogEnv = this.parent.dialogEnv;
-        } else {
-            let cloneEnv = {};
-            Object.assign(cloneEnv, this.env);
-            this.dialogEnv = cloneEnv;
+        this.response = {};
+        if (!this.parent.baseEnv){
+            this.baseEnv = this.env;
+            this.env = generateEnvironment();
+            this.env.origin = this.baseEnv.raw;
         }
+        this.innerTemplate = '';
+        this.renderDialog();
+    }
+    renderDialogContent(){
+        
+    }
+    renderDialog(){
+        this.renderDialogContent();
+        this.template = `
+            <lbwt-dialog>
+                <div class="dialog-panner">
+                </div>
+                <div class="dialog-main">
+                    <div class="dialog-header">
+                        <div class="dialog-title">
+                            ${this.params.title || ''}
+                        </div>
+                        <div class="dialog-close" l-ref="dialog-close">
+                            x
+                        </div>
+                    </div>
+                    <div class="dialog-content" l-ref="dialog-content">
+                        ${this.innerTemplate || ''}
+                    </div>
+                    <div class="dialog-footer">
+                        ${this.innerFooter || ''}
+                    </div>
+                </div>
+            </lbwt-dialog>
+        `
     }
     mounted(){
         let res = super.mounted();
+        
         this.dialogClose.el.addEventListener('click', e=>{
-            if (this.params.dialogCallback){
-                this.params.dialogCallback(this.env);
+            if (this.params.callback){
+                this.params.callback(this.response);
             }
             this.destroy();
         })
         return res
     }
-    innerTemplate = '';
-    template = `
-        <lbwt-dialog>
-            <div class="dialog-panner">
-            </div>
-            <div class="dialog-main">
-                <div class="dialog-header">
-                    <div class="dialog-title">
-                        ${this.params.title || ''}
-                    </div>
-                    <div class="dialog-close" l-ref="dialog-close">
-                        x
-                    </div>
-                </div>
-                <div class="dialog-content" l-ref="dialog-content">
-                    ${this.innerTemplate}
-                </div>
-                <div class="dialog-footer">
-                
-                </div>
-            </div>
-        </lbwt-dialog>
-    `
 }

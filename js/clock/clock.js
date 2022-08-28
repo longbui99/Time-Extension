@@ -22,7 +22,7 @@ export class Clock extends Component {
     constructor() {
         super(...arguments);
         this.secondToString = util.parseSecondToString(this.env.resource?.hrs_per_day || 8, this.env.resource?.days_per_week || 5);
-        this.env.subscribe('issueData', this.renderClockData.bind(this))
+        this.subscribe('issueData', this.renderClockData.bind(this))
     }
 
     async renderTimeActions() {
@@ -65,7 +65,7 @@ export class Clock extends Component {
         }
         if (this.env.issueData) {
             if (refresh === true){
-                this.env.update('loadIssueData', null);
+                this.update('loadIssueData', null);
             }
             let record = this.env.issueData;
             this.totalDurationRef.el.innerText = this.secondToString(record.total_duration);
@@ -137,21 +137,13 @@ export class Clock extends Component {
             }
         })
     }
-    _getTimezoneOffset() {
-        let offset = String(-new Date().getTimezoneOffset() / 60)
-        if (offset.length === 1) {
-            offset = "+" + offset
-        }
-        offset = offset[0] + offset[1].padStart(2, '0')
-        return offset
-    }
 
     async _doneWorkLog(refresh = true) {
         let date = new Date();
         let payload = {
             'source': 'Extension',
             'description': this.commentRef.el.value,
-            'start_date': `${this.loggedDate.el.value}T${date.getHours()}:${date.getMinutes()}:${date.getSeconds()}${this._getTimezoneOffset()}00`
+            'start_date': `${this.loggedDate.el.value}T${date.getHours()}:${date.getMinutes()}:${date.getSeconds()}${util.getTimezoneOffset()}00`
         }
         let triggerServer = true;
         if (this.manualLogref.el.value.length > 0) {

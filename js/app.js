@@ -95,15 +95,11 @@ export class App extends Component {
     this.loadingBannerRef.el.style.display = (display?"inline-block": "none");
   }
   onError(data){
-    this.showDialog({
-      'type': 'error'
-    }, data)
+    this.showDialog(ErrorDialog, data)
     
   }
   onSessionError(data){
-    this.showDialog({
-      'type': 'error'
-    }, data)
+    this.showDialog(ErrorDialog, data)
     this.onAuthentication(this.env.raw, false);
   }
   async onIssueChanged(issueData){
@@ -172,23 +168,6 @@ export class App extends Component {
       }
     }
     this.componentReady()
-  }
-  showDialog(request, params={}){
-    let element = document.getElementsByTagName('lbwt')[0].firstElementChild;
-    if (element){
-      let popup = null;
-      if (this.popup){
-        this.popup.destroy();
-      }
-      if (request.type === 'base'){
-        popup = new ErrorDialog(this, params);
-        popup.mount(element);
-      } else if (request.type === "error"){
-        popup = new ErrorDialog(this, params);
-        popup.mount(element);
-      }
-      this.popup = popup
-    }
   }
   template = `
   <lbwt>

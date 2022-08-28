@@ -4,14 +4,12 @@ export class ErrorDialog extends BaseDialog{
     constructor(){
         super(...arguments);
     }
-    mounted(){
-        let res = super.mounted();
-        this.dialogContent.el.innerHTML = `
+    renderDialogContent(){
+        this.innerTemplate = `
             <div class="error-content">
                 ${this.params.message}
             </div>
         `;
-        return res;
     }
     
 }

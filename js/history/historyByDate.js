@@ -2,6 +2,7 @@
 import * as util from "../utils/utils.js"
 import * as hUtil from "./historyUtils.js"
 import { Component } from "../base.js"
+import { IssueSubsitution } from "../dialog/issueSubsitution.js"
 class Log extends Component{
     secondToString = util.parseSecondToString(this.env.resource?.hrs_per_day || 8, this.env.resource?.days_per_week || 5)
     constructor() {
@@ -56,9 +57,14 @@ class Log extends Component{
         }
         for (let element of this.el.querySelectorAll('.wl-circle-decorator')){
             element.addEventListener('click', event=>{
-                self.toggleDatetimeSelection([new Date(), new Date()], 'range', (data)=>{
+                function callback(data){
                     console.log(data)
-                })
+                }
+                self.showDialog(IssueSubsitution, {
+                    title: "Change Work Log", 
+                    startDate: this.params.start_date,
+                    endDate: new Date(this.params.start_date.getTime()+this.params.duration*1000),
+                    callback: callback})
             })
         }
         return res
@@ -68,6 +74,7 @@ class Log extends Component{
             <input class="log-duration tm-form-control" value="${this.secondToString(this.params.duration)}" data-origin="${this.secondToString(this.params.duration)}">
             <span class="wl-circle-decorator" title="${this.params.date || ''}">
                 <svg class="svg-inline--fa fa-circle" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="circle" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" data-fa-i2svg=""><path fill="currentColor" d="M512 256C512 397.4 397.4 512 256 512C114.6 512 0 397.4 0 256C0 114.6 114.6 0 256 0C397.4 0 512 114.6 512 256z"></path></svg><!-- <i class="fas fa-circle"></i> Font Awesome fontawesome.com -->
+                <svg class="svg-inline--fa fa-ellipsis-vertical" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="ellipsis-vertical" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 512" data-fa-i2svg=""><path fill="currentColor" d="M64 360C94.93 360 120 385.1 120 416C120 446.9 94.93 472 64 472C33.07 472 8 446.9 8 416C8 385.1 33.07 360 64 360zM64 200C94.93 200 120 225.1 120 256C120 286.9 94.93 312 64 312C33.07 312 8 286.9 8 256C8 225.1 33.07 200 64 200zM64 152C33.07 152 8 126.9 8 96C8 65.07 33.07 40 64 40C94.93 40 120 65.07 120 96C120 126.9 94.93 152 64 152z"></path></svg>
             </span>
             <input class="log-description tm-form-control" value="${this.params.description}" data-origin="${this.params.description}">
             <span class="action-log-delete" title="Remove this ${this.secondToString(this.params.duration)}">

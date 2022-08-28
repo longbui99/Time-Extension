@@ -31,7 +31,7 @@ export function deleteLogData(target) {
     if (values.exported) {
         this.env.exportedTotal -= data.duration;
     }
-    this.env.update('setGlobalData', null)
+    this.update('setGlobalData', null)
 }
 export async function exportLog(exportIds) {
     let res = {

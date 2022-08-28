@@ -1,87 +1,90 @@
 const storage = "WorkTrackingStorage";
-var env = {
-    sync: true,
-    mustSync: false,
-    raw: {},
-    channels: {},
-    saveChannels: {},
-    async reload(){
-        let result = {};
-        if (chrome.storage){
-            result = (await chrome.storage.local.get([storage]));
-            result = result[storage];
-        } else {
-            result = JSON.parse(localStorage.getItem(storage));
-        }
-        for(let key in result){
-            this[key] = result[key];
-        }
-    },
-    async saveLocal(){
-        if (chrome.storage){
-            let data = {};
-            data[storage] = this.raw
-            await chrome.storage.local.set(data)
-        } else {
-            localStorage.setItem(storage, JSON.stringify(this.raw));
-        }
-    },
-    set origin(updatedValues){
-        for (let key in updatedValues){
-            this[key] = updatedValues[key];
+export function generateEnvironment(){
+    return {
+        sync: true,
+        mustSync: false,
+        raw: {},
+        channels: {},
+        saveChannels: {},
+        async reload(){
+            let result = {};
+            if (chrome.storage){
+                result = (await chrome.storage.local.get([storage]));
+                result = result[storage];
+            } else {
+                result = JSON.parse(localStorage.getItem(storage));
+            }
+            for(let key in result){
+                this[key] = result[key];
+            }
+        },
+        async saveLocal(){
+            if (chrome.storage){
+                let data = {};
+                data[storage] = this.raw
+                await chrome.storage.local.set(data)
+            } else {
+                localStorage.setItem(storage, JSON.stringify(this.raw));
+            }
+        },
+        set origin(updatedValues){
+            for (let key in updatedValues){
+                this[key] = updatedValues[key];
+                if (this.channels[key]){
+                    for (let callback of this.channels[key]){
+                        callback(updatedValues[key])
+                    }
+                }
+                if (this.saveChannels[key]){
+                    this.raw[key] = updatedValues[key];
+                    this.mustSync = true;
+                }
+            }
+            if (this.mustSync){
+                this.saveLocal();
+                this.mustSync = false;
+            }
+        },
+        syncAll(data){
+            for (let key in data){
+                this.raw[key] = data[key];
+            }
+            this.saveLocal();
+        },
+        syncOne(key, value){
+            this.raw[key] = value;
+            this.saveLocal();
+        },
+        update(key, value){
+            this[key] = value;
             if (this.channels[key]){
                 for (let callback of this.channels[key]){
-                    callback(updatedValues[key])
+                    callback(value)
                 }
             }
             if (this.saveChannels[key]){
-                this.raw[key] = updatedValues[key];
-                this.mustSync = true;
+                this.raw[key] = value;
+                this.saveLocal();
             }
-        }
-        if (this.mustSync){
-            this.saveLocal();
-            this.mustSync = false;
-        }
-    },
-    syncAll(data){
-        for (let key in data){
-            this.raw[key] = data[key];
-        }
-        this.saveLocal();
-    },
-    syncOne(key, value){
-        this.raw[key] = value;
-        this.saveLocal();
-    },
-    update(key, value){
-        this[key] = value;
-        if (this.channels[key]){
-            for (let callback of this.channels[key]){
-                callback(value)
+        },
+        subscribe(key, callback){
+            if (this.channels[key]){
+                this.channels[key].push(callback)
+            } else {
+                this.channels[key] = [callback]
             }
-        }
-        if (this.saveChannels[key]){
-            this.raw[key] = value;
-            this.saveLocal();
-        }
-    },
-    subscribe(key, callback){
-        if (this.channels[key]){
-            this.channels[key].push(callback)
-        } else {
-            this.channels[key] = [callback]
-        }
-    },
-    syncChannel(keys){
-        if (typeof keys === 'string'){
-            keys = [keys];
-        }
-        for (let key of keys){
-            this.saveChannels[key] = true;
+        },
+        syncChannel(keys){
+            if (typeof keys === 'string'){
+                keys = [keys];
+            }
+            for (let key of keys){
+                this.saveChannels[key] = true;
+            }
         }
     }
 }
+var env = generateEnvironment();
 export async function loadEnvironment(){
     let result = {};
     if (chrome.storage){
@@ -104,7 +107,11 @@ export class Component {
         this.params = params;
         this.childrens = [];
         this.subEnv = {};
-        this.env = env;
+        if (this.parent?.env){
+            this.env = this.parent.env;
+        } else {
+            this.env = env;
+        }
         if (this.parent) {
             this.parent.childrens.push(this);
             this.subEnv = this.parent.subEnv;
@@ -124,6 +131,12 @@ export class Component {
                 return self.refs[name] || null;
             },
         };
+    }
+    update(key, value){
+        this.env.update(key, value);
+    }
+    subscribe(key, callback){
+        this.env.subscribe(key, callback);
     }
     mount(element) {
         let self = this;
@@ -225,7 +238,11 @@ export class Component {
             }
         }
         catch (erros) {
-            this.trigger_up('error', {
+            let key = 'error';
+            if (method === "GET"){
+                key = 'session_errors'
+            }
+            this.trigger_up(key, {
                 'message': erros.message
             })
             return false
@@ -259,13 +276,27 @@ export class Component {
             }
         }
         catch (erros) {
-            this.trigger_up('error', {
+            let key = 'error';
+            if (method === "GET"){
+                key = 'session_errors'
+            }
+            this.trigger_up(key, {
                 'message': erros.message
             })
             return false
         }
     }
-    showDialog(request){
+    showDialog(object, params={}){
+        let element = document.getElementsByTagName('lbwt')[0].firstElementChild;
+        if (element){
+        let popup = null;
+        if (this.popup){
+            this.popup.destroy();
+        }
+        popup = new object(this, params);
+        popup.mount(element);
+        this.popup = popup
+        }
     }
 }
 export function mount(object, element, params={}) {
