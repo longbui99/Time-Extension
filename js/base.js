@@ -1,25 +1,26 @@
 const storage = "WorkTrackingStorage";
-export function generateEnvironment(){
+
+export function generateEnvironment() {
     return {
         sync: true,
         mustSync: false,
         raw: {},
         channels: {},
         saveChannels: {},
-        async reload(){
+        async reload() {
             let result = {};
-            if (chrome.storage){
+            if (chrome.storage) {
                 result = (await chrome.storage.local.get([storage]));
                 result = result[storage];
             } else {
                 result = JSON.parse(localStorage.getItem(storage));
             }
-            for(let key in result){
+            for (let key in result) {
                 this[key] = result[key];
             }
         },
-        async saveLocal(){
-            if (chrome.storage){
+        async saveLocal() {
+            if (chrome.storage) {
                 let data = {};
                 data[storage] = this.raw
                 await chrome.storage.local.set(data)
@@ -27,67 +28,69 @@ export function generateEnvironment(){
                 localStorage.setItem(storage, JSON.stringify(this.raw));
             }
         },
-        set origin(updatedValues){
-            for (let key in updatedValues){
+        set origin(updatedValues) {
+            for (let key in updatedValues) {
                 this[key] = updatedValues[key];
-                if (this.channels[key]){
-                    for (let callback of this.channels[key]){
+                if (this.channels[key]) {
+                    for (let callback of this.channels[key]) {
                         callback(updatedValues[key])
                     }
                 }
-                if (this.saveChannels[key]){
+                if (this.saveChannels[key]) {
                     this.raw[key] = updatedValues[key];
                     this.mustSync = true;
                 }
             }
-            if (this.mustSync){
+            if (this.mustSync) {
                 this.saveLocal();
                 this.mustSync = false;
             }
         },
-        syncAll(data){
-            for (let key in data){
+        syncAll(data) {
+            for (let key in data) {
                 this.raw[key] = data[key];
             }
             this.saveLocal();
         },
-        syncOne(key, value){
+        syncOne(key, value) {
             this.raw[key] = value;
             this.saveLocal();
         },
-        update(key, value){
+        update(key, value) {
             this[key] = value;
-            if (this.channels[key]){
-                for (let callback of this.channels[key]){
+            if (this.channels[key]) {
+                for (let callback of this.channels[key]) {
                     callback(value)
                 }
             }
-            if (this.saveChannels[key]){
+            if (this.saveChannels[key]) {
                 this.raw[key] = value;
                 this.saveLocal();
             }
         },
-        subscribe(key, callback){
-            if (this.channels[key]){
+        subscribe(key, callback) {
+            if (this.channels[key]) {
                 this.channels[key].push(callback)
             } else {
                 this.channels[key] = [callback]
             }
         },
-        syncChannel(keys){
-            if (typeof keys === 'string'){
+        syncChannel(keys) {
+            if (typeof keys === 'string') {
                 keys = [keys];
             }
-            for (let key of keys){
+            for (let key of keys) {
                 this.saveChannels[key] = true;
             }
         }
     }
 }
+
 var env = generateEnvironment();
-export async function loadEnvironment(){
+
+export async function loadEnvironment() {
     let result = {};
-    if (chrome.storage){
+    if (chrome.storage) {
         result = (await chrome.storage.local.get([storage]));
         result = result[storage];
     } else {
@@ -97,17 +100,19 @@ export async function loadEnvironment(){
     Object.assign(env.raw, result)
     env.origin = result;
 }
+
 export class Component {
     custom_events = {}
     ref = []
     refs = {}
     template = null
+
     constructor(parent, params = {}) {
         this.parent = parent;
         this.params = params;
         this.childrens = [];
         this.subEnv = {};
-        if (this.parent?.env){
+        if (this.parent?.env) {
             this.env = this.parent.env;
         } else {
             this.env = env;
@@ -116,13 +121,14 @@ export class Component {
             this.parent.childrens.push(this);
             this.subEnv = this.parent.subEnv;
         }
-        if (params.subEnv){
+        if (params.subEnv) {
             this.subEnv = params.subEnv;
         }
-        if (params.extensionID){
+        if (params.extensionID) {
             this.subEnv.extensionID = params.extensionID;
         }
     }
+
     useRef(name) {
         let self = this;
         this.ref.push(name);
@@ -132,20 +138,24 @@ export class Component {
             },
         };
     }
-    update(key, value){
+
+    update(key, value) {
         this.env.update(key, value);
     }
-    subscribe(key, callback){
+
+    subscribe(key, callback) {
         this.env.subscribe(key, callback);
     }
+
     mount(element) {
         let self = this;
         this.willStart().then(self.render(element).then(self.mounted()));
         return this;
     }
-    reload(){
-        let parent = this.parent, afterNode=this.el.nextSibling, parentNode = this.el.parentNode, self = this;
-        setTimeout(()=>{
+
+    reload() {
+        let parent = this.parent, afterNode = this.el.nextSibling, parentNode = this.el.parentNode, self = this;
+        setTimeout(() => {
             self.el.remove();
             let tempoClass = (new self.constructor(parent, self.params))
             let newTemplate = tempoClass.template;
@@ -155,9 +165,12 @@ export class Component {
             this.mounted();
         }, 1)
     }
+
     willStart() {
-        return new Promise(() => { });
+        return new Promise(() => {
+        });
     }
+
     render(element) {
         if (!this.template) {
             throw Error("Cannot find template: " + this.template);
@@ -165,12 +178,16 @@ export class Component {
         this.baseHTML = new DOMParser().parseFromString(this.template, 'text/html');
         this.el = this.baseHTML.body.firstChild;
         element.append(this.el);
-        return new Promise(() => { });
+        return new Promise(() => {
+        });
     }
+
     mounted() {
         this.initObject()
-        return new Promise(() => { });
+        return new Promise(() => {
+        });
     }
+
     initObject() {
         for (let ref of this.ref) {
             let element = this.el.querySelector(`[l-ref="${ref}"]`);
@@ -180,93 +197,59 @@ export class Component {
             }
         }
     }
+
     event(event, data) {
         if (this.custom_events[event]) {
             this.custom_events[event] = this.custom_events[event].bind(this);
             this.custom_events[event](data);
-        }
-        else {
+        } else {
             this.trigger_up(event, data);
         }
     }
+
     trigger_up(event, data) {
         if (this.parent) {
             this.parent.event(event, data)
         }
     }
-    blockHandling(){
-        for (let element of document.querySelectorAll('button')){
+
+    blockHandling() {
+        for (let element of document.querySelectorAll('button')) {
             element.setAttribute("disabled", "disabled")
         }
     }
-    unblockHandling(){
-        for (let element of document.querySelectorAll('button')){
+
+    unblockHandling() {
+        for (let element of document.querySelectorAll('button')) {
             element.removeAttribute("disabled")
         }
     }
-    destroy(){
-        setTimeout(()=>{
-            for(let child of this.childrens){
+
+    destroy() {
+        setTimeout(() => {
+            for (let child of this.childrens) {
                 child.destroy();
             }
         }, 1)
         this.el?.remove();
     }
-    async do_request(method='GET', url, content) {
+
+    async do_request(method = 'GET', url, content) {
         try {
             let json = {
                 method: method,
                 mode: 'cors',
             }
-            if (!['GET'].includes(method)){
+            if (!['GET'].includes(method)) {
                 json.body = JSON.stringify(content)
             }
             this.trigger_up('loading', true);
             let res = (await fetch(url, json));
-            if (res.ok){
+            if (res.ok) {
                 return res
-            }
-            else{
+            } else {
                 let key = "error";
-                if (res.status === 403){
-                    key = 'session_errors'
-                }
-                this.trigger_up(key, {
-                    'message': (await res.text()),
-                })
-                return falses
-            }
-        }
-        catch (erros) {
-            let key = 'error';
-            if (method === "GET"){
-                key = 'session_errors'
-            }
-            this.trigger_up(key, {
-                'message': erros.message
-            })
-            return false
-        }
-        finally {
-            this.trigger_up('loading', false);
-        }
-    }
-    async do_invisible_request(method='GET', url, content) {
-        try {
-            let json = {
-                method: method,
-                mode: 'cors',
-            }
-            if (!['GET'].includes(method)){
-                json.body = JSON.stringify(content)
-            }
-            let res = (await fetch(url, json));
-            if (res.ok){
-                return res
-            }
-            else{
-                let key = "error";
-                if (res.status === 403){
+                if (res.status === 403) {
                     key = 'session_errors'
                 }
                 this.trigger_up(key, {
@@ -274,10 +257,45 @@ export class Component {
                 })
                 return false
             }
-        }
-        catch (erros) {
+        } catch (erros) {
             let key = 'error';
-            if (method === "GET"){
+            if (method === "GET") {
+                key = 'session_errors'
+            }
+            this.trigger_up(key, {
+                'message': erros.message
+            })
+            return false
+        } finally {
+            this.trigger_up('loading', false);
+        }
+    }
+
+    async do_invisible_request(method = 'GET', url, content) {
+        try {
+            let json = {
+                method: method,
+                mode: 'cors',
+            }
+            if (!['GET'].includes(method)) {
+                json.body = JSON.stringify(content)
+            }
+            let res = (await fetch(url, json));
+            if (res.ok) {
+                return res
+            } else {
+                let key = "error";
+                if (res.status === 403) {
+                    key = 'session_errors'
+                }
+                this.trigger_up(key, {
+                    'message': (await res.text()),
+                })
+                return false
+            }
+        } catch (erros) {
+            let key = 'error';
+            if (method === "GET") {
                 key = 'session_errors'
             }
             this.trigger_up(key, {
@@ -286,20 +304,22 @@ export class Component {
             return false
         }
     }
-    showDialog(object, params={}){
+
+    showDialog(object, params = {}) {
         let element = document.getElementsByTagName('lbwt')[0].firstElementChild;
-        if (element){
-        let popup = null;
-        if (this.popup){
-            this.popup.destroy();
-        }
-        popup = new object(this, params);
-        popup.mount(element);
-        this.popup = popup
+        if (element) {
+            let popup = null;
+            if (this.popup) {
+                this.popup.destroy();
+            }
+            popup = new object(this, params);
+            popup.mount(element);
+            this.popup = popup
         }
     }
 }
-export function mount(object, element, params={}) {
+
+export function mount(object, element, params = {}) {
     let component = new object(null, params);
     component.mount(element);
     return component
