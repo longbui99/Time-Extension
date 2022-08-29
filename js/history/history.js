@@ -22,18 +22,17 @@ export class LogReport extends Component {
         this.loadHistory(from_unix, to_unix)
     }
     reloadHistory(){
-        this.loadHistory(this.unix[0]-1, this.unix[1])
+        this.loadHistory(this.unix[0], this.unix[1]+1)
     }
     async loadHistory(from_unix=0, unix=0, refresh=false){
         if ((this.unix && this.unix[0]=== from_unix && this.unix[1] === unix) || refresh){
             return
         }
         this.unix = [from_unix, unix]
-        let self = this;
         let response = (await this.do_invisible_request('GET', `${this.env.serverURL}/management/issue/work-log/history?from_unix=${from_unix}&unix=${unix}&jwt=${this.env.jwt}`));
         let result = (await response.json());
-        this.logHistoryDateRangeTotalRef.el.innerHTML = util.secondToHour(0)
         this.logHistoryRef.el.innerHTML = '';
+        this.logHistoryDateRangeTotalRef.el.innerHTML = util.secondToHour(0)
         let options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
         let detailOptions = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', hour: 'numeric', minute: 'numeric' };
         if (result.length){
@@ -66,10 +65,9 @@ export class LogReport extends Component {
                 }
             }
             this.unix = [minDate, maxDate]
-            let innerHTML = '', pageLog = {}
+            let pageLog = {}
             let globalTotal = 0, exportedTotal=0;
             this.logHistoryDateRangeTotalRef.el.innerHTML = util.secondToHour(globalTotal)
-            this.logHistoryRef.el.innerHTML = innerHTML;
             for (let group in historyByDate){
                 let tmpl = '';
                 let total_duration = 0;

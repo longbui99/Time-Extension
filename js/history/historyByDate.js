@@ -68,8 +68,7 @@ class Log extends Component{
                         'jwt': self.env.jwt
                     }
                     await self.do_invisible_request('POST', `${self.env.serverURL}/management/issue/work-log/update`, values);
-                    let base = self.parent.parent.parent;
-                    base.loadHistory(base.unix[0]-1, base.unix[1])
+                    self.parent.parent.parent.reloadHistory()
                 }
                 self.showDialog(IssueSubsitution, {
                     title: "Edit Log", 
