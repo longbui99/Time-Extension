@@ -81,6 +81,12 @@ class Log extends Component{
                     startDate: this.params.start_date,
                     endDate: new Date(this.params.start_date.getTime()+this.params.duration*1000),
                     comment: this.params.description,
+                    issueData: {
+                        id: this.params.issue,
+                        name: this.params.issueName,
+                        key: this.params.key,
+                        type_url: this.params.type_url,
+                    },
                     successCallback: callback})
             })
         }
@@ -151,6 +157,7 @@ class LogByIssue extends Component{
         <div class="log" data-group="${this.params.group}" data-id="${this.params.origin['id']}">
             <div class="log-title">
                 <div class="log-title-heading">
+                    <img class="issue-type-url" src="${this.params.origin.type_url}"/>
                     <button type="button" class="log-issue">
                         ${this.params.origin.key}
                     </button>

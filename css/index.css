@@ -1003,14 +1003,19 @@ lbwt .log-report .space-segment.log-history .log-group .log-segment .log .log-ti
 lbwt .log-report .space-segment.log-history .log-group .log-segment .log .log-title .log-title-heading{ 
     display: flex;
     align-items: center;
-    width: 100px;
+    width: 115px;
     justify-content: space-around;
+}
+lbwt .log-report .space-segment.log-history .log-group .log-segment .log .log-title .log-title-heading .issue-type-url{ 
+    margin-left: 2px;
+    margin-right: 2px;
 }
 lbwt .log-report .space-segment.log-history .log-group .log-segment .log .log-title .log-title-heading .log-issue-export{
     visibility: hidden;
     opacity: 0.7;
     transition: linear 0.2s;
     cursor: pointer;
+    padding: 1px;
 }
 lbwt .log-report .space-segment.log-history .log-group .log-segment .log .log-title:hover .log-title-heading .log-issue-export{
     visibility: visible;
@@ -1026,6 +1031,7 @@ lbwt .log-report .space-segment.log-history .log-group .log-segment .log .log-ti
     cursor: pointer;
     height: max-content;
     display: block;
+    padding: 0px;
 }
 lbwt .log-report .space-segment.log-history .log-group .log-segment .log .log-title .log-display-name{
     width: 475px;
