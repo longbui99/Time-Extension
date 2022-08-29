@@ -45,13 +45,13 @@ export class BaseDialog extends Component{
     mounted(){
         let res = super.mounted();
         
-        this.dialogClose.el.addEventListener('click', e=>{
+        this.dialogClose?.el?.addEventListener('click', e=>{
             if (this.params.closeCallback){
                 this.params.closeCallback(this.response);
             }
             this.destroy();
         })
-        this.dialogCancel?.el.addEventListener('click', e=>{
+        this.dialogCancel?.el?.addEventListener('click', e=>{
             if (this.params.cancelCallback){
                 this.params.cancelCallback(this.response);
             }

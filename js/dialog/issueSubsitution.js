@@ -60,8 +60,10 @@ export class IssueSubsitution extends BaseDialog{
                 maxDate = self.response.startDate
             }
             self.response.issue = self.env.issueData;
-            self.response.start = `${new Date().toISOString().substring(0,19)}+0000`;
+            self.response.start = minDate.getTime()/1000;
             self.response.duration = (maxDate?.getTime() - minDate.getTime())/1000;
+            self.response.id = self.params.id;
+            self.response.comment = self.commentRef.el.value;
             if (self.params.successCallback){
                 self.params.successCallback(self.response);
             }

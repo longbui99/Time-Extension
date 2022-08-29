@@ -58,11 +58,22 @@ class Log extends Component{
         }
         for (let element of this.el.querySelectorAll('.wl-circle-decorator')){
             element.addEventListener('click', event=>{
-                function callback(data){
-                    console.log(data)
+                async function callback(data){
+                    let values = {
+                        'id': data.id,
+                        'issue_id': data.issue?.id,
+                        'duration': data.duration,
+                        'start_date': data.start,
+                        'description': data.comment,
+                        'jwt': self.env.jwt
+                    }
+                    await self.do_invisible_request('POST', `${self.env.serverURL}/management/issue/work-log/update`, values);
+                    let base = self.parent.parent.parent;
+                    base.loadHistory(base.unix[0]-1, base.unix[1])
                 }
                 self.showDialog(IssueSubsitution, {
                     title: "Edit Log", 
+                    id: this.params.id,
                     startDate: this.params.start_date,
                     endDate: new Date(this.params.start_date.getTime()+this.params.duration*1000),
                     comment: this.params.description,

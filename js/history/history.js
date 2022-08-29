@@ -5,7 +5,7 @@ import { LogByDate } from "./historyByDate.js"
 export class LogReport extends Component {
 
     logReportSectionRef = this.useRef('log-report-section')
-    logHistoryDateRangeRef = this.useRef('hisory-date-range')
+    logHistoryDateRangeRef = this.useRef('history-date-range')
     durationUnexportedRef = this.useRef('duration-unexpored')
     logHistoryDateRangeTotalRef = this.useRef('log-history-total-range')
     logHistoryRef = this.useRef('log-history')
@@ -13,12 +13,16 @@ export class LogReport extends Component {
     constructor() {
         super(...arguments);
         this.subscribe('setGlobalData', this.setGlobalData.bind(this));
+        this.subscribe('reloadHistory', this.reloadHistory.bind(this));
         this.secondToString = util.parseSecondToString(this.env.resource?.hrs_per_day || 8, this.env.resource?.days_per_week || 5)
     }
     onChangeRangeHistoryFilter(selectedDates, dateStr, instance){
         let from_unix = selectedDates[0].getTime()/1000;
         let to_unix = selectedDates[1].getTime()/1000;
         this.loadHistory(from_unix, to_unix)
+    }
+    reloadHistory(){
+        this.loadHistory(this.unix[0]-1, this.unix[1])
     }
     async loadHistory(from_unix=0, unix=0, refresh=false){
         if ((this.unix && this.unix[0]=== from_unix && this.unix[1] === unix) || refresh){
@@ -133,7 +137,7 @@ export class LogReport extends Component {
                     <span class="filter-icon">
                         <svg class="svg-inline--fa fa-filter" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="filter" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" data-fa-i2svg=""><path fill="currentColor" d="M3.853 54.87C10.47 40.9 24.54 32 40 32H472C487.5 32 501.5 40.9 508.1 54.87C514.8 68.84 512.7 85.37 502.1 97.33L320 320.9V448C320 460.1 313.2 471.2 302.3 476.6C291.5 482 278.5 480.9 268.8 473.6L204.8 425.6C196.7 419.6 192 410.1 192 400V320.9L9.042 97.33C-.745 85.37-2.765 68.84 3.854 54.87L3.853 54.87z"></path></svg>
                     </span>
-                    <input l-ref="hisory-date-range" class="log-history-navigator-input tm-form-control">
+                    <input l-ref="history-date-range" class="log-history-navigator-input tm-form-control">
                     <div style="margin-left:auto"></div>
                     <div class="duration-description">
                         <span>    
