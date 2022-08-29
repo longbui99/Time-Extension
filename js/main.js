@@ -64,7 +64,7 @@ export class Main extends Component {
         for (let index = 0; index < elements.length; index++) {
             elements[index].addEventListener('click', function(event){
                 self.env.issueData = self.relatedActiveIssues[index];
-                this.update('loadIssueData', null);
+                self.update('loadIssueData', null);
                 // self.env.update('issueData', self.env.issueData)
             })
             if (self.relatedActiveIssues[index].last_start){
