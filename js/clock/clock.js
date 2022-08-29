@@ -217,6 +217,13 @@ export class Clock extends Component {
         })
     }
     _initEvent(){
+        window.addEventListener('keydown', function (event){
+            if (window.event.ctrlKey && event.keyCode == 13){
+                if (self.env.contentState.showLog){
+                    self._doneWorkLog();
+                }
+            }
+        })
         this._initPause();
         this._initAddWorkLog();
         this._initDoneWorkLog();
@@ -225,13 +232,6 @@ export class Clock extends Component {
         this._initIconRef();
         let self = this;
         this.flatPickr = flatpickr(this.loggedDate.el,{defaultDate: new Date(),dateFormat: 'Y-m-d'});
-        window.addEventListener('keydown', function (event){
-            if (window.event.ctrlKey && event.keyCode == 13){
-                if (self.env.contentState.showLog){
-                    self._doneWorkLog();
-                }
-            }
-        })
     }
     destroy(){
         this.flatPickr.destroy();
