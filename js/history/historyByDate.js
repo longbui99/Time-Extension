@@ -132,7 +132,7 @@ class LogByIssue extends Component{
                 if (exports.length === 1){
                     total_duration = exports[0].duration
                 } else{
-                    total_duration = exports.reduce((x,y)=>x.duration+y.duration);
+                    total_duration = exports.reduce((x,y)=>x+y.duration, 0);
                 }
                 this.env.exportedTotal -= total_duration;
                 let exportIds = exports.map(e=>e.id)
