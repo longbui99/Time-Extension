@@ -62,7 +62,7 @@ export class Main extends Component {
         let self = this;
         let progressLog = []
         for (let index = 0; index < elements.length; index++) {
-            elements[index].addEventListener('click', event => {
+            elements[index].addEventListener('click', function(event){
                 self.env.issueData = self.relatedActiveIssues[index];
                 this.update('loadIssueData', null);
                 // self.env.update('issueData', self.env.issueData)

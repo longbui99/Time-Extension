@@ -175,7 +175,7 @@ export class Clock extends Component {
     }
     _initManualChange() {
         let self = this;
-        this.manualLogref.el.addEventListener('keyup', event => {
+        this.manualLogref.el.addEventListener('keyup', function(event){
             if (!['pause', 'active'].includes(self.env.issueData?.timeStatus)) {
                 self.env.issueData.timeStatus = "force";
                 self.renderTimeActions();
@@ -225,7 +225,7 @@ export class Clock extends Component {
         this._initIconRef();
         let self = this;
         this.flatPickr = flatpickr(this.loggedDate.el,{defaultDate: new Date(),dateFormat: 'Y-m-d'});
-        window.addEventListener('keydown', event=>{
+        window.addEventListener('keydown', function (event){
             if (window.event.ctrlKey && event.keyCode == 13){
                 if (self.env.contentState.showLog){
                     self._doneWorkLog();

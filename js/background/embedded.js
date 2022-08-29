@@ -39,7 +39,7 @@ class PinPopup extends Component {
             window.addEventListener("mouseup", mouseUpEvent)
         }
         this.dragElRef.el.addEventListener('mousedown', onMounseDown)
-        this.removeRef.el.addEventListener('click', async event => {
+        this.removeRef.el.addEventListener('click', async function(event){
             self.el.remove();
             self.instance = null;
             event.stopPropagation();
@@ -47,7 +47,7 @@ class PinPopup extends Component {
                 chrome.runtime.sendMessage({ closeAll: true });
             }
         })
-        window.addEventListener('keydown', async event => {
+        window.addEventListener('keydown', async function(event){
             if (event.keyCode === 68 && window.event.ctrlKey && window.event.altKey) {
                 self.el.remove();
                 self.instance = null;
@@ -61,7 +61,7 @@ class PinPopup extends Component {
         if (this.env.pinHTML) {
             this.pinHTML.el.classList.add('pinned');
         }
-        this.pinHTML.el.addEventListener('click', async event => {
+        this.pinHTML.el.addEventListener('click', async function(event){
             self.env.pinHTML = true;
             if (chrome.runtime) {
                 chrome.runtime.sendMessage({ pinHTML: true });

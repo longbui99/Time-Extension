@@ -26,10 +26,10 @@ export class App extends Component {
   }
   mountServerAction() {
     let self = this;
-    this.serverActionRef.el.addEventListener('click', event => {
+    this.serverActionRef.el.addEventListener('click', function(event){
       window.open(self.env.serverURL, '_blank');
     })
-    this.serverLogoutRef.el.addEventListener('click', event => {
+    this.serverLogoutRef.el.addEventListener('click', function(event){
       self.processMainRef.innerHTML = "";
       self.onAuthentication(self.env.raw, false);
     })
@@ -67,7 +67,7 @@ export class App extends Component {
       this.pinRef.el.remove();
     }
     this.component.mount(this.processMainRef.el)
-    // this.pinRef.el.addEventListener("click", async event => {
+    // this.pinRef.el.addEventListener("click", async function(event){
     //   this.showDialog({
     //     'type': 'base'
     //   })
