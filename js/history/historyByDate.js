@@ -33,8 +33,13 @@ class Log extends Component{
         }
         for (let element of this.el.querySelectorAll('.action-log-delete')){
             element.addEventListener('click', event=>{
-                hUtil.deleteLogData.bind(this)(event.currentTarget)
-                if (this.parent.params.logs.length == 1){
+                let value = hUtil.getLogDataGroup.bind(this)(event.currentTarget);
+                hUtil.deleteLogData.bind(this)(event.currentTarget);
+                let index = this.parent.params.logs.findIndex(e=>e.id === value.id);
+                if (index !== -1){
+                    this.parent.params.logs.splice(index, 1)
+                }
+                if (this.parent.params.logs.length == 0) {
                     this.parent.destroy();
                 }
             })
@@ -123,7 +128,12 @@ class LogByIssue extends Component{
                 let group = event.currentTarget.parentNode.parentNode.parentNode.getAttribute('data-group');
                 let data = hUtil.getLogDataGroup.bind(self)(event.currentTarget.parentNode.parentNode)
                 let exports = self.env.historyByDate[group].values.filter(e=> e.issue == data.issue);
-                let total_duration = exports.reduce((x,y)=>x.duration+y.duration);
+                let total_duration = 0;
+                if (exports.length === 1){
+                    total_duration = exports[0].duration
+                } else{
+                    total_duration = exports.reduce((x,y)=>x.duration+y.duration);
+                }
                 this.env.exportedTotal -= total_duration;
                 let exportIds = exports.map(e=>e.id)
                 hUtil.exportLog.bind(self)(exportIds).then(function(response){
