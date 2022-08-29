@@ -217,13 +217,14 @@ export class Clock extends Component {
         })
     }
     _initEvent(){
-        window.addEventListener('keydown', function (event){
+        function keyDown(event){
             if (window.event.ctrlKey && event.keyCode == 13){
                 if (self.env.contentState.showLog){
                     self._doneWorkLog();
                 }
             }
-        })
+        }
+        window.addEventListener('keydown', keyDown)
         this._initPause();
         this._initAddWorkLog();
         this._initDoneWorkLog();
