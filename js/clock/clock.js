@@ -18,7 +18,7 @@ export class Clock extends Component {
     commentRef = this.useRef('comment-for-issue')
     manualLogref = this.useRef('manual-log-text')
     loggedDate = this.useRef("start-date")
-
+    trackingDelete = this.useRef('action-tracking-delete')
     constructor() {
         super(...arguments);
         this.secondToString = util.parseSecondToString(this.env.resource?.hrs_per_day || 8, this.env.resource?.days_per_week || 5);
@@ -200,8 +200,8 @@ export class Clock extends Component {
     }
     async _initIconRef() {
         let self = this;
-        this.activeDurationIconRef.el.addEventListener("click", async (event) => {
-            if (window.event.ctrlKey && window.event.altKey) {
+        this.trackingDelete.el.addEventListener("click", async (event) => {
+            if (['pause', 'active'].includes(self.env.issueData.timeStatus)) {
                 self.env.issueData.timeStatus = null;
                 let payload = {
                     'source': 'Extension'
@@ -212,7 +212,7 @@ export class Clock extends Component {
                     "payload": payload
                 }
                 self.env.issueData.timeStatus = "normal";
-                await self.do_invisible_request('POST', `${self.env.serverURL}/management/issue/work-log/cancel`, params);
+                await self.do_request('POST', `${self.env.serverURL}/management/issue/work-log/cancel`, params);
                 self.renderClockData(true);
             }
         })
@@ -269,10 +269,13 @@ export class Clock extends Component {
                             <small l-ref="total-duration">0m</small>
                         </div>
                         <div class="active-duration">
-                            <button type="button" l-ref="active-duration-icon" class="avt" title="Ctrl+Alt+Click: To delete current tracking">
+                            <button type="button" l-ref="active-duration-icon" class="avt">
                                 <span class="tm-icon-svg"><svg class="svg-inline--fa fa-stopwatch" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="stopwatch" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" data-fa-i2svg=""><path fill="currentColor" d="M272 0C289.7 0 304 14.33 304 32C304 49.67 289.7 64 272 64H256V98.45C293.5 104.2 327.7 120 355.7 143L377.4 121.4C389.9 108.9 410.1 108.9 422.6 121.4C435.1 133.9 435.1 154.1 422.6 166.6L398.5 190.8C419.7 223.3 432 262.2 432 304C432 418.9 338.9 512 224 512C109.1 512 16 418.9 16 304C16 200 92.32 113.8 192 98.45V64H176C158.3 64 144 49.67 144 32C144 14.33 158.3 0 176 0L272 0zM248 192C248 178.7 237.3 168 224 168C210.7 168 200 178.7 200 192V320C200 333.3 210.7 344 224 344C237.3 344 248 333.3 248 320V192z"></path></svg>
                             </button>
                             </span> <span l-ref="active-duration">0m</span>
+                            <span class="action-tracking-delete" l-ref="action-tracking-delete" title="Remove this tracking">
+                                <svg class="svg-inline--fa fa-xmark" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="xmark" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 512" data-fa-i2svg=""><path fill="currentColor" d="M310.6 361.4c12.5 12.5 12.5 32.75 0 45.25C304.4 412.9 296.2 416 288 416s-16.38-3.125-22.62-9.375L160 301.3L54.63 406.6C48.38 412.9 40.19 416 32 416S15.63 412.9 9.375 406.6c-12.5-12.5-12.5-32.75 0-45.25l105.4-105.4L9.375 150.6c-12.5-12.5-12.5-32.75 0-45.25s32.75-12.5 45.25 0L160 210.8l105.4-105.4c12.5-12.5 32.75-12.5 45.25 0s12.5 32.75 0 45.25l-105.4 105.4L310.6 361.4z"></path></svg><!-- <i class="fas fa-times"></i> Font Awesome fontawesome.com -->
+                            </span>
                         </div>
                     </div>
                     <div class="time-action">

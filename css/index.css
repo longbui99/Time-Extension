@@ -1171,8 +1171,19 @@ lbwt .issue.time-log .duration .active-duration {
     font-style: italic;
 }
 
-lbwt .issue.time-log .duration .active-duration .avt:hover {
-    color: orange;
+lbwt .issue.time-log .duration .active-duration .action-tracking-delete{
+    visibility: hidden;
+    font-size: 0.8em;
+    color: gray;
+    margin-left: 4px;
+    cursor: pointer;
+}
+lbwt .issue.time-log .duration .active-duration:hover .action-tracking-delete{
+    visibility: visible;
+    transition: linear 0.12s;
+}
+lbwt .issue.time-log .duration .active-duration .action-tracking-delete:hover{
+    color: red;
 }
 
 lbwt .issue.time-log .duration span {

@@ -1,7 +1,7 @@
 {
     "name": "Work Tracking",
     "description": "Build an Extension!",
-    "version": "4.1.4",
+    "version": "4.1.4.1",
     "manifest_version": 3,
     "permissions": [
         "tabs",
