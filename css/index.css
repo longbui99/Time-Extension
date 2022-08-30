@@ -144,7 +144,7 @@ svg:not(:root).tm-svg-inline--fa {
 }
 
 .main-page .loading-layer {
-    position: absolute;
+    position: fixed;
     opacity: 0.6;
     background-color: lightgrey;
     min-width: inherit;
