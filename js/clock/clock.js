@@ -221,7 +221,9 @@ export class Clock extends Component {
         function keyDown(event){
             if (window.event.ctrlKey && event.keyCode == 13){
                 if (self.env.contentState.showLog){
-                    self._doneWorkLog();
+                    setTimeout(()=>{
+                        self._doneWorkLog();
+                    },1)
                 }
             }
         }
