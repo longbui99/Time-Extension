@@ -13,7 +13,7 @@ class Log extends Component{
         let self = this;
         for (let element of this.el.querySelectorAll('.tm-form-control')){
             element.addEventListener('change', async event=>{
-                let values = hUtil.exportLogData.bind(this)(event.target);
+                let values = hUtil.exportLogData.bind(self)(event.target);
                 if (element.parentNode.classList.contains('unexported')){
                     let result = {}
                     try {
@@ -33,8 +33,8 @@ class Log extends Component{
         }
         for (let element of this.el.querySelectorAll('.action-log-delete')){
             element.addEventListener('click', event=>{
-                let value = hUtil.getLogDataGroup.bind(this)(event.currentTarget);
-                hUtil.deleteLogData.bind(this)(event.currentTarget);
+                let value = hUtil.getLogDataGroup.bind(self)(event.currentTarget);
+                hUtil.deleteLogData.bind(self)(event.currentTarget);
                 let index = this.parent.params.logs.findIndex(e=>e.id === value.id);
                 if (index !== -1){
                     this.parent.params.logs.splice(index, 1)
@@ -120,7 +120,7 @@ class LogByIssue extends Component{
         }
         for (let element of this.el.querySelectorAll('.log-issue')){
             element.addEventListener('click', event=>{
-                let data = hUtil.getLogDataGroup.bind(this)(event.currentTarget.parentNode.parentNode)
+                let data = hUtil.getLogDataGroup.bind(self)(event.currentTarget.parentNode.parentNode)
                 if (!self.env.issueData){
                     self.env.issueData = {};
                 }
@@ -180,6 +180,7 @@ export class LogByDate extends Component {
     }
     mounted() {
         let res = super.mounted();
+        let self = this;
         let element = this.logSegment.el;
         for (let issue of this.params.issueLogs){
             new LogByIssue(this, issue).mount(element)
@@ -187,8 +188,8 @@ export class LogByDate extends Component {
         for (let element of this.el.querySelectorAll('.log-date-export')){
             element.addEventListener('click', event=>{
                 let group = event.currentTarget.getAttribute('data-group');
-                let exportIds = historyByDate[group].values.map(e=> e.id);
-                hUtil.exportLog(exportIds).bind(this).then(e=>{
+                let exportIds = self.env.historyByDate[group].values.map(e=> e.id);
+                hUtil.exportLog.bind(self)(exportIds).then(e=>{
                     self.parent.loadHistory(this.parent.unix[0]-1, this.parent.unix[1])
                 });
             })
