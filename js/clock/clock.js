@@ -188,7 +188,7 @@ export class Clock extends Component {
     _initCommentEvent() {
         let self = this;
         this.commentRef.el.addEventListener("keyup", (event) => {
-            if (event.keyCode == 13 && window.event.ctrlKey) {
+            if (event.keyCode == 13 && !window.event.ctrlKey) {
                 self.commentRef.el.setAttribute("rows", parseInt(self.commentRef.el.getAttribute("rows")) + 1)
                 event.stopPropagation()
             }
@@ -220,7 +220,7 @@ export class Clock extends Component {
         })
     }
     _initEvent(){
-        function keyDown(event){
+        window.addEventListener('keyup', (event)=>{
             if (window.event.ctrlKey && event.keyCode == 13){
                 if (self.env.contentState.showLog){
                     setTimeout(()=>{
@@ -228,8 +228,7 @@ export class Clock extends Component {
                     },1)
                 }
             }
-        }
-        window.addEventListener('keydown', keyDown)
+        })
         this._initPause();
         this._initAddWorkLog();
         this._initDoneWorkLog();
