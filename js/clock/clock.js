@@ -164,9 +164,11 @@ export class Clock extends Component {
             (await this.do_request('POST', `${this.env.serverURL}/management/issue/work-log/manual`, params));
             this.manualLogref.el.value = '';
         }
+        this.renderClockData(refresh);
         this.commentRef.el.value = '';
         this.env.issueData.timeStatus = null;
-        this.renderClockData(refresh);
+        this.env.issueData.localComment = '';
+        this.env.syncOne('issueData', this.env.issueData)
     }
     _initDoneWorkLog() {
         let self = this;
