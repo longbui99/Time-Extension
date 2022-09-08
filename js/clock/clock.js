@@ -186,7 +186,7 @@ export class Clock extends Component {
     _initCommentEvent() {
         let self = this;
         this.commentRef.el.addEventListener("keyup", (event) => {
-            if (event.keyCode == 13) {
+            if (event.keyCode == 13 && window.event.ctrlKey) {
                 self.commentRef.el.setAttribute("rows", parseInt(self.commentRef.el.getAttribute("rows")) + 1)
                 event.stopPropagation()
             }
