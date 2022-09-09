@@ -466,7 +466,7 @@ lbwt .acceptance-criteria .ac-content .ac-container .ac-segment .tm-form-check {
     width: 100%;
     font-size: 1.2em;
     display: flex;
-    padding-left: 1.5em;
+    padding-left: 2em;
     align-items: flex-start;
 }
 
@@ -582,6 +582,10 @@ lbwt .acceptance-criteria .ac-content .ac-container.header .ac-segment .tm-form-
 
 lbwt .acceptance-criteria .ac-content .ac-container.unsaved.header .tm-form-check-label {
     border-left: solid 2px var(--primary);
+}
+
+lbwt .acceptance-criteria .ac-content .ac-container.header .tm-form-check-label {
+    font-weight: 700;
 }
 
 
