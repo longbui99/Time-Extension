@@ -234,11 +234,11 @@ export class Component {
         this.el?.remove();
     }
 
-    async do_request(method = 'GET', url, content) {
+    async do_request(method = 'GET', url, content, mode="cors") {
         try {
             let json = {
                 method: method,
-                mode: 'cors',
+                mode: mode,
             }
             if (!['GET'].includes(method)) {
                 json.body = JSON.stringify(content)

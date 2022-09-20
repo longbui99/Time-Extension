@@ -105,6 +105,9 @@ export class Main extends Component {
     }
     issueDataChange(){
         this.fetchRelativeActive();
+        if (!this.env.contentState){
+            this.initContentState();
+        }
     }
 
     async actionExportToOriginalServer(){
@@ -179,17 +182,22 @@ export class Main extends Component {
         }
     }
     initContentState(){
-        if (this.env.contentState){
-            this.contentStateChange();
-        } else{
-            this.env.contentState = {
-                showLog: true,
-                showLogReport: false,
-                showChecklist: false,
-                showFavorite: false
+        if (this.env.issueData){
+            if (this.env.contentState){
+                this.contentStateChange();
+            } else{
+                this.env.contentState = {
+                    showLog: true,
+                    showLogReport: false,
+                    showChecklist: false,
+                    showFavorite: false
+                }
+                this.update('contentState', this.env.contentState)
+                this.initContentState();
             }
-            this.update('contentState', this.env.contentState)
-            this.initContentState();
+        } else {
+            this.env.contentState = null;
+            this.env.syncOne('contentState', null)
         }
     }
     triggerContentType(){

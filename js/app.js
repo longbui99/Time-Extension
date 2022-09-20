@@ -31,6 +31,7 @@ export class App extends Component {
     })
     this.serverLogoutRef.el.addEventListener('click', function(event){
       self.processMainRef.innerHTML = "";
+      self.env.raw.jwt = false;
       self.onAuthentication(self.env.raw, false);
     })
   }
@@ -49,8 +50,7 @@ export class App extends Component {
       event.stopImmediatePropagation();
     })
   }
-  async
-  mountingComponent() {
+  async mountingComponent() {
     let self = this;
     this.component = null;
     if (this.env?.authenticated) {
@@ -60,18 +60,26 @@ export class App extends Component {
       this.loggedNameRef.el.innerText=  this.env.loggedName || '';
     }
     else {
-      this.component = new Login(this, {});
-      this.el.classList.remove('logged');
+      if (this.env.jwt && !this.checked){
+        let payload = {
+          'jwt': this.env.jwt
+        }
+        let res = ( await this.do_request('POST', this.env.serverURL + "/web/login/jwt/status", (payload)))
+        if (res && (await res.json())){
+          self.update('authenticated', true)
+        }
+        this.checked = true;
+        self.mountingComponent(true)
+        return
+      } else {
+        this.component = new Login(this, {});
+        this.el.classList.remove('logged');
+      }
     }
     if (this.mode === "pinned"){
       this.pinRef.el.remove();
     }
     this.component.mount(this.processMainRef.el)
-    // this.pinRef.el.addEventListener("click", async function(event){
-    //   this.showDialog({
-    //     'type': 'base'
-    //   })
-    // })
     this.initGeneralEvent();
   }
   loadUI() {
@@ -83,13 +91,14 @@ export class App extends Component {
     return res
   }
   async onAuthentication(data, authenticated = true) {
-    if (data.jwt) {
-      data['authenticated'] = authenticated;
-      await this.env.syncAll(data);
-      await this.env.reload();
-      this.processMainRef.el.innerHTML = '';
-      this.loadUI();
+    if (this.env.serverURL !== data.serverURL){
+      this.env.syncOne('issueData', null)
     }
+    data['authenticated'] = authenticated;
+    await this.env.syncAll(data);
+    await this.env.reload();
+    this.processMainRef.el.innerHTML = '';
+    this.loadUI();
   }
   onLoading(display=true){
     this.loadingBannerRef.el.style.display = (display?"inline-block": "none");
@@ -99,6 +108,7 @@ export class App extends Component {
     
   }
   onSessionError(data){
+    this.checked = true;
     this.showDialog(ErrorDialog, data)
     this.onAuthentication(this.env.raw, false);
   }
