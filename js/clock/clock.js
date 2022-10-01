@@ -68,9 +68,9 @@ export class Clock extends Component {
                 this.update('loadIssueData', null);
             }
             let record = this.env.issueData;
-            this.totalDurationRef.el.innerText = this.secondToString(record.total_duration);
-            this.myTotalDurationRef.el.innerText = this.secondToString(record.my_total_duration);
-            this.activeDurationRef.el.innerText = this.secondToString(record.active_duration);
+            this.totalDurationRef.el.innerText = util.secondToHour(record.total_duration);
+            this.myTotalDurationRef.el.innerText = util.secondToHour(record.my_total_duration);
+            this.activeDurationRef.el.innerText = util.secondToHour(record.active_duration);
             this.pointRef.el.innerText = record.point + (record.estimate_unit !== "general" ? `(${record.estimate_unit})` : '');
             this.assingneeRef.el.innerText = record.assignee || 'Unset';
             this.testerRef.el.innerText = record.tester || 'Unset'
@@ -82,7 +82,7 @@ export class Clock extends Component {
             if (record.last_start) {
                 let pivotTime = new Date().getTime();
                 this.currentInterval = setInterval(() => {
-                    this.activeDurationRef.el.innerText = this.secondToString(parseInt(record.active_duration + (new Date().getTime() - pivotTime) / 1000));
+                    this.activeDurationRef.el.innerText = util.secondToHour(parseInt(record.active_duration + (new Date().getTime() - pivotTime) / 1000));
                 }, 500)
                 this.env.issueData.timeStatus = "active";
             }
