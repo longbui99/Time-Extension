@@ -1,5 +1,8 @@
 
 export function _getDisplayName(record, length = 40000) {
+    if (record.name === undefined){
+        return ''
+    }
     return `${record.key}: ${(record.name.length > length) ? record.name.substring(0, length) + "..." : record.name}`;
 }
 export function _minifyString(string, length) {
