@@ -22,6 +22,12 @@ export function secondToHour(second) {
     let minute = String(parseInt(second % 3600 / 60)).padStart(2, "0");
     return `${hour}:${minute}`
 }
+export function secondToHMS(second) {
+    let hour = String(parseInt(second / 3600)).padStart(2, "0");
+    let minute = String(parseInt(second % 3600 / 60)).padStart(2, "0");
+    second = String(parseInt(second % 60)).padStart(2, "0");
+    return `${hour}:${minute}:${second}`
+}
 
 export function debounce(func, timeout = 500) {
     let timer;
@@ -60,6 +66,26 @@ export function _pushParams(serverURL, jsonData) {
     }
     return serverURL
 }
+
+export function secondToHMSString(time) {
+    let data = [
+    { 'key': 'h', 'duration': 3600 },
+    { 'key': 'm', 'duration': 60 },
+    { 'key': 's', 'duration': 1 }]
+    let response = ""
+    for (let segment of data) {
+        let duration = segment['duration'];
+        if (time >= duration) {
+            response += `${parseInt(time / duration)}${segment['key']} `
+            time -= (parseInt(time / duration) * duration)
+        }
+    }
+    if (!response.length) {
+        response = "0s"
+    }
+    return response
+}
+
 
 export function parseSecondToString(hpd = 8, dpw = 5) {
     return function secondToString(time) {

@@ -1217,7 +1217,6 @@ lbwt .issue.time-log .duration .total-duration p {
 }
 
 lbwt .issue.time-log .duration .total-duration small {
-    max-width: 25%;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;

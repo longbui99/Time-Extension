@@ -295,7 +295,7 @@ export class Main extends Component {
             <div class="tm-tab-background">
             </div>
             <div class="tm-tab-action" data-action="left" l-ref="time-log-heading" title="Ctrl+Shift+1">
-                Clock
+                Timer
             </div>
             <div class="tm-tab-action" data-action="middle" l-ref="log-report-heading" title="Ctrl+Shift+2">
                 Tracking
