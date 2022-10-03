@@ -68,7 +68,7 @@ export class Clock extends Component {
                 this.update('loadIssueData', null);
             }
             let record = this.env.issueData;
-            this.totalDurationRef.el.innerText = this.secondToString(record.total_duration);
+            this.totalDurationRef.el.innerText = util.secondToHMSString(record.total_duration);
             this.myTotalDurationRef.el.innerText = util.secondToHMSString(record.my_total_duration);
             this.activeDurationRef.el.innerText = util.secondToHMS(record.active_duration);
             this.pointRef.el.innerText = record.point + (record.estimate_unit !== "general" ? `(${record.estimate_unit})` : '');
