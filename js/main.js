@@ -219,7 +219,7 @@ export class Main extends Component {
             }
         })
         this.logReportHeadingRef.el.addEventListener('click', ()=>{
-            if (!self.env.contentState.showLogReport){
+            if (!self.env.contentState?.showLogReport){
                 resetContentState();
                 self.env.contentState.showLogReport = true;
                 self.triggerContentType()

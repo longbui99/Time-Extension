@@ -46,10 +46,16 @@ export class Clock extends Component {
                 this.actionStopRef.el.style.display = "flex";
             }
             else {
-                this.actionAddRef.el.style.display = "flex";
-                this.actionResumeRef.el.style.display = "none";
-                this.actionPauseRef.el.style.display = "none";
-                this.actionStopRef.el.style.display = "none";
+                if (this.manualLogref.el.value){
+                    this.env.issueData.timeStatus = "force";
+                    this.renderTimeActions();
+                }
+                else {
+                    this.actionAddRef.el.style.display = "flex";
+                    this.actionResumeRef.el.style.display = "none";
+                    this.actionPauseRef.el.style.display = "none";
+                    this.actionStopRef.el.style.display = "none";
+                }
             }
         }
         else {
@@ -204,7 +210,6 @@ export class Clock extends Component {
         let self = this;
         this.trackingDelete.el.addEventListener("click", async (event) => {
             if (['pause', 'active'].includes(self.env.issueData.timeStatus)) {
-                self.env.issueData.timeStatus = null;
                 let payload = {
                     'source': 'Extension'
                 }
@@ -213,7 +218,9 @@ export class Clock extends Component {
                     "jwt": self.env.jwt,
                     "payload": payload
                 }
-                self.env.issueData.timeStatus = "normal";
+                if (!self.manualLogref.el.value){
+                    self.env.issueData.timeStatus = "normal";
+                }
                 await self.do_request('POST', `${self.env.serverURL}/management/issue/work-log/cancel`, params);
                 self.renderClockData(true);
             }
@@ -223,9 +230,7 @@ export class Clock extends Component {
         window.addEventListener('keyup', (event)=>{
             if (window.event.ctrlKey && event.keyCode == 13){
                 if (self.env.contentState.showLog){
-                    setTimeout(()=>{
-                        self._doneWorkLog();
-                    },1)
+                    self._doneWorkLog();
                 }
             }
         })
