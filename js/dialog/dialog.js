@@ -37,7 +37,7 @@ export class BaseDialog extends Component{
     }
     destroy(){
         if (this.parentSize > 0){
-            this.el.parentNode.style.height = (this.parentSize) + "px";
+            this.el.parentNode.style.height = "unset";
             this.parentSize = 0;
         }
         this.parent.popup = null;

@@ -94,6 +94,9 @@ export class SearchBar extends Component {
                     }
                     event.stopPropagation();
                 }
+                if (event.keyCode === 13){
+                    p.click()
+                }
             })
             element.append(p);
         }

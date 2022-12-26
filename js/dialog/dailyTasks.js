@@ -11,7 +11,7 @@ export class dailyTasks extends BaseDialog{
     }
     renderDialogContent(){
         this.innerTemplate = `
-            <div class="dialog-issue-content" l-ref="dialog-content">
+            <div class="dialog-issue-content daily-tasks" l-ref="dialog-content">
             </div>
         `;
         this.innerFooter = `
