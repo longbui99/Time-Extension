@@ -81,6 +81,7 @@ export class Clock extends Component {
             this.assingneeRef.el.innerText = record.assignee || 'Unset';
             this.testerRef.el.innerText = record.tester || 'Unset'
             this.commentRef.el.innerText = record.comment || record.localComment || '';
+            this.manualLogref.el.value = record.localManualLog || '';
             this.commentRef.el.setAttribute("rows", ((record.comment !== "" && record.comment) ? record.comment.split("\n").length : 1));
             if (record.active_duration > 0) {
                 this.env.issueData.timeStatus = "pause";
@@ -173,6 +174,7 @@ export class Clock extends Component {
         this.renderClockData(refresh);
         this.commentRef.el.value = '';
         this.env.issueData.timeStatus = null;
+        this.env.issueData.localManualLog = '';
         this.env.issueData.localComment = '';
         this.env.syncOne('issueData', this.env.issueData)
     }
@@ -187,6 +189,8 @@ export class Clock extends Component {
         this.manualLogref.el.addEventListener('keyup', function(event){
             if (!['pause', 'active'].includes(self.env.issueData?.timeStatus)) {
                 self.env.issueData.timeStatus = "force";
+                self.env.issueData.localManualLog = self.manualLogref.el.value;
+                self.env.syncOne('issueData', self.env.issueData);
                 self.renderTimeActions();
             }
         })

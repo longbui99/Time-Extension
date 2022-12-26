@@ -393,8 +393,10 @@ export class CheckList extends Component {
     }
     mounted() {
         let res = super.mounted();
-        this.initChecklists();
-        return res
+        return new Promise(async (resolve, reject)=>{
+            await this.initChecklists();
+            resolve(true)
+        });
     }
     template = `
         <div class="acceptance-criteria" l-ref="tm-ac-section">

@@ -3,6 +3,7 @@ import {Login} from "./login.js"
 import { loadEnvironment, mount, Component} from "./base.js"
 import { ErrorDialog } from "./dialog/errorDialog.js";
 import * as chrome from "./background/chrome.js"
+import { dailyTasks } from "./dialog/dailyTasks.js"
 export class App extends Component {
   serverActionRef = this.useRef('server-open')
   serverLogoutRef = this.useRef('server-logout')
@@ -11,6 +12,7 @@ export class App extends Component {
   loggedNameRef = this.useRef('logged-name')
   errorRef = this.useRef('error')
   pinRef = this.useRef('action-pin-ref')
+  dailyTask = this.useRef('action-daily-task-ref')
 
   custom_events = {
     'authentication': this.onAuthentication,
@@ -48,6 +50,9 @@ export class App extends Component {
           self.pinRef.el.click();
       }
       event.stopImmediatePropagation();
+    })
+    this.dailyTask.el.addEventListener('click', event=>{
+      self.showDialog(dailyTasks, {title: "Daily Task"})
     })
   }
   async mountingComponent() {
@@ -198,9 +203,12 @@ export class App extends Component {
                 </div>
               </div>
             </div>
-            <div class="pin-action clas" l-ref="action-pin-ref" >
-              <span class="tm-icon-svg">
+            <div class="pin-action" >
+              <span class="tm-icon-svg" l-ref="action-pin-ref" >
                 <svg class="tm-svg-inline--fa" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="map-pin" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 512" data-fa-i2svg=""><path fill="currentColor" d="M320 144C320 223.5 255.5 288 176 288C96.47 288 32 223.5 32 144C32 64.47 96.47 0 176 0C255.5 0 320 64.47 320 144zM192 64C192 55.16 184.8 48 176 48C122.1 48 80 90.98 80 144C80 152.8 87.16 160 96 160C104.8 160 112 152.8 112 144C112 108.7 140.7 80 176 80C184.8 80 192 72.84 192 64zM144 480V317.1C154.4 319 165.1 319.1 176 319.1C186.9 319.1 197.6 319 208 317.1V480C208 497.7 193.7 512 176 512C158.3 512 144 497.7 144 480z"></path></svg>
+              </span>
+              <span class="tm-icon-svg" l-ref="action-daily-task-ref" >
+                <svg class="tm-svg-inline--fa fa-list-check" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="list-check" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" data-fa-i2svg=""><path fill="currentColor" d="M152.1 38.16C161.9 47.03 162.7 62.2 153.8 72.06L81.84 152.1C77.43 156.9 71.21 159.8 64.63 159.1C58.05 160.2 51.69 157.6 47.03 152.1L7.029 112.1C-2.343 103.6-2.343 88.4 7.029 79.03C16.4 69.66 31.6 69.66 40.97 79.03L63.08 101.1L118.2 39.94C127 30.09 142.2 29.29 152.1 38.16V38.16zM152.1 198.2C161.9 207 162.7 222.2 153.8 232.1L81.84 312.1C77.43 316.9 71.21 319.8 64.63 319.1C58.05 320.2 51.69 317.6 47.03 312.1L7.029 272.1C-2.343 263.6-2.343 248.4 7.029 239C16.4 229.7 31.6 229.7 40.97 239L63.08 261.1L118.2 199.9C127 190.1 142.2 189.3 152.1 198.2V198.2zM224 96C224 78.33 238.3 64 256 64H480C497.7 64 512 78.33 512 96C512 113.7 497.7 128 480 128H256C238.3 128 224 113.7 224 96V96zM224 256C224 238.3 238.3 224 256 224H480C497.7 224 512 238.3 512 256C512 273.7 497.7 288 480 288H256C238.3 288 224 273.7 224 256zM160 416C160 398.3 174.3 384 192 384H480C497.7 384 512 398.3 512 416C512 433.7 497.7 448 480 448H192C174.3 448 160 433.7 160 416zM0 416C0 389.5 21.49 368 48 368C74.51 368 96 389.5 96 416C96 442.5 74.51 464 48 464C21.49 464 0 442.5 0 416z"></path></svg>
               </span>
             </div>
             <button class="extend-tool" l-ref="server-logout">

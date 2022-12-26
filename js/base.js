@@ -149,8 +149,12 @@ export class Component {
 
     mount(element) {
         let self = this;
-        this.willStart().then(self.render(element).then(self.mounted()));
-        return this;
+        let promise = this.willStart().then(()=>{
+                self.render(element)
+                return self.mounted()
+            }
+        );
+        return promise
     }
 
     reload() {
@@ -167,8 +171,7 @@ export class Component {
     }
 
     willStart() {
-        return new Promise(() => {
-        });
+        return Promise.all([]);
     }
 
     render(element) {
@@ -178,14 +181,11 @@ export class Component {
         this.baseHTML = new DOMParser().parseFromString(this.template, 'text/html');
         this.el = this.baseHTML.body.firstChild;
         element.append(this.el);
-        return new Promise(() => {
-        });
     }
 
     mounted() {
-        this.initObject()
-        return new Promise(() => {
-        });
+        this.initObject();
+        return Promise.resolve();
     }
 
     initObject() {

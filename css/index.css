@@ -270,12 +270,15 @@ svg:not(:root).tm-svg-inline--fa {
     cursor: pointer;
 }
 
-.main-page .title .pin-action {
+.main-page .title .pin-action {    
     position: absolute;
-    left: 50%;
+    left: 35%;
+    width: 30%;
+    display: flex;
+    justify-content: space-around;
 }
 
-.main-page .title .pin-action:hover {
+.main-page .title .pin-action span:hover {
     cursor: pointer;
     color: orange;
 }
