@@ -5,6 +5,7 @@ export class BaseDialog extends Component{
     dialogContent = this.useRef('dialog-content');
     dialogFooter = this.useRef('dialog-footer')
     dialogCancel = this.useRef('button-cancel')
+    dialogTitle = this.useRef('dialog-title')
     maxHeight = 525
     constructor(){
         super(...arguments);
@@ -20,7 +21,6 @@ export class BaseDialog extends Component{
     }
     autoCloseDialog(event){
         console.log(event)
-
     }
     renderDialogContent(){
         
@@ -40,6 +40,7 @@ export class BaseDialog extends Component{
             this.el.parentNode.style.height = (this.parentSize) + "px";
             this.parentSize = 0;
         }
+        this.parent.popup = null;
         super.destroy()
     }
     renderDialog(){
@@ -50,7 +51,7 @@ export class BaseDialog extends Component{
                 </div>
                 <div class="dialog-main" l-ref="dialog-area">
                     <div class="dialog-header">
-                        <div class="dialog-title">
+                        <div class="dialog-title" l-ref="dialog-title">
                             ${this.params.title || ''}
                         </div>
                         <div class="dialog-close" l-ref="dialog-close">

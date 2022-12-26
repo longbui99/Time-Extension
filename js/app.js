@@ -1,6 +1,6 @@
-import {Main} from "./main.js"
-import {Login} from "./login.js"
-import { loadEnvironment, mount, Component} from "./base.js"
+import { Main } from "./main.js"
+import { Login } from "./login.js"
+import { loadEnvironment, mount, Component } from "./base.js"
 import { ErrorDialog } from "./dialog/errorDialog.js";
 import * as chrome from "./background/chrome.js"
 import { dailyTasks } from "./dialog/dailyTasks.js"
@@ -28,31 +28,38 @@ export class App extends Component {
   }
   mountServerAction() {
     let self = this;
-    this.serverActionRef.el.addEventListener('click', function(event){
+    this.serverActionRef.el.addEventListener('click', function (event) {
       window.open(self.env.serverURL, '_blank');
     })
-    this.serverLogoutRef.el.addEventListener('click', function(event){
+    this.serverLogoutRef.el.addEventListener('click', function (event) {
       self.processMainRef.innerHTML = "";
       self.env.raw.jwt = false;
       self.onAuthentication(self.env.raw, false);
     })
   }
-  scrollEvent(){
-    window.addEventListener('scroll', event=>{
+  scrollEvent() {
+    window.addEventListener('scroll', event => {
       localStorage.setItem("localScrollStorage", window.pageYOffset);
     })
   }
-  initGeneralEvent(){
+  initGeneralEvent() {
     let self = this;
     this.scrollEvent();
-    window.addEventListener('keydown', event=>{
-      if (window.event.altKey && window.event.ctrlKey && window.event.shiftKey){
-          self.pinRef.el.click();
+    window.addEventListener('keydown', event => {
+      if (window.event.altKey && window.event.ctrlKey && window.event.shiftKey) {
+        self.pinRef.el.click();
+      } 
+      else if (window.event.shiftKey && window.event.keyCode == 32){
+        if (this.popup){
+          this.popup.destroy()
+        } else{
+          self.dailyTask.el.click()
+        }
       }
       event.stopImmediatePropagation();
     })
-    this.dailyTask.el.addEventListener('click', event=>{
-      self.showDialog(dailyTasks, {title: "Daily Task"})
+    this.dailyTask.el.addEventListener('click', event => {
+      self.showDialog(dailyTasks, { title: "Daily Task" })
     })
   }
   async mountingComponent() {
@@ -62,15 +69,15 @@ export class App extends Component {
       this.component = new Main(this);
       this.mountServerAction();
       this.el.classList.add('logged');
-      this.loggedNameRef.el.innerText=  this.env.loggedName || '';
+      this.loggedNameRef.el.innerText = this.env.loggedName || '';
     }
     else {
-      if (this.env.jwt && !this.checked){
+      if (this.env.jwt && !this.checked) {
         let payload = {
           'jwt': this.env.jwt
         }
-        let res = ( await this.do_request('POST', this.env.serverURL + "/web/login/jwt/status", (payload)))
-        if (res && (await res.json())){
+        let res = (await this.do_request('POST', this.env.serverURL + "/web/login/jwt/status", (payload)))
+        if (res && (await res.json())) {
           self.update('authenticated', true)
         }
         this.checked = true;
@@ -81,7 +88,7 @@ export class App extends Component {
         this.el.classList.remove('logged');
       }
     }
-    if (this.mode === "pinned"){
+    if (this.mode === "pinned") {
       this.pinRef.el.remove();
     }
     this.component.mount(this.processMainRef.el)
@@ -96,7 +103,7 @@ export class App extends Component {
     return res
   }
   async onAuthentication(data, authenticated = true) {
-    if (this.env.serverURL !== data.serverURL){
+    if (this.env.serverURL !== data.serverURL) {
       this.env.syncOne('issueData', null)
     }
     data['authenticated'] = authenticated;
@@ -105,80 +112,80 @@ export class App extends Component {
     this.processMainRef.el.innerHTML = '';
     this.loadUI();
   }
-  onLoading(display=true){
-    this.loadingBannerRef.el.style.display = (display?"inline-block": "none");
+  onLoading(display = true) {
+    this.loadingBannerRef.el.style.display = (display ? "inline-block" : "none");
   }
-  onError(data){
+  onError(data) {
     this.showDialog(ErrorDialog, data)
-    
+
   }
-  onSessionError(data){
+  onSessionError(data) {
     this.checked = true;
     this.showDialog(ErrorDialog, data)
     this.onAuthentication(this.env.raw, false);
   }
-  async onIssueChanged(issueData){
-    if (chrome.storage){
+  async onIssueChanged(issueData) {
+    if (chrome.storage) {
       let data = (await chrome.storage.local.get(["timeLogStorage"]))?.timeLogStorage
       data.issueData = issueData;
-      chrome.storage.local.set({'timeLogStorage': data})
-      this.flushDataToExtension({issueUpdate: data.issueData});
+      chrome.storage.local.set({ 'timeLogStorage': data })
+      this.flushDataToExtension({ issueUpdate: data.issueData });
     } else {
       let data = JSON.parse(localStorage.getItem(storage) || "{}");
       data.issueData = issueData;
       localStorage.setItem(storage, JSON.stringify(data));
     }
   }
-  onRelativeUpdated(relatives){
-    if (this.subEnv.extensionID){
-      this.flushDataToExtension({'relativeUpdate': relatives})
+  onRelativeUpdated(relatives) {
+    if (this.subEnv.extensionID) {
+      this.flushDataToExtension({ 'relativeUpdate': relatives })
     }
   }
-  checkListChanged(payload){
-    this.flushDataToExtension({checkGroup: payload});
+  checkListChanged(payload) {
+    this.flushDataToExtension({ checkGroup: payload });
   }
-  flushDataToExtension(data){
+  flushDataToExtension(data) {
     chrome.runtime.sendMessage(data);
   }
-  issueUpdate(issueData){
-    if (this.subEnv.authenticated){
+  issueUpdate(issueData) {
+    if (this.subEnv.authenticated) {
       issueData.broardcast = true;
       this.component.issueData = issueData;
       this.component.renderContent();
       this.component.issueData.broardcast = false;
     }
   }
-  relativeActiveUpdate(relativeActives){
-    if (this.subEnv.authenticated){
+  relativeActiveUpdate(relativeActives) {
+    if (this.subEnv.authenticated) {
       this.component.issueData.broardcast = true;
       this.component.relatedActiveIssues = relativeActives;
       this.component.fetchRelativeActive();
       this.component.issueData.broardcast = false;
     }
   }
-  searchedUpdate(searchData){
+  searchedUpdate(searchData) {
     if (this.subEnv.authenticated) {
       this.component.searchData = searchData;
     }
   }
-  checkListUpdated(payload){
-    if (this.subEnv.authenticated){
+  checkListUpdated(payload) {
+    if (this.subEnv.authenticated) {
       this.component.insertCheckGroup(payload)
     }
   }
-  componentReady(){
+  componentReady() {
     let lastScrollY = parseInt(localStorage.getItem('localScrollStorage')) || 0;
-    if (lastScrollY){
+    if (lastScrollY) {
       window.scrollTo(0, lastScrollY)
     }
   }
-  onLoadStart(data){
+  onLoadStart(data) {
     this.load[data] = false
   }
-  onLoadDone(data){
+  onLoadDone(data) {
     this.load[data] = true
-    for (let key in this.load){
-      if (!this.load[key]){
+    for (let key in this.load) {
+      if (!this.load[key]) {
         return;
       }
     }
