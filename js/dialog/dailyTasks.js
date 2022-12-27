@@ -38,11 +38,19 @@ export class dailyTasks extends BaseDialog{
             self.postUpdateDialogContent();
         })
     }
+    onchangeDailyTaskFilter(selectedDates, dateStr, instance){
+        let from_unix = selectedDates[0].getTime()/1000;
+        let to_unix = selectedDates[1].getTime()/1000;
+    }
     mounted(){
         let res = super.mounted();
         let self = this;
         this.initDailyTaskDialog().then(e=>{
-            flatpickr(self.applicableDate.el, {defaultDate: self.env.issueData.applicable_date, altInput: true});
+            flatpickr(self.applicableDate.el, {
+                defaultDate: self.env.issueData.applicable_date, 
+                altInput: true,
+                onClose: self.onchangeDailyTaskFilter.bind(self)
+            });
         });
         this.buttonConfirmRef.el.addEventListener('click', ()=>self.dialogClose.el.click());
         this.applicableDateLabel.el.addEventListener('click', ()=>self.applicableDate.el._flatpickr.toggle());
