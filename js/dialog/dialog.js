@@ -26,23 +26,26 @@ export class BaseDialog extends Component{
     renderDialogContent(){
         
     }
-    postUpdateDialogContent(){
-        this.dialogArea.el.style.height = "unset";
+    resizeChange(){
+        this.dialogArea.el.style.minHeight = "unset";
         var screenPosition = this.dialogArea.el.getBoundingClientRect();
         let height = screenPosition.height;
+        height -= 20
         if (height > this.maxHeight){
             height = this.maxHeight
         }
-        height -= 20
-        this.dialogArea.el.style.height = parseInt(height) + "px";
+        this.dialogArea.el.style.minHeight = parseInt(height) + "px";
         this.parentSize = this.el.parentNode.getBoundingClientRect().height;
         if (this.parentSize < height + 20){
-            this.el.parentNode.style.height = (height+25) + "px";
-        }
+            this.el.parentNode.style.minHeight = (height+25) + "px";
+        } 
+    }
+    postUpdateDialogContent(){
+        this.resizeChange()
     }
     destroy(){
         if (this.parentSize > 0){
-            this.el.parentNode.style.height = "unset";
+            this.el.parentNode.style.minHeight = "unset";
             this.parentSize = 0;
         }
         this.parent.popup = null;
@@ -95,7 +98,11 @@ export class BaseDialog extends Component{
             this.destroy();
         })
         window.addEventListener('keydown', self.autoCloseDialog.bind(self))
-        console.log(window)
+        const resize_ob = new ResizeObserver(function(entries) {
+            self.resizeChange()
+        });
+        resize_ob.observe(this.dialogContent.el);
+        this.dialogArea.el.style.maxHeight = this.maxHeight + "px";
         return res
     }
 }
