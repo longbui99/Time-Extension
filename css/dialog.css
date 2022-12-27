@@ -56,8 +56,8 @@ lbwt-dialog .dialog-main .dialog-header .dialog-title .applicable-date{
     position: relative;
     width: 0px;
     height: 0px;
-    margin-left: -9px;
-    margin-top: 8px;
+    margin-left: -13px;
+    margin-top: 10px;
     cursor: pointer;
     border: 0;
 }

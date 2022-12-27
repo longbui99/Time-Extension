@@ -33,19 +33,18 @@ export class dailyTasks extends BaseDialog{
         let tasks = (await result.json());
         this.env.issueData = tasks[0];
         this.dialogTitle.el.textContent = `[${this.env.issueData.key}] ${this.env.issueData.name}`
-        let component = new CheckList(this);
-        component.mount(this.dialogContent.el).then(e=>{
-            self.postUpdateDialogContent();
-        })
+        this.component = new CheckList(this);
+        return this.component.mount(this.dialogContent.el)
     }
     onchangeDailyTaskFilter(selectedDates, dateStr, instance){
-        let from_unix = selectedDates[0].getTime()/1000;
-        let to_unix = selectedDates[1].getTime()/1000;
+        this.component?.destroy()
+        this.initDailyTaskDialog(`p${dateStr}`)
     }
     mounted(){
         let res = super.mounted();
         let self = this;
         this.initDailyTaskDialog().then(e=>{
+            self.postUpdateDialogContent();
             flatpickr(self.applicableDate.el, {
                 defaultDate: self.env.issueData.applicable_date, 
                 altInput: true,

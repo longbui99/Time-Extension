@@ -34,7 +34,10 @@ export class BaseDialog extends Component{
         }
         this.parentSize = this.el.parentNode.getBoundingClientRect().height;
         this.dialogArea.el.style.height = parseInt(height) + "px";
-        this.el.parentNode.style.height = (height+50) + "px";
+        let parentScreenPosition = this.el.parentNode.getBoundingClientRect();
+        if (parentScreenPosition.height < height){
+            this.el.parentNode.style.height = (height+50) + "px";
+        }
     }
     destroy(){
         if (this.parentSize > 0){
