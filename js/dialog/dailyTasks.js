@@ -34,7 +34,9 @@ export class dailyTasks extends BaseDialog{
         this.env.issueData = tasks[0];
         this.dialogTitle.el.textContent = `[${this.env.issueData.key}] ${this.env.issueData.name}`
         this.component = new CheckList(this);
-        return this.component.mount(this.dialogContent.el)
+        this.component.mount(this.dialogContent.el).then(e=>{
+            self.postUpdateDialogContent();
+        })
     }
     onchangeDailyTaskFilter(selectedDates, dateStr, instance){
         this.component?.destroy()
@@ -44,7 +46,6 @@ export class dailyTasks extends BaseDialog{
         let res = super.mounted();
         let self = this;
         this.initDailyTaskDialog().then(e=>{
-            self.postUpdateDialogContent();
             flatpickr(self.applicableDate.el, {
                 defaultDate: self.env.issueData.applicable_date, 
                 altInput: true,

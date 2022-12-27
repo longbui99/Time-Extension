@@ -6,7 +6,7 @@ export class BaseDialog extends Component{
     dialogFooter = this.useRef('dialog-footer')
     dialogCancel = this.useRef('button-cancel')
     dialogTitle = this.useRef('dialog-title')
-    maxHeight = 525
+    maxHeight = 550
     constructor(){
         super(...arguments);
         this.response = {};
@@ -27,16 +27,17 @@ export class BaseDialog extends Component{
         
     }
     postUpdateDialogContent(){
+        this.dialogArea.el.style.height = "unset";
         var screenPosition = this.dialogArea.el.getBoundingClientRect();
         let height = screenPosition.height;
         if (height > this.maxHeight){
             height = this.maxHeight
         }
-        this.parentSize = this.el.parentNode.getBoundingClientRect().height;
+        height -= 20
         this.dialogArea.el.style.height = parseInt(height) + "px";
-        let parentScreenPosition = this.el.parentNode.getBoundingClientRect();
-        if (parentScreenPosition.height < height){
-            this.el.parentNode.style.height = (height+50) + "px";
+        this.parentSize = this.el.parentNode.getBoundingClientRect().height;
+        if (this.parentSize < height + 20){
+            this.el.parentNode.style.height = (height+25) + "px";
         }
     }
     destroy(){
