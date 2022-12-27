@@ -16,6 +16,7 @@ export class BaseDialog extends Component{
             this.env.origin = this.baseEnv.raw;
         }
         this.innerTemplate = '';
+        this.headerTooltip = '';
         this.parentSize = 0;
         this.renderDialog();
     }
@@ -51,8 +52,13 @@ export class BaseDialog extends Component{
                 </div>
                 <div class="dialog-main" l-ref="dialog-area">
                     <div class="dialog-header">
-                        <div class="dialog-title" l-ref="dialog-title">
-                            ${this.params.title || ''}
+                        <div class="dialog-title">
+                            <span l-ref="dialog-title">
+                                ${this.params.title || ''}
+                            </span>
+                            <span>
+                                ${this.headerTooltip || ''}    
+                            </span>
                         </div>
                         <div class="dialog-close" l-ref="dialog-close">
                             x

@@ -49,6 +49,25 @@ lbwt-dialog .dialog-main .dialog-header{
 lbwt-dialog .dialog-main .dialog-header .dialog-title{
     font-size: 1.5em;
     font-weight: 700;
+    display: flex;
+    justify-content: space-between;
+}
+lbwt-dialog .dialog-main .dialog-header .dialog-title .applicable-date{
+    position: relative;
+    width: 0px;
+    height: 0px;
+    margin-left: -9px;
+    margin-top: 8px;
+    cursor: pointer;
+    border: 0;
+}
+lbwt-dialog .dialog-main .dialog-header .dialog-title .applicable-date-label{
+    margin-left: 15px;
+    color: var(--primary);
+}
+lbwt-dialog .dialog-main .dialog-header .dialog-title .applicable-date-label:hover{
+    color: orange;
+    cursor: pointer;
 }
 lbwt-dialog .dialog-main .dialog-header .dialog-close{
     font-size: 1.5em;
