@@ -272,7 +272,7 @@ svg:not(:root).tm-svg-inline--fa {
 
 .main-page .title .pin-action {    
     position: absolute;
-    left: 35%;
+    left: 45%;
     width: 30%;
     display: flex;
     justify-content: space-around;
@@ -294,9 +294,21 @@ svg:not(:root).tm-svg-inline--fa {
     margin-bottom: 2px;
 }
 
-.main-page .title .content:hover {
+.main-page .title .content .server-open:hover {
     color: orange;
     cursor: pointer;
+}
+
+.main-page .title .content .help{
+    margin-left: 10px;
+    cursor: pointer;
+}
+.main-page .title .content .help:hover{
+    color: orange;
+}
+.main-page .title .content .help svg{
+    width: 15px;
+    height: 15px;
 }
 
 .main-page .title .extend-tool {
