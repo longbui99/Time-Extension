@@ -10,6 +10,8 @@ export class IssueSubsitution extends BaseDialog{
     commentRef = this.useRef('comment-for-issue')
     constructor(){
         super(...arguments);
+        this.startChange = false;
+        this.endChange = false
         this.env.issueData = this.params.issueData;
     }
     renderDialogContent(){
@@ -40,17 +42,29 @@ export class IssueSubsitution extends BaseDialog{
         super.destroy();
     }
     changeStartDate(selectedDates, dateStr, instance){
+        if (!this.endChange){
+            this.response.endDate = new Date(this.response.endDate.getTime() - this.response.startDate.getTime() + selectedDates[0].getTime());
+            this.startChange = true;
+            this.date2pickr.setDate(this.response.endDate);
+        }
         this.response.startDate = selectedDates[0];
     }
     changeEndDate(selectedDates, dateStr, instance){
+        if (!this.startChange){
+            this.response.startDate = new Date(this.response.startDate.getTime() - this.response.startDate.getTime() + selectedDates[0].getTime());
+            this.endChange = true;
+            this.date1pickr.setDate(this.response.startDate);
+        }
         this.response.endDate = selectedDates[0];
     }
-    mounted(){
+    async mounted(){
         let res = super.mounted();
         let self = this;
         this.response.startDate = this.params.startDate || new Date();
         this.response.endDate = this.params.endDate || new Date();
-        this.searchBar = new SearchBar(this).mount(this.searchBarRef.el);
+        this.searchBar = new SearchBar(this);
+        this.searchBar.mount(this.searchBarRef.el);
+        this.searchBar._searchIssue('favorite', true)
         this.commentRef.el.innerText = this.params.comment || '';
         this.date1pickr = flatpickr(this.startDateRef.el,{ enableTime: true, defaultDate: this.response.startDate, altInput: true, onClose: self.changeStartDate.bind(self)});
         this.date2pickr = flatpickr(this.endDateRef.el,{ enableTime: true, defaultDate: this.response.endDate, altInput: true, onClose: self.changeEndDate.bind(self)});

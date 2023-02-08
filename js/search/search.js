@@ -118,11 +118,13 @@ export class SearchBar extends Component {
             element.style.display = 'inline-block';
         }
     }
-    async _searchIssue(text) {
+    async _searchIssue(text, invisible=false) {
         this.searchData = {}
         this.searchData.query = text;
         this.searchData.values =  (await this.fetchSearchIssue(text));
-        this.loadSearchedIssues(this.searchData.values);
+        if (!invisible){
+            this.loadSearchedIssues(this.searchData.values);
+        }
         this.update('searchData', this.searchData);
     }
     _initSearchBar() {
