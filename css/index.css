@@ -922,10 +922,13 @@ lbwt .log-report .space-segment.log-history-navigator .log-history-navigator-act
     height: 1em;
 }
 lbwt .log-report .space-segment.log-history-navigator .log-history-navigator-action .total{
-    width: 50px;
+    margin-left: 2px;
     font-size: 1.5em;
     display: flex;
     justify-content: space-between;
+}
+lbwt .log-report .space-segment.log-history-navigator .log-history-navigator-action .total{
+    font-weight: 700;
 }
 lbwt .log-report .space-segment.log-history-navigator .log-history-navigator-action .duration-description{
     margin-left: 10px;
@@ -938,12 +941,41 @@ lbwt .log-report .space-segment.log-history-navigator .log-history-navigator-act
     width: 0.4em;
     color: lightgray;
 }
-lbwt .log-report .space-segment.log-history-navigator .log-history-navigator-action .total div{
+lbwt .log-report .space-segment.log-history-navigator .log-history-navigator-action .duration-description:hover{
+    color: orange;
+    cursor: pointer;
+}
+lbwt .log-report .space-segment.log-history-navigator .log-history-navigator-action.unexported .total{
+    font-size: 1.2em;
+    font-weight: 400;
+}
+lbwt .log-report .space-segment.log-history-navigator .log-history-navigator-action.unexported .duration-description{
+    font-size: 1.5em;
     font-weight: 700;
 }
+lbwt .log-report .space-segment.log-history-navigator .log-history-navigator-action.unexported .total:hover{
+    color: orange;
+    cursor: pointer;
+}
+lbwt .log-report .space-segment.log-history-navigator .log-history-navigator-action.unexported .duration-description:hover{
+    color: unset;
+    cursor: unset;
+}
+lbwt .log-report .space-segment.log-history-navigator .log-history-navigator-action .pin-action {    
+    color: var(--primary);
+    font-size: 1.2em;
+}
 
+lbwt .log-report .space-segment.log-history-navigator .log-history-navigator-action .pin-action span:hover {
+    cursor: pointer;
+    color: orange;
+}
+lbwt .log-report .space-segment.log-history-navigator .log-history-navigator-action .pin-action.pinned{
+    color: var(--secondary);
+    transform: rotateZ(45deg);
+} 
 lbwt .log-report .space-segment.log-history-navigator .log-history-navigator-input{
-    width: 40%;
+    width: 35%;
     border: solid 1px transparent;
     font-size: 1.3em;
     padding-left: 25px;
