@@ -152,6 +152,9 @@ export class LogReport extends Component {
         this.daterange = flatpickr(this.logHistoryDateRangeRef.el,{mode: "range", defaultDate: [new Date(), new Date()], altInput: true, altFormat: "M j, Y",
             onClose: self.onChangeRangeHistoryFilter.bind(self)
         });
+        if (typeof this.env.issueData.trackingMode === 'string' || this.env.issueData.trackingMode instanceof String){
+            this.logTypeChange(this.env.issueData.trackingMode)
+        }
         this.actionPinRef.el.addEventListener('click', self.pinFilterChange.bind(self));
         this.logHistoryDateRangeTotalRef.el.addEventListener('click', (e) => self.logTypeChange.bind(self)('all'))
         this.durationUnexportedRef.el.addEventListener('click', (e) => self.logTypeChange.bind(self)('unexported'))

@@ -975,9 +975,9 @@ lbwt .log-report .space-segment.log-history-navigator .log-history-navigator-act
     transform: rotateZ(45deg);
 } 
 lbwt .log-report .space-segment.log-history-navigator .log-history-navigator-input{
-    width: 35%;
+    width: 27.5%;
     border: solid 1px transparent;
-    font-size: 1.3em;
+    font-size: 1em;
     padding-left: 25px;
 }
 
