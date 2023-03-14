@@ -1,6 +1,6 @@
 
 export function _getDisplayName(record, length = 40000) {
-    if (record.name === undefined){
+    if (record.name === undefined) {
         return ''
     }
     return `${record.key}: ${(record.name.length > length) ? record.name.substring(0, length) + "..." : record.name}`;
@@ -69,9 +69,9 @@ export function _pushParams(serverURL, jsonData) {
 
 export function secondToHMSString(time) {
     let data = [
-    { 'key': 'h', 'duration': 3600 },
-    { 'key': 'm', 'duration': 60 },
-    { 'key': 's', 'duration': 1 }]
+        { 'key': 'h', 'duration': 3600 },
+        { 'key': 'm', 'duration': 60 },
+        { 'key': 's', 'duration': 1 }]
     let response = ""
     for (let segment of data) {
         let duration = segment['duration'];
@@ -168,4 +168,21 @@ export function getTimezoneOffset() {
     }
     offset = offset[0] + offset[1].padStart(2, '0')
     return offset
+}
+
+export function GroupBy(listData, func) {
+    let res = {};
+    let getterKey = ""
+    if (typeof func !== "function") {
+        getterKey = func;
+        func = (record) => record[getterKey] 
+    }
+    for (let record of listData) {
+        let key = func(record)
+        if (key in res)
+            res[key].values.push(record)
+        else
+            res[key] = {values: [record]}
+    }
+    return res
 }

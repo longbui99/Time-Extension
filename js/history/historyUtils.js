@@ -40,3 +40,14 @@ export async function exportLog(exportIds) {
     };
     return this.do_request('POST', `${this.env.serverURL}/management/issue/work-log/export`, res);
 }
+
+export function getLogTypeDuration(logs){
+    let exportedTotal = 0, globalTotal = 0
+    for (let record of logs){
+        if (record.exported) {
+            exportedTotal += record.duration;
+        }
+        globalTotal += record.duration;
+    }
+    return [exportedTotal, globalTotal]
+}

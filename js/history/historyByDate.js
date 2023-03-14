@@ -3,7 +3,7 @@ import * as util from "../utils/utils.js"
 import * as hUtil from "./historyUtils.js"
 import { Component } from "../base.js"
 import { IssueSubsitution } from "../dialog/issueSubsitution.js"
-class Log extends Component{
+class Log extends Component {
     secondToString = util.parseSecondToString(this.env.resource?.hrs_per_day || 8, this.env.resource?.days_per_week || 5)
     constructor() {
         super(...arguments);
@@ -11,10 +11,10 @@ class Log extends Component{
     mounted() {
         let res = super.mounted();
         let self = this;
-        for (let element of this.el.querySelectorAll('.tm-form-control')){
-            element.addEventListener('change', async event=>{
+        for (let element of this.el.querySelectorAll('.tm-form-control')) {
+            element.addEventListener('change', async event => {
                 let values = hUtil.exportLogData.bind(self)(event.target);
-                if (element.parentNode.classList.contains('unexported')){
+                if (element.parentNode.classList.contains('unexported')) {
                     let result = {}
                     try {
                         let response = (await self.do_invisible_request('POST', `${self.env.serverURL}/management/issue/work-log/update`, values));
@@ -22,21 +22,21 @@ class Log extends Component{
                     } catch {
                         result = self.params;
                     } finally {
-                        for (let key in result){
+                        for (let key in result) {
                             self.params[key] = result[key]
                         }
-                        self.params.start_date = new Date(result['start_date']+"Z");
+                        self.params.start_date = new Date(result['start_date'] + "Z");
                         self.reload();
                     }
                 }
             })
         }
-        for (let element of this.el.querySelectorAll('.action-log-delete')){
-            element.addEventListener('click', event=>{
+        for (let element of this.el.querySelectorAll('.action-log-delete')) {
+            element.addEventListener('click', event => {
                 let value = hUtil.getLogDataGroup.bind(self)(event.currentTarget);
                 hUtil.deleteLogData.bind(self)(event.currentTarget);
-                let index = this.parent.params.logs.findIndex(e=>e.id === value.id);
-                if (index !== -1){
+                let index = this.parent.params.logs.findIndex(e => e.id === value.id);
+                if (index !== -1) {
                     this.parent.params.logs.splice(index, 1)
                 }
                 if (this.parent.params.logs.length == 0) {
@@ -44,28 +44,28 @@ class Log extends Component{
                 }
             })
         }
-        function checkUnexported(element){
-            if (element.value !== element.getAttribute('data-origin')){
+        function checkUnexported(element) {
+            if (element.value !== element.getAttribute('data-origin')) {
                 element.parentNode.classList.add('unexported');
-                this.params.exported=false;
-            } else if (element.parentNode.getAttribute('data-export') === "true"){
+                this.params.exported = false;
+            } else if (element.parentNode.getAttribute('data-export') === "true") {
                 element.parentNode.classList.remove('unexported');
-                this.params.exported=true;
+                this.params.exported = true;
             }
         }
-        for (let element of this.el.querySelectorAll('.log-description')){
-            element.addEventListener('keyup', ()=>{
+        for (let element of this.el.querySelectorAll('.log-description')) {
+            element.addEventListener('keyup', () => {
                 checkUnexported.bind(this)(element);
             })
         }
-        for (let element of this.el.querySelectorAll('.log-duration')){
-            element.addEventListener('keyup', ()=>{
+        for (let element of this.el.querySelectorAll('.log-duration')) {
+            element.addEventListener('keyup', () => {
                 checkUnexported.bind(this)(element);
             })
         }
-        for (let element of this.el.querySelectorAll('.wl-circle-decorator')){
-            element.addEventListener('click', event=>{
-                async function callback(data){
+        for (let element of this.el.querySelectorAll('.wl-circle-decorator')) {
+            element.addEventListener('click', event => {
+                async function callback(data) {
                     let values = {
                         'id': data.id,
                         'issue_id': data.issue?.id,
@@ -78,10 +78,10 @@ class Log extends Component{
                     self.parent.parent.parent.reloadHistory()
                 }
                 self.showDialog(IssueSubsitution, {
-                    title: "Edit Log", 
+                    title: "Edit Log",
                     id: this.params.id,
                     startDate: this.params.start_date,
-                    endDate: new Date(this.params.start_date.getTime()+this.params.duration*1000),
+                    endDate: new Date(this.params.start_date.getTime() + this.params.duration * 1000),
                     comment: this.params.description,
                     issueData: {
                         id: this.params.issue,
@@ -89,13 +89,14 @@ class Log extends Component{
                         key: this.params.key,
                         type_url: this.params.type_url,
                     },
-                    successCallback: callback})
+                    successCallback: callback
+                })
             })
         }
         return res
     }
     template = `
-        <div class="log-each ${this.params.exported? '': 'unexported'}" data-export="${this.params.exported}" data-group="${this.params.group}" data-id="${this.params['id']}">
+        <div class="log-each ${this.params.exported ? '' : 'unexported'}" data-export="${this.params.exported}" data-group="${this.params.group}" data-id="${this.params['id']}">
             <input class="log-duration tm-form-control" value="${this.secondToString(this.params.duration)}" data-origin="${this.secondToString(this.params.duration)}">
             <span class="wl-circle-decorator" title="${this.params.date || ''}">
                 <svg class="svg-inline--fa fa-circle" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="circle" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" data-fa-i2svg=""><path fill="currentColor" d="M512 256C512 397.4 397.4 512 256 512C114.6 512 0 397.4 0 256C0 114.6 114.6 0 256 0C397.4 0 512 114.6 512 256z"></path></svg><!-- <i class="fas fa-circle"></i> Font Awesome fontawesome.com -->
@@ -108,7 +109,7 @@ class Log extends Component{
         </div>
     `
 }
-class LogByIssue extends Component{
+class LogByIssue extends Component {
     constructor() {
         super(...arguments);
     }
@@ -116,14 +117,14 @@ class LogByIssue extends Component{
         let res = super.mounted();
         let element = this.el;
         let group = this.params.group, self = this;
-        for(let log of this.params.logs){
+        for (let log of this.params.logs) {
             log['group'] = group;
             new Log(this, log).mount(element)
         }
-        for (let element of this.el.querySelectorAll('.log-issue')){
-            element.addEventListener('click', event=>{
+        for (let element of this.el.querySelectorAll('.log-issue')) {
+            element.addEventListener('click', event => {
                 let data = hUtil.getLogDataGroup.bind(self)(event.currentTarget.parentNode.parentNode)
-                if (!self.env.issueData){
+                if (!self.env.issueData) {
                     self.env.issueData = {};
                 }
                 self.env.issueData.id = data.issue;
@@ -131,23 +132,23 @@ class LogByIssue extends Component{
                 event.stopPropagation();
             })
         }
-        for (let element of this.el.querySelectorAll('.log-issue-export')){
-            element.addEventListener('click', event=>{
+        for (let element of this.el.querySelectorAll('.log-issue-export')) {
+            element.addEventListener('click', event => {
                 let group = event.currentTarget.parentNode.parentNode.parentNode.getAttribute('data-group');
                 let data = hUtil.getLogDataGroup.bind(self)(event.currentTarget.parentNode.parentNode)
-                let exports = self.env.historyByDate[group].values.filter(e=> e.issue == data.issue && e.exported == false);
-                if (exports.length){
+                let exports = self.env.historyByDate[group].values.filter(e => e.issue == data.issue && e.exported == false);
+                if (exports.length) {
                     let total_duration = 0;
-                    if (exports.length === 1){
+                    if (exports.length === 1) {
                         total_duration = exports[0].duration
-                    } else{
-                        total_duration = exports.reduce((x,y)=>x+y.duration, 0);
+                    } else {
+                        total_duration = exports.reduce((x, y) => x + y.duration, 0);
                     }
                     this.env.exportedTotal += total_duration;
-                    let exportIds = exports.map(e=>e.id)
-                    hUtil.exportLog.bind(self)(exportIds).then(function(response){
-                        response.json().then(result=>{
-                            self.params.logs = result.sort(function(a,b){return b.sequence-a.sequence});
+                    let exportIds = exports.map(e => e.id)
+                    hUtil.exportLog.bind(self)(exportIds).then(function (response) {
+                        response.json().then(result => {
+                            self.params.logs = result.sort(function (a, b) { return b.sequence - a.sequence });
                             self.env.update('setGlobalData', null)
                             self.reload();
                         })
@@ -177,40 +178,66 @@ class LogByIssue extends Component{
         </div>
     `
 }
-export class LogByDate extends Component {
-    logSegment = this.useRef('log-segment')
+class LogByProject extends Component {
+    projectLogRef = this.useRef('project-logs')
     constructor() {
         super(...arguments);
     }
     mounted() {
         let res = super.mounted();
+        return res
+    }
+    template = `
+        <div class="project">
+            <div class="project-title" l-ref="project-title">
+                ${this.params.projectGroup}
+            <div>
+            <div class="project-logs" l-ref="project-logs">
+
+            </div>
+        </div>
+    `
+}
+export class LogByDate extends Component {
+    logSegment = this.useRef('log-segment')
+    totalDurationRef = this.useRef("total-duration")
+    logActionRef = this.useRef('log-date-export')
+    constructor() {
+        super(...arguments);
+    }
+    mounted() {
         let self = this;
+        let logs = hUtil.getLogTypeDuration(this.params.datas.values);
+        let res = super.mounted();
         let element = this.logSegment.el;
-        for (let issue of this.params.issueLogs){
-            new LogByIssue(this, issue).mount(element)
+        let dateLogbyProject = util.GroupBy(this.params.datas.values, "projectName")
+        for (let group in dateLogbyProject) {
+            new LogByProject(this, {
+                'dateGroup': this.params.dateGroup,
+                'projectGroup': group,
+                'datas': dateLogbyProject[group]
+            }).mount(element)
         }
-        for (let element of this.el.querySelectorAll('.log-date-export')){
-            element.addEventListener('click', event=>{
-                let group = event.currentTarget.getAttribute('data-group');
-                let exportIds = self.env.historyByDate[group].values.map(e=> e.id);
-                hUtil.exportLog.bind(self)(exportIds).then(e=>{
-                    self.parent.loadHistory(this.parent.unix[0]-1, this.parent.unix[1])
-                });
-            })
-        }
+        this.totalDurationRef.el.innerHTML = util.secondToHour(logs[1])
+        this.logActionRef.el.addEventListener('click', event => {
+            let exportIds = self.env.historyByDate[self.params.dateGroup].values.map(e => e.id);
+            hUtil.exportLog.bind(self)(exportIds).then(e => {
+                self.parent.loadHistory(self.parent.unix[0] - 1, self.parent.unix[1])
+            });
+        })
         return res
     }
     template = `
         <div class="log-group">
             <div class="log-heading">
                 <div class="log-heading-title">
-                    <span class="datetime"> ${this.params.group} </span>
-                    <button type="button" class="log-date-export" data-group="${this.params.group}">
+                    <span class="datetime"> ${this.params.dateGroup} </span>
+                    <button type="button" class="log-date-export" l-ref="log-date-export">
                         <svg class="svg-inline--fa fa-square-up-right" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="square-up-right" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" data-fa-i2svg=""><path fill="currentColor" d="M384 32H64C28.65 32 0 60.65 0 96v320c0 35.34 28.65 64 64 64h320c35.35 0 64-28.66 64-64V96C448 60.65 419.3 32 384 32zM330.5 323.9c0 6.473-3.889 12.3-9.877 14.78c-5.979 2.484-12.86 1.105-17.44-3.469l-45.25-45.25l-67.92 67.92c-12.5 12.5-32.72 12.46-45.21-.0411l-22.63-22.63C109.7 322.7 109.6 302.5 122.1 289.1l67.92-67.92L144.8 176.8C140.2 172.2 138.8 165.3 141.3 159.4c2.477-5.984 8.309-9.875 14.78-9.875h158.4c8.835 0 15.1 7.163 15.1 15.1V323.9z"></path></svg>
                     </button>
                 </div>
                 <div>
-                    Total: <div class="total-duration"> ${util.secondToHour(this.params.total_duration)} </div> 
+                    Total: <div class="total-duration" l-ref="total-duration"> 00:00 </div> 
                 </div>
             </div>
             <div class="log-segment" l-ref="log-segment">

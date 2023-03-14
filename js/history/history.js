@@ -1,8 +1,8 @@
 
 import * as util from "../utils/utils.js"
+import * as hUtil from "./historyUtils.js"
 import { Component } from "../base.js"
 import { LogByDate } from "./historyByDate.js"
-import { Favorite } from "../favorite/favorite.js"
 export class LogReport extends Component {
 
     logReportSectionRef = this.useRef('log-report-section')
@@ -21,18 +21,27 @@ export class LogReport extends Component {
         this.env.issueData.lastDatetimeSelection = this.env.issueData.lastDatetimeSelection || [0, 0];
         this.secondToString = util.parseSecondToString(this.env.resource?.hrs_per_day || 8, this.env.resource?.days_per_week || 5)
     }
-    onChangeRangeHistoryFilter(selectedDates, dateStr, instance){
-        let from_unix = selectedDates[0].getTime()/1000;
-        let to_unix = selectedDates[1].getTime()/1000;
+    onChangeRangeHistoryFilter(selectedDates, dateStr, instance) {
+        let from_unix = selectedDates[0].getTime() / 1000;
+        let to_unix = selectedDates[1].getTime() / 1000;
         this.env.issueData.lastDatetimeSelection = [from_unix, to_unix];
         this.loadHistory(from_unix, to_unix);
         this.update('issueData', this.env.issueData);
     }
-    reloadHistory(){
-        this.loadHistory(this.unix[0], this.unix[1]+1)
+    renderLogByDate(historyByDate) {
+        for (let group in historyByDate) {
+            new LogByDate(this, {
+                'dateGroup': group,
+                'datas': historyByDate[group]
+            }).mount(this.logHistoryRef.el)
+        }
     }
-    async loadHistory(from_unix=0, unix=0, refresh=false, keepTotal=false){
-        if ((this.unix && this.unix[0]=== from_unix && this.unix[1] === unix) || refresh){
+
+    reloadHistory() {
+        this.loadHistory(this.unix[0], this.unix[1] + 1)
+    }
+    async loadHistory(from_unix = 0, unix = 0, refresh = false, keepTotal = false) {
+        if ((this.unix && this.unix[0] === from_unix && this.unix[1] === unix) || refresh) {
             return
         }
         this.unix = [from_unix, unix]
@@ -42,118 +51,115 @@ export class LogReport extends Component {
         this.logHistoryDateRangeTotalRef.el.innerHTML = util.secondToHour(0)
         let options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
         let detailOptions = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', hour: 'numeric', minute: 'numeric' };
-        if (result.length){
-            let historyByDate = {};
-            this.env.historyByDate = historyByDate;
-            let maxDate = this.unix[1] || 0, minDate = this.unix[0] || new Date().getTime()/1000;
-            for (let record of result){
-                let date = new Date(record['start_date']+"Z");
-                let groupUnix = date.getTime()/1000;
-                if (groupUnix > maxDate){
+        if (result.length) {
+            let maxDate = this.unix[1] || 0, minDate = this.unix[0] || new Date().getTime() / 1000;
+            let globalTotal = 0, exportedTotal = 0;
+            for (let record of result) {
+                let date = new Date(record['start_date'] + "Z");
+                let groupUnix = date.getTime() / 1000;
+                if (groupUnix > maxDate) {
                     maxDate = groupUnix;
-                } else if (groupUnix < minDate){
+                } else if (groupUnix < minDate) {
                     minDate = groupUnix;
                 }
-                let key = date.toLocaleDateString("en-US", options);
                 record['start_date'] = date;
                 record['date'] = date.toLocaleDateString('en-US', detailOptions)
-                record['sequence'] = parseInt(Array.from(" " + record['key'])?.reduce(function(result, item){
-                    if (!isNaN(item)){
+                record['sequence'] = parseInt(Array.from(" " + record['key'])?.reduce((result, item) => {
+                    if (!isNaN(item))
                         result += item
-                    } else {
+                    else
                         result += item.charCodeAt(0)
-                    }
                     return result
                 }))
-                if (historyByDate[key]){
-                    historyByDate[key].values.push(record);
-                } else {
-                    historyByDate[key] = {values: [record]}
-                }
             }
-            this.unix = [minDate, maxDate]
-            let pageLog = {}
-            let globalTotal = 0, exportedTotal=0;
-            this.logHistoryDateRangeTotalRef.el.innerHTML = util.secondToHour(globalTotal)
-            for (let group in historyByDate){
-                let tmpl = '';
-                let total_duration = 0;
-                let index = 0 ;
-                let values = historyByDate[group].values.sort(function(a,b){return b.sequence-a.sequence})
-                values.push({})
-                let checkpointKey = values[0]?.key;
-                let issueLogs = [];
-                let workLogs = [];
-                for (let log of values){
-                    if (log.exported){
-                        exportedTotal += log.duration;
-                    }
-                    if (log.key !== checkpointKey){
-                        pageLog = values[index-1];
-                        issueLogs.push({
-                            'origin': pageLog,
-                            'logs': workLogs,
-                            'group': group,
-                        })
-                        workLogs = [];
-                    } 
-                    checkpointKey = log.key;
-                    workLogs.push(log)
-                    total_duration += (log.duration || 0);
-                    index++;
-                }
-                historyByDate[group].totalDuration = total_duration;
-                globalTotal += total_duration
-                if (issueLogs.length){
-                    new LogByDate(this, {
-                        'total_duration': total_duration,
-                        'tmpl': tmpl,
-                        'group': group,
-                        'issueLogs': issueLogs
-                    }).mount(this.logHistoryRef.el)
-                }
-            }
-            if (!keepTotal){
-                this.env.globalTotal = globalTotal;
-                this.env.exportedTotal = exportedTotal;
+            this.unix = [minDate, maxDate];
+            let historyByDate = util.GroupBy(result, (item) => {
+                return (new Date(item['start_date'] + "Z")).toLocaleDateString("en-US", options)
+            });
+            let res = hUtil.getLogTypeDuration(result)
+            this.env.historyByDate = historyByDate;
+            if (!keepTotal) {
+                this.env.globalTotal = res[1];
+                this.env.exportedTotal = res[0];
             }
             this.setGlobalData();
-            if (this.daterange){
-                this.daterange.setDate([new Date(this.unix[0]*1000), new Date(this.unix[1]*1000)]);
+            if (this.daterange) {
+                this.daterange.setDate([new Date(this.unix[0] * 1000), new Date(this.unix[1] * 1000)]);
             }
+
+            this.renderLogByDate(historyByDate)
+            // for (let group in historyByDate){
+            //     let tmpl = '';
+            //     let total_duration = 0;
+            //     let index = 0 ;
+            //     let values = historyByDate[group].values.sort(function(a,b){return b.sequence-a.sequence})
+            //     values.push({})
+            //     let checkpointKey = values[0]?.key;
+            //     let issueLogs = [];
+            //     let workLogs = [];
+            //     for (let log of values){
+            //         if (log.exported){
+            //             exportedTotal += log.duration;
+            //         }
+            //         if (log.key !== checkpointKey){
+            //             pageLog = values[index-1];
+            //             issueLogs.push({
+            //                 'origin': pageLog,
+            //                 'logs': workLogs,
+            //                 'group': group,
+            //             })
+            //             workLogs = [];
+            //         } 
+            //         checkpointKey = log.key;
+            //         workLogs.push(log)
+            //         total_duration += (log.duration || 0);
+            //         index++;
+            //     }
+            //     historyByDate[group].totalDuration = total_duration;
+            //     globalTotal += total_duration
+            //     if (issueLogs.length){
+            //         new LogByDate(this, {
+            //             'total_duration': total_duration,
+            //             'tmpl': tmpl,
+            //             'group': group,
+            //             'issueLogs': issueLogs
+            //         }).mount(this.logHistoryRef.el)
+            //     }
+            // }
         }
     }
-    setGlobalData(){
+    setGlobalData() {
         this.logHistoryDateRangeTotalRef.el.innerHTML = util.secondToHour(this.env.globalTotal)
         this.durationUnexportedRef.el.innerHTML = util.secondToHour(this.env.globalTotal - this.env.exportedTotal)
     }
-    pinFilterChange(){
+    pinFilterChange() {
         this.actionPinRef.el.classList.toggle('pinned');
         this.env.issueData.pinFilter = !(this.env.issueData.pinFilter || false);
         this.update('issueData', this.env.issueData);
     }
-    logTypeChange(type='all'){
+    logTypeChange(type = 'all') {
         this.logHistoryTypeRef.el.classList.remove(this.env.issueData.trackingMode)
         this.logHistoryTypeRef.el.classList.add(type)
         this.env.issueData.trackingMode = type;
         this.update('issueData', this.env.issueData);
-        this.loadHistory(this.unix[0], this.unix[1]+1, false, true)
+        this.loadHistory(this.unix[0], this.unix[1] + 1, false, true)
     }
     mounted() {
         let res = super.mounted();
         let self = this;
         let sUnix = 0, eUnix = 0;
-        if (Array.isArray(this.env.issueData.lastDatetimeSelection) && this.env.issueData.lastDatetimeSelection.length >= 2 && this.env.issueData.pinFilter){
+        if (Array.isArray(this.env.issueData.lastDatetimeSelection) && this.env.issueData.lastDatetimeSelection.length >= 2 && this.env.issueData.pinFilter) {
             sUnix = this.env.issueData.lastDatetimeSelection[0];
             eUnix = this.env.issueData.lastDatetimeSelection[1];
             this.actionPinRef.el.classList.add('pinned')
         }
         this.loadHistory(sUnix, eUnix);
-        this.daterange = flatpickr(this.logHistoryDateRangeRef.el,{mode: "range", defaultDate: [new Date(), new Date()], altInput: true, altFormat: "M j, Y",
+        this.daterange = flatpickr(this.logHistoryDateRangeRef.el, {
+            mode: "range", defaultDate: [new Date(), new Date()], altInput: true, altFormat: "M j, Y",
             onClose: self.onChangeRangeHistoryFilter.bind(self)
         });
-        if (typeof this.env.issueData.trackingMode === 'string' || this.env.issueData.trackingMode instanceof String){
-            this.logTypeChange(this.env.issueData.trackingMode)
+        if (typeof this.env.issueData.trackingMode === 'string' || this.env.issueData.trackingMode instanceof String) {
+            // this.logTypeChange(this.env.issueData.trackingMode)
         }
         this.actionPinRef.el.addEventListener('click', self.pinFilterChange.bind(self));
         this.logHistoryDateRangeTotalRef.el.addEventListener('click', (e) => self.logTypeChange.bind(self)('all'))
@@ -172,6 +178,10 @@ export class LogReport extends Component {
                         <span class="tm-icon-svg">
                             <svg class="tm-svg-inline--fa" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="map-pin" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 512" data-fa-i2svg=""><path fill="currentColor" d="M320 144C320 223.5 255.5 288 176 288C96.47 288 32 223.5 32 144C32 64.47 96.47 0 176 0C255.5 0 320 64.47 320 144zM192 64C192 55.16 184.8 48 176 48C122.1 48 80 90.98 80 144C80 152.8 87.16 160 96 160C104.8 160 112 152.8 112 144C112 108.7 140.7 80 176 80C184.8 80 192 72.84 192 64zM144 480V317.1C154.4 319 165.1 319.1 176 319.1C186.9 319.1 197.6 319 208 317.1V480C208 497.7 193.7 512 176 512C158.3 512 144 497.7 144 480z"></path></svg>
                         </span>
+                    </div>
+                    <div class="fold-config" l-ref="fold-config">
+                        <span class="fold">Fold</span>
+                        <span class="unfold">Unfold</span>
                     </div>
                     <div style="margin-left:auto"></div>
                     <div class="duration-description">
