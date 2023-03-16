@@ -50,7 +50,7 @@ export class CheckList extends Component {
             'previous': previousID,
             'after': afterID
         }
-        this.trigger_up('checklist-changed', data)
+        this.triggerUp('checklist-changed', data)
     }
     async pushChecklist(el, params, parent, force=false){
         if (force || parent.getAttribute('force') === 'true' || (el.innerText !== "" && el.innerHTML.trim() !== el.nextElementSibling.innerHTML.trim())){

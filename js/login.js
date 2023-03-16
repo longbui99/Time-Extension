@@ -30,7 +30,7 @@ export class Login extends Component {
             const response = await this.do_request('POST', serverURL + "/web/login/jwt", (payload));
             const data = await response.json();
             this.popupRef.el.style.display = "none";
-            this.trigger_up('authentication', {
+            this.triggerUp('authentication', {
                 'jwt': data.data,
                 'loggedName': data.name,
                 "resource": data.resource,

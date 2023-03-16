@@ -1162,6 +1162,28 @@ lbwt .log-report .space-segment.log-history .log-group .log-segment {
     width: 100%;
 }
 
+lbwt .log-report .space-segment.log-history .log-group .log-segment .project{
+    width: 100%;
+}
+
+lbwt .log-report .space-segment.log-history .log-group .log-segment .project-logs{
+    width: 100%;
+}
+
+lbwt .log-report .space-segment.log-history .log-group .log-segment .project-title{
+    width: 95%;
+    background-color: lightgray;
+    padding-left: 5%;
+    font-size: 1.2em;
+    font-style: italic;
+    font-weight: 700;
+    color: var(--primary);
+    cursor: pointer;
+}
+lbwt .log-report .space-segment.log-history .log-group .log-segment .project-title:hover{
+    color: orange;
+}
+
 lbwt .log-report .space-segment.log-history .log-group .log-segment .log {
     display: inline-block;
     width: 100%;

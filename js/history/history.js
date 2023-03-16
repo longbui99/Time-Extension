@@ -17,9 +17,32 @@ export class LogReport extends Component {
         super(...arguments);
         this.subscribe('setGlobalData', this.setGlobalData.bind(this));
         this.subscribe('reloadHistory', this.reloadHistory.bind(this));
+        this.adjustDuration = this.adjustDuration.bind(this);
+        this.deletDuration = this.deletDuration.bind(this);
         this.env.issueData.trackingMode = this.env.issueData.trackingMode || 'all';
         this.env.issueData.lastDatetimeSelection = this.env.issueData.lastDatetimeSelection || [0, 0];
         this.secondToString = util.parseSecondToString(this.env.resource?.hrs_per_day || 8, this.env.resource?.days_per_week || 5)
+    }
+    adjustDuration(data){
+        util.updateItem(this.result, (e)=>e.id === data.id, data);
+        this.resetDuration()
+    }
+    deletDuration(data){
+        util.popItem(this.result, (e)=>e.id === data.logID);
+        if (this.result.length === 0){
+            this.destroy();
+        } else {
+            this.resetDuration()
+        }
+    }
+    resetDuration(){
+        let res = hUtil.getLogTypeDuration(this.result)
+        this.env.globalTotal = res[1];
+        this.env.exportedTotal = res[0];
+        this.setGlobalData();
+        if (this.daterange) {
+            this.daterange.setDate([new Date(this.unix[0] * 1000), new Date(this.unix[1] * 1000)]);
+        }
     }
     onChangeRangeHistoryFilter(selectedDates, dateStr, instance) {
         let from_unix = selectedDates[0].getTime() / 1000;
@@ -47,6 +70,7 @@ export class LogReport extends Component {
         this.unix = [from_unix, unix]
         let response = (await this.do_invisible_request('GET', `${this.env.serverURL}/management/issue/work-log/history?from_unix=${from_unix}&unix=${unix}&tracking=${this.env.issueData.trackingMode}&jwt=${this.env.jwt}`));
         let result = (await response.json());
+        this.result = result;
         this.logHistoryRef.el.innerHTML = '';
         this.logHistoryDateRangeTotalRef.el.innerHTML = util.secondToHour(0)
         let options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
@@ -76,18 +100,9 @@ export class LogReport extends Component {
             let historyByDate = util.GroupBy(result, (item) => {
                 return (new Date(item['start_date'] + "Z")).toLocaleDateString("en-US", options)
             });
-            let res = hUtil.getLogTypeDuration(result)
             this.env.historyByDate = historyByDate;
-            if (!keepTotal) {
-                this.env.globalTotal = res[1];
-                this.env.exportedTotal = res[0];
-            }
-            this.setGlobalData();
-            if (this.daterange) {
-                this.daterange.setDate([new Date(this.unix[0] * 1000), new Date(this.unix[1] * 1000)]);
-            }
-
-            this.renderLogByDate(historyByDate)
+            this.resetDuration();
+            this.renderLogByDate(historyByDate);
             // for (let group in historyByDate){
             //     let tmpl = '';
             //     let total_duration = 0;

@@ -64,7 +64,7 @@ export class IssueSubsitution extends BaseDialog{
         this.response.endDate = this.params.endDate || new Date();
         this.searchBar = new SearchBar(this);
         this.searchBar.mount(this.searchBarRef.el);
-        this.searchBar._searchIssue('favorite', true)
+        this.searchBar._searchIssue(`favorite  ${this.env.searchData.query}`, true)
         this.commentRef.el.innerText = this.params.comment || '';
         this.date1pickr = flatpickr(this.startDateRef.el,{ enableTime: true, defaultDate: this.response.startDate, altInput: true, onClose: self.changeStartDate.bind(self)});
         this.date2pickr = flatpickr(this.endDateRef.el,{ enableTime: true, defaultDate: this.response.endDate, altInput: true, onClose: self.changeEndDate.bind(self)});

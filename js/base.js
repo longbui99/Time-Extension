@@ -198,18 +198,47 @@ export class Component {
         }
     }
 
-    event(event, data) {
+    event(event, data, matchLevel=1, f) {
         if (this.custom_events[event]) {
             this.custom_events[event] = this.custom_events[event].bind(this);
             this.custom_events[event](data);
-        } else {
-            this.trigger_up(event, data);
+            matchLevel -= 1 ;
+        }
+        if (matchLevel > 0){
+            f(event, data, matchLevel);
+        }     
+    }
+
+    methodEvent(method, data, matchLevel, f){
+        if (this[method]) {
+            this[method](data)
+            matchLevel -= 1 ;
+        }
+        if (matchLevel > 0){
+            f(method, data, matchLevel);
+        }     
+    }
+
+    triggerUp(event, data, matchLevel) {
+        if (this.parent) {
+            this.parent.event(event, data, matchLevel, this.triggerUp.bind(this.parent))
         }
     }
 
-    trigger_up(event, data) {
+    triggerUpMethod(functionName, data, matchLevel){
         if (this.parent) {
-            this.parent.event(event, data)
+            this.parent.methodEvent(functionName, data, matchLevel, this.triggerUpMethod.bind(this.parent))
+        }
+    }
+
+    patchDown(event, data, matchLevel){
+        for (let child of this.childrens){
+            child.event(event, data, matchLevel, this.patchDown.bind(child))
+        }
+    }
+    patchDownMethod(event, data, matchLevel){
+        for (let child of this.childrens){
+            child.event(event, data, matchLevel, this.patchDownMethod.bind(child))
         }
     }
 
@@ -243,7 +272,7 @@ export class Component {
             if (!['GET'].includes(method)) {
                 json.body = JSON.stringify(content)
             }
-            this.trigger_up('loading', true);
+            this.triggerUp('loading', true);
             let res = (await fetch(url, json));
             if (res.ok) {
                 return res
@@ -252,7 +281,7 @@ export class Component {
                 if (res.status === 403) {
                     key = 'session_errors'
                 }
-                this.trigger_up(key, {
+                this.triggerUp(key, {
                     'message': (await res.text()),
                 })
                 return false
@@ -262,12 +291,12 @@ export class Component {
             if (method === "GET") {
                 key = 'session_errors'
             }
-            this.trigger_up(key, {
+            this.triggerUp(key, {
                 'message': erros.message
             })
             return false
         } finally {
-            this.trigger_up('loading', false);
+            this.triggerUp('loading', false);
         }
     }
 
@@ -288,7 +317,7 @@ export class Component {
                 if (res.status === 403) {
                     key = 'session_errors'
                 }
-                this.trigger_up(key, {
+                this.triggerUp(key, {
                     'message': (await res.text()),
                 })
                 return false
@@ -298,7 +327,7 @@ export class Component {
             if (method === "GET") {
                 key = 'session_errors'
             }
-            this.trigger_up(key, {
+            this.triggerUp(key, {
                 'message': erros.message
             })
             return false

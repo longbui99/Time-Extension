@@ -186,3 +186,24 @@ export function GroupBy(listData, func) {
     }
     return res
 }
+
+export function concat(json1, json2){
+    let res = Object.assign({}, json1)
+    for (let key in json2){
+        res[key] = json2[key]
+    }
+    return res
+}
+
+export function popItem(lst, f){
+    let index = lst.findIndex(f)
+    if (index !== -1) lst.splice(index, 1)
+}
+
+export function updateItem(lst, f, data){
+    let index = lst.findIndex(f)
+    if (index !== -1){
+        let item = lst[index]
+        lst[index] = concat(item, data)
+    }
+}

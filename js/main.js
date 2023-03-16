@@ -20,7 +20,7 @@ export class Main extends Component {
         super(...arguments);
         this.loadID = util.uniqueID();
         this.secondToString = util.parseSecondToString(this.env.resource?.hrs_per_day || 8, this.env.resource?.days_per_week || 5);
-        this.trigger_up("load_start", this.loadID)
+        this.triggerUp("load_start", this.loadID)
         this.env.syncChannel(['contentState']);
         this.subscribe('issueData', this.issueDataChange.bind(this))
         this.subscribe('relativeAdd', this.relativeAdd.bind(this))
@@ -98,7 +98,7 @@ export class Main extends Component {
             let result = (await response.json());
             this.relatedActiveIssues = result;
             setTimeout(()=>{
-                self.trigger_up('relative-updated', result);
+                self.triggerUp('relative-updated', result);
             },200)
         }
         this.renderRelatedActiveData()

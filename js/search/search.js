@@ -153,7 +153,7 @@ export class SearchBar extends Component {
     }
     openIssueNaviagor(event){
         if (window.event.ctrlKey && window.event.altKey && this.issueData) {
-            this.trigger_up('action-export');
+            this.triggerUp('action-export');
         } 
         else {
             window.open(this.env.issueData.url, '_blank')
