@@ -29,7 +29,7 @@ class PinPopup extends Component {
                 if (position > -10) {
                     self.el.style.top = (position + startScroll - window.scrollY).toFixed(2) + "px";
                     self.el.style.left = (rect.left + event.pageX - mouseX).toFixed(2) + "px";
-                } 
+                }
             }
             function mouseUpEvent(event) {
                 window.removeEventListener("mousemove", mouseMoveEvent);
@@ -39,7 +39,7 @@ class PinPopup extends Component {
             window.addEventListener("mouseup", mouseUpEvent)
         }
         this.dragElRef.el.addEventListener('mousedown', onMounseDown)
-        this.removeRef.el.addEventListener('click', async function(event){
+        this.removeRef.el.addEventListener('click', async function (event) {
             self.el.remove();
             self.instance = null;
             event.stopPropagation();
@@ -47,7 +47,7 @@ class PinPopup extends Component {
                 chrome.runtime.sendMessage({ closeAll: true });
             }
         })
-        window.addEventListener('keydown', async function(event){
+        window.addEventListener('keydown', async function (event) {
             if (event.keyCode === 68 && window.event.ctrlKey && window.event.altKey) {
                 self.el.remove();
                 self.instance = null;
@@ -61,7 +61,7 @@ class PinPopup extends Component {
         if (this.env.pinHTML) {
             this.pinHTML.el.classList.add('pinned');
         }
-        this.pinHTML.el.addEventListener('click', async function(event){
+        this.pinHTML.el.addEventListener('click', async function (event) {
             self.env.pinHTML = true;
             if (chrome.runtime) {
                 chrome.runtime.sendMessage({ pinHTML: true });
@@ -70,32 +70,32 @@ class PinPopup extends Component {
         })
         chrome.runtime.onMessage.addListener(
             function (request, sender, sendResponse) {
-                if (request.issueUpdate){
+                if (request.issueUpdate) {
                     self.component.issueUpdate(request.issueUpdate);
                 }
-                if (request.relativeUpdate){
+                if (request.relativeUpdate) {
                     self.component.relativeActiveUpdate(request.relativeUpdate);
                 }
-                if (request.searchData){
+                if (request.searchData) {
                     self.component.searchedUpdate(request.searchData);
                 }
-                if (request.checkGroup){
+                if (request.checkGroup) {
                     self.component.checkListUpdated(request.checkGroup);
                 }
-                sendResponse({farewell: "done"});
+                sendResponse({ farewell: "done" });
             }
         );
-        this.minimizeRef.el.addEventListener('click', event=>{
-            if (self.mainPopupRef.el.style.display !== "none"){
+        this.minimizeRef.el.addEventListener('click', event => {
+            if (self.mainPopupRef.el.style.display !== "none") {
                 let rect = self.mainPopupRef.el.getBoundingClientRect();
-                self.dragElRef.el.style.width = rect.width*0.98 + "px";
+                self.dragElRef.el.style.width = rect.width * 0.98 + "px";
                 self.el.style.left = self.el.getBoundingClientRect().left.toFixed(2) + "px";
-                self.mainPopupRef.el.style.display="none";
+                self.mainPopupRef.el.style.display = "none";
             }
         })
-        this.epxandRef.el.addEventListener('click', event=>{
+        this.epxandRef.el.addEventListener('click', event => {
             self.dragElRef.el.style.width = null;
-            self.mainPopupRef.el.style.display="inline-block";
+            self.mainPopupRef.el.style.display = "inline-block";
         })
     }
     mounted() {
@@ -104,7 +104,8 @@ class PinPopup extends Component {
         this.loadEvent();
         return res
     }
-    template = `
+    getTemplate() {
+        return `
         <div class="popup-container">
             <div style="width:100%, position:relative">
                 <div>
@@ -143,8 +144,8 @@ class PinPopup extends Component {
             </div>
         </div>
     `
+    }
 }
+{/* <svg class="svg-inline--fa fa-arrows-rotate" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="arrows-rotate" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" data-fa-i2svg=""><path fill="currentColor" d="M464 16c-17.67 0-32 14.31-32 32v74.09C392.1 66.52 327.4 32 256 32C161.5 32 78.59 92.34 49.58 182.2c-5.438 16.81 3.797 34.88 20.61 40.28c16.89 5.5 34.88-3.812 40.3-20.59C130.9 138.5 189.4 96 256 96c50.5 0 96.26 24.55 124.4 64H336c-17.67 0-32 14.31-32 32s14.33 32 32 32h128c17.67 0 32-14.31 32-32V48C496 30.31 481.7 16 464 16zM441.8 289.6c-16.92-5.438-34.88 3.812-40.3 20.59C381.1 373.5 322.6 416 256 416c-50.5 0-96.25-24.55-124.4-64H176c17.67 0 32-14.31 32-32s-14.33-32-32-32h-128c-17.67 0-32 14.31-32 32v144c0 17.69 14.33 32 32 32s32-14.31 32-32v-74.09C119.9 445.5 184.6 480 255.1 480c94.45 0 177.4-60.34 206.4-150.2C467.9 313 458.6 294.1 441.8 289.6z"></path></svg> */ }
 
-{/* <svg class="svg-inline--fa fa-arrows-rotate" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="arrows-rotate" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" data-fa-i2svg=""><path fill="currentColor" d="M464 16c-17.67 0-32 14.31-32 32v74.09C392.1 66.52 327.4 32 256 32C161.5 32 78.59 92.34 49.58 182.2c-5.438 16.81 3.797 34.88 20.61 40.28c16.89 5.5 34.88-3.812 40.3-20.59C130.9 138.5 189.4 96 256 96c50.5 0 96.26 24.55 124.4 64H336c-17.67 0-32 14.31-32 32s14.33 32 32 32h128c17.67 0 32-14.31 32-32V48C496 30.31 481.7 16 464 16zM441.8 289.6c-16.92-5.438-34.88 3.812-40.3 20.59C381.1 373.5 322.6 416 256 416c-50.5 0-96.25-24.55-124.4-64H176c17.67 0 32-14.31 32-32s-14.33-32-32-32h-128c-17.67 0-32 14.31-32 32v144c0 17.69 14.33 32 32 32s32-14.31 32-32v-74.09C119.9 445.5 184.6 480 255.1 480c94.45 0 177.4-60.34 206.4-150.2C467.9 313 458.6 294.1 441.8 289.6z"></path></svg> */}
-                       
 

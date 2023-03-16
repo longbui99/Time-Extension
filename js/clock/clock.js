@@ -46,7 +46,7 @@ export class Clock extends Component {
                 this.actionStopRef.el.style.display = "flex";
             }
             else {
-                if (this.manualLogref.el.value){
+                if (this.manualLogref.el.value) {
                     this.env.issueData.timeStatus = "force";
                     this.renderTimeActions();
                 }
@@ -66,14 +66,14 @@ export class Clock extends Component {
         }
     }
     async renderClockData(refresh = false) {
-        if (this.env.issueData.timeStatus === "active"){
+        if (this.env.issueData.timeStatus === "active") {
             this._pauseWorkLog()
         }
         if (this.currentInterval) {
             clearInterval(this.currentInterval)
         }
         if (this.env.issueData) {
-            if (refresh === true){
+            if (refresh === true) {
                 this.update('loadIssueData', null);
             }
             let record = this.env.issueData;
@@ -189,7 +189,7 @@ export class Clock extends Component {
     }
     _initManualChange() {
         let self = this;
-        this.manualLogref.el.addEventListener('keyup', function(event){
+        this.manualLogref.el.addEventListener('keyup', function (event) {
             if (!['pause', 'active'].includes(self.env.issueData?.timeStatus)) {
                 self.env.issueData.timeStatus = "force";
                 self.env.issueData.localManualLog = self.manualLogref.el.value;
@@ -225,7 +225,7 @@ export class Clock extends Component {
                     "jwt": self.env.jwt,
                     "payload": payload
                 }
-                if (!self.manualLogref.el.value){
+                if (!self.manualLogref.el.value) {
                     self.env.issueData.timeStatus = "normal";
                 }
                 await self.do_request('POST', `${self.env.serverURL}/management/issue/work-log/cancel`, params);
@@ -233,10 +233,10 @@ export class Clock extends Component {
             }
         })
     }
-    _initEvent(){
-        window.addEventListener('keyup', (event)=>{
-            if (window.event.ctrlKey && event.keyCode == 13){
-                if (self.env.contentState.showLog){
+    _initEvent() {
+        window.addEventListener('keyup', (event) => {
+            if (window.event.ctrlKey && event.keyCode == 13) {
+                if (self.env.contentState.showLog) {
                     self._doneWorkLog();
                 }
             }
@@ -248,9 +248,9 @@ export class Clock extends Component {
         this._initCommentEvent();
         this._initIconRef();
         let self = this;
-        this.flatPickr = flatpickr(this.loggedDate.el,{defaultDate: new Date(),dateFormat: 'Y-m-d'});
+        this.flatPickr = flatpickr(this.loggedDate.el, { defaultDate: new Date(), dateFormat: 'Y-m-d' });
     }
-    destroy(){
+    destroy() {
         this.flatPickr.destroy();
         return super.destroy();
     }
@@ -260,7 +260,8 @@ export class Clock extends Component {
         this._initEvent();
         return res
     }
-    template = `
+    getTemplate() {
+        return `
         <div class="issue time-log" l-ref="time-log-section">
             <div class="space-segment">
                 <div class="clock-segment">
@@ -324,4 +325,5 @@ export class Clock extends Component {
             </div>
         </div>
     `
+    }
 }

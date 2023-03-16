@@ -18,12 +18,12 @@ class Log extends Component {
         this.description = this.data.description;
     }
 
-    updateExported(data){
+    updateExported(data) {
         this.data.exported = true;
         this.toggleExported()
     }
 
-    __getSyncValue(){
+    __getSyncValue() {
         return {
             id: this.data.id,
             time: this.logDurationRef.el.value,
@@ -32,19 +32,19 @@ class Log extends Component {
         }
     }
 
-    toggleExported(){
+    toggleExported() {
         this.el.classList.remove('unexported')
-        if (!this.data.exported){
+        if (!this.data.exported) {
             this.el.classList.add('unexported')
         }
     }
 
-    async _onchangeLogContent(){
-        if (this.data.exported){
+    async _onchangeLogContent() {
+        if (this.data.exported) {
             this.data.exported = false;
             this.toggleExported();
         }
-        if (this.data.exported === false){
+        if (this.data.exported === false) {
             let values = this.__getSyncValue();
             let result = {}
             try {
@@ -57,14 +57,16 @@ class Log extends Component {
                 result['start_date'] = new Date(result['start_date'] + "Z")
                 this.data.start_date = result['start_date'];
                 for (let key in result) {
-                    if (this.data[key] !== result[key]){
+                    if (this.data[key] !== result[key]) {
                         update[key] = result[key];
                     }
                     this.data[key] = result[key]
                 }
-                if (update){
+                if (update) {
+                    let datas = {};
+                    datas[this.data.id] = update
                     this.reload();
-                    this.triggerUpMethod('adjustDuration', util.concat(update, {'id': this.data.id}), 5);
+                    this.triggerUpMethod('adjustDuration', datas, 5);
                 }
             }
         }
@@ -76,7 +78,7 @@ class Log extends Component {
         this.do_invisible_request('POST', `${this.env.serverURL}/management/issue/work-log/delete/${values.id}`, values);
         this.triggerUpMethod("deletDuration", {
             'duration': this.data.duration,
-            'mode': (this.data.exported?'exported':'unexported'),
+            'mode': (this.data.exported ? 'exported' : 'unexported'),
             'logID': this.data.id
         }, 5)
     }
@@ -125,16 +127,17 @@ class Log extends Component {
         this.logDurationRef.el.addEventListener('change', self._onchangeLogContent.bind(this));
         this.logDescriptionRef.el.addEventListener('change', self._onchangeLogContent.bind(this));
         this.actionLogDeleteRef.el.addEventListener('click', self.__actionDeleteWorkLogs.bind(this));
-        this.logDurationRef.el.addEventListener('keyup', ()=>self.checkUnexported(self.logDurationRef.el, self.duration));
-        this.logDescriptionRef.el.addEventListener('keyup', ()=>self.checkUnexported(self.logDescriptionRef.el, self.description));
+        this.logDurationRef.el.addEventListener('keyup', () => self.checkUnexported(self.logDurationRef.el, self.duration));
+        this.logDescriptionRef.el.addEventListener('keyup', () => self.checkUnexported(self.logDescriptionRef.el, self.description));
         this.actionAdjustLogRef.el.addEventListener('click', self.editLog.bind(this));
         return res
     }
-    destroy(){
+    destroy() {
         super.destroy()
         delete this.params.datas;
     }
-    template = `
+    getTemplate() {
+        return `
         <div class="log-each ${this.params.datas.exported ? '' : 'unexported'}" l-ref="export-statement">
             <input class="log-duration tm-form-control" l-ref="log-duration" value="${this.secondToString(this.params.datas.duration)}">
             <span class="wl-circle-decorator" title="${this.params.datas.date || ''}" l-ref="wl-circle-decorator">
@@ -147,6 +150,7 @@ class Log extends Component {
             </span>
         </div>
     `
+    }
 }
 class LogByIssue extends Component {
     LogByIssueBtnRef = this.useRef("log-issue-btn")
@@ -155,32 +159,36 @@ class LogByIssue extends Component {
         super(...arguments);
         this.deletDuration = this.deletDuration.bind(this);
     }
-    adjustDuration(data){
+    adjustDuration(data) {
         // console.log("LOGBYDATE")
     }
-    deletDuration(data){
-        util.popItem(this.params.datas.values, (e)=>e.id === data.logID)
-        if (this.params.datas.values.length === 0){
+    deletDuration(data) {
+        util.popItem(this.params.datas.values, (e) => e.id === data.logID)
+        if (this.params.datas.values.length === 0) {
             this.destroy();
         }
     }
-    exportLogs(event){
+    exportLogs(event) {
         let datas = this.params.datas.values;
         let exports = datas.filter(e => e.exported == false);
-        if (exports.length){
+        let self = this;
+        if (exports.length) {
             let total_duration = 0;
             if (exports.length === 1) {
                 total_duration = exports[0].duration;
             } else {
                 total_duration = exports.reduce((x, y) => x + y.duration, 0);
             }
-            this.triggerUpMethod('adjustDuration', {
-                'duration': total_duration,
-                'type': 'exported'
-            }, 2)
-            let exportIds = exports.map(e=>e.id)
-            hUtil.exportLog.bind(this)(exportIds).then(function(response){
-                this.patchDownMethod('updateExported', {})
+            datas = {}
+            let exportIds = exports.map(e => e.id)
+            exports.map(function (element) {
+                datas[element.id] = { 'exported': true }
+            })
+            hUtil.exportLog.bind(this)(exportIds).then(function (response) {
+                self.patchDownMethod('updateExported', {})
+                self.triggerUpMethod('adjustDuration',
+                    datas
+                    , 4)
             });
         }
     }
@@ -188,9 +196,9 @@ class LogByIssue extends Component {
         let res = super.mounted();
         let self = this;
         let element = this.el;
-        for (let logs of this.params.datas.values){
+        for (let logs of this.params.datas.values) {
             new Log(this, util.concat(
-                self.params, 
+                self.params,
                 {
                     'datas': logs
                 }
@@ -207,7 +215,8 @@ class LogByIssue extends Component {
         this.LogIssueExportBtnRef.el.addEventListener('click', this.exportLogs.bind(this))
         return res
     }
-    template = `
+    getTemplate() {
+        return `
         <div class="log">
             <div class="log-title">
                 <div class="log-title-heading">
@@ -226,28 +235,60 @@ class LogByIssue extends Component {
             </div>
         </div>
     `
+    }
 }
 class LogByProject extends Component {
+    projectTitleRef = this.useRef('project-title')
     projectLogRef = this.useRef('project-logs')
+    projectDurationRef = this.useRef('project-duration')
     constructor() {
         super(...arguments);
         this.deletDuration = this.deletDuration.bind(this);
+        this.isFold = this.params.isFold;
     }
-    adjustDuration(data){
+    adjustDuration(data) {
         // console.log("LOGBYDATE")
     }
-    deletDuration(data){
-        util.popItem(this.params.datas.values, (e)=>e.id === data.logID);
-        if (this.params.datas.values.length === 0){
+    deletDuration(data) {
+        util.popItem(this.params.datas.values, (e) => e.id === data.logID);
+        if (this.params.datas.values.length === 0) {
             this.destroy();
+        } else {
+            this.resetDuration()
         }
     }
-    mounted() {
-        let res = super.mounted();
-        this.params.datas.values.sort(function(a,b){return b.sequence-a.sequence})
+    resetDuration() {
+        let logs = hUtil.getLogTypeDuration(this.params.datas.values);
+        this.projectDurationRef.el.innerHTML = util.secondToHour(logs[1])
+    }
+    updateFoldState(){
+        let self = this;
+        this.projectLogRef.el.classList.remove(...['fold', 'unfold'])
+        if (this.isFold){
+            setTimeout(() => {
+                self.projectLogRef.el.classList.add('fold')
+                this.projectLogRef.el.style.display = "none";
+            }, 1)
+        } else{
+            setTimeout(() => {
+                self.projectLogRef.el.classList.add('unfold')
+                this.projectLogRef.el.style.display = "inline-block";
+            }, 1)
+        }
+    }
+    forceFoldState(state){
+        this.isFold = state;
+        this.updateFoldState();
+    }
+    toggleFoldState(){
+        this.isFold = !this.isFold;
+        this.updateFoldState();
+    }
+    loadIssueLogs(){
+        this.params.datas.values.sort(function (a, b) { return b.sequence - a.sequence })
         let logByIssue = util.GroupBy(this.params.datas.values, "issueName")
         let element = this.projectLogRef.el;
-        for (let issueName in logByIssue){
+        for (let issueName in logByIssue) {
             logByIssue[issueName]['model'] = {
                 'issueID': logByIssue[issueName].values[0].issue,
                 'issueName': issueName,
@@ -259,66 +300,115 @@ class LogByProject extends Component {
             })
             new LogByIssue(this, newParams).mount(element)
         }
+    }
+    initEvent(){
+        this.projectTitleRef.el.addEventListener('click', this.toggleFoldState.bind(this));
+    }
+    mounted() {
+        let res = super.mounted();
+        this.resetDuration();
+        this.updateFoldState();
+        this.initEvent();
+        this.loadIssueLogs();
         return res
     }
-    template = `
+    getTemplate() {
+        return `
         <div class="project">
             <div class="project-title" l-ref="project-title">
-                ${this.params.projectGroup}
+                <span>
+                    ${this.params.projectGroup}
+                </span>
+                <span class="project-duration" l-ref="project-duration">
+                    00:00
+                </span>
             </div>
             <div class="project-logs" l-ref="project-logs">
                 
             </div>
         </div>
     `
+    }
 }
 export class LogByDate extends Component {
     logSegment = this.useRef('log-segment')
     totalDurationRef = this.useRef("total-duration")
     logActionRef = this.useRef('log-date-export')
+    foldConfigRef = this.useRef('fold-config')
     constructor() {
         super(...arguments);
         this.adjustDuration = this.adjustDuration.bind(this);
         this.deletDuration = this.deletDuration.bind(this);
+        this.isFold = this.params.isFold || false;
     }
-    adjustDuration(data){
-        util.updateItem(this.params.datas.values, (e)=>e.id === data.id, data);
+    adjustDuration(datas) {
+        util.updateItemsByKey(this.params.datas.values, datas, 'id');
         this.resetDuration()
     }
-    deletDuration(data){
-        util.popItem(this.params.datas.values, (e)=>e.id === data.logID);
-        if (this.params.datas.values.length === 0){
+    deletDuration(data) {
+        util.popItem(this.params.datas.values, (e) => e.id === data.logID);
+        if (this.params.datas.values.length === 0) {
             this.destroy();
         } else {
             this.resetDuration()
         }
     }
-    resetDuration(){
+    resetDuration() {
         let logs = hUtil.getLogTypeDuration(this.params.datas.values);
         this.totalDurationRef.el.innerHTML = util.secondToHour(logs[1])
     }
-    mounted() {
+    updateFoldState(patch=true){
+        this.foldConfigRef.el.classList.remove(...['fold','unfold']);
+        if (this.isFold){
+            this.foldConfigRef.el.classList.add('fold');
+        } else{
+            this.foldConfigRef.el.classList.add('unfold');
+        }
+        if (patch)
+            this.patchDownMethod('forceFoldState', this.isFold)
+    }
+    toggleFoldState(){
+        this.isFold = !this.isFold;
+        this.updateFoldState();
+    }
+    forceFoldState(state){
+        this.isFold = state;
+        this.updateFoldState();
+    }
+    initEvent(){
+        this.foldConfigRef.el.addEventListener('click', this.toggleFoldState.bind(this));
+    }
+    renderProjectLogs(){
         let self = this;
-        let res = super.mounted();
         let element = this.logSegment.el;
         let dateLogbyProject = util.GroupBy(this.params.datas.values, "projectName")
         for (let group in dateLogbyProject) {
             new LogByProject(this, {
                 'dateGroup': this.params.dateGroup,
                 'projectGroup': group,
-                'datas': dateLogbyProject[group]
+                'datas': dateLogbyProject[group],
+                'isFold': this.isFold
             }).mount(element)
         }
         this.logActionRef.el.addEventListener('click', event => {
-            let exportIds = exports.map(e=>e.id && e.exported === false)
-            hUtil.exportLog.bind(this)(exportIds).then(function(response){
+            let datas = self.params.datas.values;
+            let exports = datas.filter(e => e.exported == false);
+            let exportIds = exports.map(e => e.id && e.exported === false)
+            hUtil.exportLog.bind(this)(exportIds).then(function (response) {
                 this.patchDownMethod('updateExported', {})
             });
         })
-        this.resetDuration()
+    }
+    mounted() {
+        let res = super.mounted();
+        this.updateFoldState(false);
+        this.resetDuration();
+        this.initEvent();
+        this.renderProjectLogs();
         return res
     }
-    template = `
+    getTemplate() {
+        return `
         <div class="log-group">
             <div class="log-heading">
                 <div class="log-heading-title">
@@ -326,6 +416,10 @@ export class LogByDate extends Component {
                     <button type="button" class="log-date-export" l-ref="log-date-export">
                         <svg class="svg-inline--fa fa-square-up-right" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="square-up-right" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" data-fa-i2svg=""><path fill="currentColor" d="M384 32H64C28.65 32 0 60.65 0 96v320c0 35.34 28.65 64 64 64h320c35.35 0 64-28.66 64-64V96C448 60.65 419.3 32 384 32zM330.5 323.9c0 6.473-3.889 12.3-9.877 14.78c-5.979 2.484-12.86 1.105-17.44-3.469l-45.25-45.25l-67.92 67.92c-12.5 12.5-32.72 12.46-45.21-.0411l-22.63-22.63C109.7 322.7 109.6 302.5 122.1 289.1l67.92-67.92L144.8 176.8C140.2 172.2 138.8 165.3 141.3 159.4c2.477-5.984 8.309-9.875 14.78-9.875h158.4c8.835 0 15.1 7.163 15.1 15.1V323.9z"></path></svg>
                     </button>
+                    <div class="fold-config" l-ref="fold-config">
+                        <span class="fold">Fold</span>
+                        <span class="unfold">Unfold</span>
+                    </div>
                 </div>
                 <div>
                     Total: <div class="total-duration" l-ref="total-duration"> 00:00 </div> 
@@ -335,4 +429,5 @@ export class LogByDate extends Component {
             </div>
         </div>
     `
+    }
 }

@@ -80,6 +80,9 @@ export function generateEnvironment() {
                 keys = [keys];
             }
             for (let key of keys) {
+                if (!this[key]){
+                    this[key] = {};
+                }
                 this.saveChannels[key] = true;
             }
         }
@@ -112,12 +115,14 @@ export class Component {
         this.params = params;
         this.childrens = [];
         this.subEnv = {};
+        this.__position = 1;
         if (this.parent?.env) {
             this.env = this.parent.env;
         } else {
             this.env = env;
         }
         if (this.parent) {
+            this.__position = this.parent.childrens.length;
             this.parent.childrens.push(this);
             this.subEnv = this.parent.subEnv;
         }
@@ -158,14 +163,13 @@ export class Component {
     }
 
     reload() {
-        let parent = this.parent, afterNode = this.el.nextSibling, parentNode = this.el.parentNode, self = this;
+        self = this;
         setTimeout(() => {
-            self.el.remove();
-            let tempoClass = (new self.constructor(parent, self.params))
-            let newTemplate = tempoClass.template;
+            let newTemplate = self.getTemplate();
             self.baseHTML = new DOMParser().parseFromString(newTemplate, 'text/html');
-            self.el = self.baseHTML.body.firstChild;
-            parentNode.insertBefore(self.el, afterNode);
+            let el = self.el;
+            self.el = self.baseHTML.body.firstChild
+            el.replaceWith(self.el);
             this.mounted();
         }, 1)
     }
@@ -173,12 +177,17 @@ export class Component {
     willStart() {
         return Promise.all([]);
     }
+    
+    getTemplate(){
+        return false
+    }
 
     render(element) {
-        if (!this.template) {
-            throw Error("Cannot find template: " + this.template);
+        let template = this.getTemplate()
+        if (!template) {
+            throw Error("Cannot find template: " + template);
         }
-        this.baseHTML = new DOMParser().parseFromString(this.template, 'text/html');
+        this.baseHTML = new DOMParser().parseFromString(template, 'text/html');
         this.el = this.baseHTML.body.firstChild;
         element.append(this.el);
     }
@@ -238,7 +247,7 @@ export class Component {
     }
     patchDownMethod(event, data, matchLevel){
         for (let child of this.childrens){
-            child.event(event, data, matchLevel, this.patchDownMethod.bind(child))
+            child.methodEvent(event, data, matchLevel, this.patchDownMethod.bind(child))
         }
     }
 
@@ -253,13 +262,16 @@ export class Component {
             element.removeAttribute("disabled")
         }
     }
-
+    __unlinkParent(){
+        this.parent.childrens.splice(this.__position, 1)
+    }
     destroy() {
         setTimeout(() => {
             for (let child of this.childrens) {
                 child.destroy();
             }
         }, 1)
+        this.__unlinkParent()
         this.el?.remove();
     }
 

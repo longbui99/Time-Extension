@@ -26,7 +26,7 @@ export class App extends Component {
     super(...arguments);
     this.subEnv = {};
     this.load = {};
-    this.env.syncChannel(['authentication', 'issueData', 'searchData']);
+    this.env.syncChannel(['authentication', 'issueData', 'searchData', 'historyData']);
   }
   mountServerAction() {
     let self = this;
@@ -50,11 +50,11 @@ export class App extends Component {
     window.addEventListener('keydown', event => {
       if (window.event.altKey && window.event.ctrlKey && window.event.shiftKey) {
         self.pinRef.el.click();
-      } 
-      else if (window.event.shiftKey && window.event.keyCode == 32){
-        if (this.popup){
+      }
+      else if (window.event.shiftKey && window.event.keyCode == 32) {
+        if (this.popup) {
           this.popup.destroy()
-        } else{
+        } else {
           self.dailyTask.el.click()
         }
       }
@@ -64,7 +64,7 @@ export class App extends Component {
       self.showDialog(dailyTasks, { title: "Daily Task" })
     })
     this.helpDialog.el.addEventListener('click', event => {
-      self.showDialog(helpDialog, {title: "Help"})
+      self.showDialog(helpDialog, { title: "Help" })
     })
   }
   async mountingComponent() {
@@ -196,7 +196,8 @@ export class App extends Component {
     }
     this.componentReady()
   }
-  template = `
+  getTemplate() {
+    return `
   <lbwt>
     <div class="main-page">
         <div l-ref="loading-banner" class="loading-layer"><div class="loader"></div></div>
@@ -238,6 +239,7 @@ export class App extends Component {
         </div>
     </div>
   </lbwt>`
+  }
 }
 
 

@@ -12,6 +12,7 @@ export class LogReport extends Component {
     logHistoryRef = this.useRef('log-history')
     logHistoryTypeRef = this.useRef('log-history-type')
     actionPinRef = this.useRef('action-pin-ref')
+    foldConfigRef = this.useRef('fold-config')
 
     constructor() {
         super(...arguments);
@@ -19,23 +20,24 @@ export class LogReport extends Component {
         this.subscribe('reloadHistory', this.reloadHistory.bind(this));
         this.adjustDuration = this.adjustDuration.bind(this);
         this.deletDuration = this.deletDuration.bind(this);
+        this.isFold = this.env.historyData?.isFold || false;
         this.env.issueData.trackingMode = this.env.issueData.trackingMode || 'all';
         this.env.issueData.lastDatetimeSelection = this.env.issueData.lastDatetimeSelection || [0, 0];
         this.secondToString = util.parseSecondToString(this.env.resource?.hrs_per_day || 8, this.env.resource?.days_per_week || 5)
     }
-    adjustDuration(data){
-        util.updateItem(this.result, (e)=>e.id === data.id, data);
+    adjustDuration(datas) {
+        util.updateItemsByKey(this.result, datas, 'id');
         this.resetDuration()
     }
-    deletDuration(data){
-        util.popItem(this.result, (e)=>e.id === data.logID);
-        if (this.result.length === 0){
+    deletDuration(data) {
+        util.popItem(this.result, (e) => e.id === data.logID);
+        if (this.result.length === 0) {
             this.destroy();
         } else {
             this.resetDuration()
         }
     }
-    resetDuration(){
+    resetDuration() {
         let res = hUtil.getLogTypeDuration(this.result)
         this.env.globalTotal = res[1];
         this.env.exportedTotal = res[0];
@@ -55,7 +57,8 @@ export class LogReport extends Component {
         for (let group in historyByDate) {
             new LogByDate(this, {
                 'dateGroup': group,
-                'datas': historyByDate[group]
+                'datas': historyByDate[group],
+                'isFold': this.isFold
             }).mount(this.logHistoryRef.el)
         }
     }
@@ -77,7 +80,6 @@ export class LogReport extends Component {
         let detailOptions = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', hour: 'numeric', minute: 'numeric' };
         if (result.length) {
             let maxDate = this.unix[1] || 0, minDate = this.unix[0] || new Date().getTime() / 1000;
-            let globalTotal = 0, exportedTotal = 0;
             for (let record of result) {
                 let date = new Date(record['start_date'] + "Z");
                 let groupUnix = date.getTime() / 1000;
@@ -98,49 +100,11 @@ export class LogReport extends Component {
             }
             this.unix = [minDate, maxDate];
             let historyByDate = util.GroupBy(result, (item) => {
-                return (new Date(item['start_date'] + "Z")).toLocaleDateString("en-US", options)
+                return item['start_date'].toLocaleDateString("en-US", options)
             });
             this.env.historyByDate = historyByDate;
             this.resetDuration();
             this.renderLogByDate(historyByDate);
-            // for (let group in historyByDate){
-            //     let tmpl = '';
-            //     let total_duration = 0;
-            //     let index = 0 ;
-            //     let values = historyByDate[group].values.sort(function(a,b){return b.sequence-a.sequence})
-            //     values.push({})
-            //     let checkpointKey = values[0]?.key;
-            //     let issueLogs = [];
-            //     let workLogs = [];
-            //     for (let log of values){
-            //         if (log.exported){
-            //             exportedTotal += log.duration;
-            //         }
-            //         if (log.key !== checkpointKey){
-            //             pageLog = values[index-1];
-            //             issueLogs.push({
-            //                 'origin': pageLog,
-            //                 'logs': workLogs,
-            //                 'group': group,
-            //             })
-            //             workLogs = [];
-            //         } 
-            //         checkpointKey = log.key;
-            //         workLogs.push(log)
-            //         total_duration += (log.duration || 0);
-            //         index++;
-            //     }
-            //     historyByDate[group].totalDuration = total_duration;
-            //     globalTotal += total_duration
-            //     if (issueLogs.length){
-            //         new LogByDate(this, {
-            //             'total_duration': total_duration,
-            //             'tmpl': tmpl,
-            //             'group': group,
-            //             'issueLogs': issueLogs
-            //         }).mount(this.logHistoryRef.el)
-            //     }
-            // }
         }
     }
     setGlobalData() {
@@ -158,6 +122,9 @@ export class LogReport extends Component {
         this.env.issueData.trackingMode = type;
         this.update('issueData', this.env.issueData);
         this.loadHistory(this.unix[0], this.unix[1] + 1, false, true)
+    }
+    initEvent(){
+        this.foldConfigRef.el.addEventListener('click', this.toggleFoldState.bind(this));
     }
     mounted() {
         let res = super.mounted();
@@ -179,9 +146,32 @@ export class LogReport extends Component {
         this.actionPinRef.el.addEventListener('click', self.pinFilterChange.bind(self));
         this.logHistoryDateRangeTotalRef.el.addEventListener('click', (e) => self.logTypeChange.bind(self)('all'))
         this.durationUnexportedRef.el.addEventListener('click', (e) => self.logTypeChange.bind(self)('unexported'))
+        this.initEvent();
+        this.updateFoldState();
         return res
     }
-    template = `
+    updateFoldState(patch=true){
+        this.foldConfigRef.el.classList.remove(...['fold','unfold']);
+        if (this.isFold){
+            this.foldConfigRef.el.classList.add('fold');
+        } else{
+            this.foldConfigRef.el.classList.add('unfold');
+        }
+        if (patch)
+            this.patchDownMethod('forceFoldState', this.isFold)
+        this.env.historyData.isFold = this.isFold;
+        this.update('historyData', this.env.historyData);
+    }
+    toggleFoldState(){
+        this.isFold = !this.isFold;
+        this.updateFoldState();
+    }
+    forceFoldState(state){
+        this.isFold = state;
+        this.updateFoldState();
+    }
+    getTemplate() {
+        return `
         <div class="log-report" l-ref="log-report-section">
             <div class="space-segment log-history-navigator"> 
                 <div class="log-history-navigator-action" l-ref='log-history-type'>
@@ -217,4 +207,5 @@ export class LogReport extends Component {
             </div>
         </div>
     `
+    }
 }

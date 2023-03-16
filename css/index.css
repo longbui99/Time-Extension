@@ -40,7 +40,28 @@ lbwt button {
         transform: rotate(360deg);
     }
 }
+@keyframes scrolltop {
+    from {
+        opacity: 1;
+        height: 100%;
+    }
 
+    to {
+        opacity: 0;
+        height: 0;
+    }
+}
+@keyframes scrolldown {
+    from {
+        opacity: 0;
+        height: 0;
+    }
+
+    to {
+        height: 100%;
+        opacity: 1;
+    }
+}
 
 .space-segment {
     width: 100%;
@@ -1152,6 +1173,24 @@ lbwt .log-report .space-segment.log-history .log-group .log-heading:hover .log-h
     visibility: visible;
 }
 
+lbwt .log-report .space-segment.log-history .log-group .log-heading .log-heading-title .fold-config {
+    color: var(--primary);
+    margin-left: 10px;
+    opacity: 0.7;
+    transition: linear 0.2s;
+    visibility: hidden;
+    cursor: pointer;
+    font-size: 0.8em;
+    font-style: normal;
+}
+
+lbwt .log-report .space-segment.log-history .log-group .log-heading:hover .log-heading-title .fold-config {
+    color: var(--primary);
+    margin-left: 10px;
+    opacity: 1;
+    visibility: visible;
+}
+
 lbwt .log-report .space-segment.log-history .log-group .log-heading .total-duration {
     font-weight: 600;
     color: black;
@@ -1164,14 +1203,17 @@ lbwt .log-report .space-segment.log-history .log-group .log-segment {
 
 lbwt .log-report .space-segment.log-history .log-group .log-segment .project{
     width: 100%;
+    margin-top: 2px;
 }
 
 lbwt .log-report .space-segment.log-history .log-group .log-segment .project-logs{
     width: 100%;
+    /* display: flex; */
+    overflow: hidden;
+    display: inline-block;
 }
-
 lbwt .log-report .space-segment.log-history .log-group .log-segment .project-title{
-    width: 95%;
+    width: 93%;
     background-color: lightgray;
     padding-left: 5%;
     font-size: 1.2em;
@@ -1179,6 +1221,11 @@ lbwt .log-report .space-segment.log-history .log-group .log-segment .project-tit
     font-weight: 700;
     color: var(--primary);
     cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-right: 2%;
+    height: 1.5em;
 }
 lbwt .log-report .space-segment.log-history .log-group .log-segment .project-title:hover{
     color: orange;

@@ -1,8 +1,8 @@
 
 import * as util from "../utils/utils.js"
-import {Component} from "../base.js"
+import { Component } from "../base.js"
 export class SearchBar extends Component {
-        
+
     searchRef = this.useRef('search-bar-issue')
     reloadIssueRef = this.useRef("reload-issue")
     favoriteNavigatorRef = this.useRef('favorite-segment-ref')
@@ -20,14 +20,14 @@ export class SearchBar extends Component {
         this.subscribe('favorite', this.favoriteChanged.bind(this));
         this.openIssueNaviagor = this.openIssueNaviagor.bind(this);
     }
-    favoriteChanged(isFavorite){
-        if (isFavorite){
+    favoriteChanged(isFavorite) {
+        if (isFavorite) {
             this.favoriteNavigatorRef.el.classList.add('favorite');
-        } else{
+        } else {
             this.favoriteNavigatorRef.el.classList.remove('favorite');
         }
     }
-    async loadIssue(){
+    async loadIssue() {
         if (!this.env.issueData?.broardcast) {
             let response = (await this.do_invisible_request('GET', `${this.env.serverURL}/management/issue/get/${this.env.issueData.id}?jwt=${this.env.jwt}`));
             let result = (await response.json());
@@ -37,7 +37,7 @@ export class SearchBar extends Component {
             this.update('issueData', this.env.issueData)
         }
     }
-    renderIssueSearch(data){
+    renderIssueSearch(data) {
         this.typeRef.el.innerHTML = `<img src="${data.type_url}"/>`;
         this.statusRef.el.innerText = data.status || '';
         this.searchRef.el.value = util._getDisplayName(data);
@@ -47,13 +47,13 @@ export class SearchBar extends Component {
         this.searchResultRef.el.style.display = 'none';
         this.update('issueData', this.searchData.values[index]);
     }
-    async fetchSearchIssue(text){
+    async fetchSearchIssue(text) {
         let offset = this.searchData?.values?.length || 0;
         let result = (await this.do_request('GET', `${this.env.serverURL}/management/issue/search/${text}?offset=${offset}&jwt=${this.env.jwt}`));
         return (await result.json());
     }
     loadSearchedIssues(data) {
-        if (data === null || data === undefined){
+        if (data === null || data === undefined) {
             return
         }
         let element = this.searchResultRef.el, record = {}, self = this;
@@ -64,7 +64,7 @@ export class SearchBar extends Component {
             data[i].displayName = util._getDisplayName(record);
             let statusSpan = document.createElement('em')
             let sprints = (record.sprint && record.sprint.split(' ') || '')
-            let sprintText = ((typeof sprints === 'string')? '' : "|" + sprints[sprints.length-1])
+            let sprintText = ((typeof sprints === 'string') ? '' : "|" + sprints[sprints.length - 1])
             statusSpan.innerHTML = `${util._minifyString(record.status, 13)}<b>${sprintText} </b>`
             let typeImg = document.createElement('img')
             typeImg.setAttribute('src', record.type_url)
@@ -74,41 +74,41 @@ export class SearchBar extends Component {
             p.append(typeImg)
             p.append(textSpan)
             p.append(statusSpan)
-            p.setAttribute('tabindex', 10+i)
+            p.setAttribute('tabindex', 10 + i)
             p.setAttribute('title', data[i].displayName)
             p.addEventListener('click', () => {
                 self.chooseIssue(i);
             })
-            p.addEventListener('keydown', event=>{
-                if (event.keyCode === 38){
+            p.addEventListener('keydown', event => {
+                if (event.keyCode === 38) {
                     let el = p.previousElementSibling;
-                    if (el){
-                        el.focus();
-                    }
-                    event.stopPropagation();
-                } 
-                if (event.keyCode === 40){
-                    let el = p.nextElementSibling;
-                    if (el){
+                    if (el) {
                         el.focus();
                     }
                     event.stopPropagation();
                 }
-                if (event.keyCode === 13){
+                if (event.keyCode === 40) {
+                    let el = p.nextElementSibling;
+                    if (el) {
+                        el.focus();
+                    }
+                    event.stopPropagation();
+                }
+                if (event.keyCode === 13) {
                     p.click()
                 }
             })
             element.append(p);
         }
-        if (data.length){
+        if (data.length) {
             let p = document.createElement('p');
             p.classList.add('search-more');
             p.innerHTML = "Search More...";
-            p.setAttribute('tabindex', 10+this.searchData?.values?.length+1);
+            p.setAttribute('tabindex', 10 + this.searchData?.values?.length + 1);
             element.append(p);
-            p.addEventListener('click', event=>{
+            p.addEventListener('click', event => {
                 event.stopImmediatePropagation();
-                self.fetchSearchIssue(self.searchData.query).then(result=>{
+                self.fetchSearchIssue(self.searchData.query).then(result => {
                     self.searchData.values.push(...result);
                     element.innerHTML = '';
                     self.loadSearchedIssues(self.searchData.values);
@@ -118,18 +118,18 @@ export class SearchBar extends Component {
             element.style.display = 'inline-block';
         }
     }
-    async _searchIssue(text, invisible=false) {
+    async _searchIssue(text, invisible = false) {
         this.searchData = {}
         this.searchData.query = text;
-        this.searchData.values =  (await this.fetchSearchIssue(text));
-        if (!invisible){
+        this.searchData.values = (await this.fetchSearchIssue(text));
+        if (!invisible) {
             this.loadSearchedIssues(this.searchData.values);
         }
         this.update('searchData', this.searchData);
     }
     _initSearchBar() {
         let self = this;
-        if (this.env.searchData){
+        if (this.env.searchData) {
             this.searchData = this.env.searchData;
         }
         this.searchRef.el.addEventListener('change', (event) => {
@@ -139,34 +139,34 @@ export class SearchBar extends Component {
                 self._searchIssue(this.searchRef.el.value)
             }
         })
-        this.searchRef.el.addEventListener('click', event=>{
-            if (self.searchData){
+        this.searchRef.el.addEventListener('click', event => {
+            if (self.searchData) {
                 self.searchResultRef.el.innerHTML = '';
                 self.searchResultRef.el.style.display = 'none';
                 self.loadSearchedIssues(self.searchData.values);
                 event.stopImmediatePropagation();
             }
         })
-        window.addEventListener('click', (e)=>{
+        window.addEventListener('click', (e) => {
             self.searchResultRef.el.style.display = 'none';
         })
     }
-    openIssueNaviagor(event){
+    openIssueNaviagor(event) {
         if (window.event.ctrlKey && window.event.altKey && this.issueData) {
             this.triggerUp('action-export');
-        } 
+        }
         else {
             window.open(this.env.issueData.url, '_blank')
         }
     }
-    async fetchIssueFromServer(){
+    async fetchIssueFromServer() {
         let response = (await this.do_request('GET', `${this.env.serverURL}/management/issue/fetch/${this.env.issueData.id}?jwt=${this.env.jwt}`));
         let data = (await response.json())
         this.update('issueData', data);
     }
     _initNavigator() {
         let self = this;
-        if (this.env.issueData){
+        if (this.env.issueData) {
             this.reloadIssueRef.el.style.visibility = 'visible';
         }
         this.openIssueref.el.addEventListener('click', this.openIssueNaviagor)
@@ -174,32 +174,32 @@ export class SearchBar extends Component {
             self.fetchIssueFromServer()
         })
     }
-    _initFavorite(){
+    _initFavorite() {
         let self = this;
-        this.addToFavoriteRef.el.addEventListener('click', event=>{
-            if (self.env.issueData){
+        this.addToFavoriteRef.el.addEventListener('click', event => {
+            if (self.env.issueData) {
                 self.do_request('POST', `${self.env.serverURL}/management/issue/favorite/add?jwt=${self.env.jwt}&id=${self.env.issueData.id}`);
                 self.favoriteNavigatorRef.el.classList.add('favorite');
             }
         })
-        this.removeToFavoriteRef.el.addEventListener('click', event=>{
-            if (self.env.issueData){
+        this.removeToFavoriteRef.el.addEventListener('click', event => {
+            if (self.env.issueData) {
                 self.do_request('POST', `${self.env.serverURL}/management/issue/favorite/delete?jwt=${self.env.jwt}&id=${self.env.issueData.id}`);
                 self.favoriteNavigatorRef.el.classList.remove('favorite');
             }
         })
     }
-    renderOverview(){
-        if (this.env.issueData){
+    renderOverview() {
+        if (this.env.issueData) {
             this.renderIssueSearch(this.env.issueData);
         }
         let self = this;
-        window.addEventListener('keydown', event=>{
-            if (event.key === "Escape"){
+        window.addEventListener('keydown', event => {
+            if (event.key === "Escape") {
                 self.searchResultRef.el.style.display = 'none';
                 self.flatPickr.close();
             }
-            if (event.code === 'KeyF' && window.event.ctrlKey && window.event.shiftKey){
+            if (event.code === 'KeyF' && window.event.ctrlKey && window.event.shiftKey) {
                 self.searchRef.el.click();
                 self.searchRef.el.focus();
             }
@@ -214,7 +214,8 @@ export class SearchBar extends Component {
         return res
     }
 
-    template = `
+    getTemplate() {
+        return `
     <div class="issue search-bar">
         <button type="button" class="reload-issue" l-ref="reload-issue" tabindex="999" title="Reload From The Original Server">
             <span class="tm-icon-svg">
@@ -255,4 +256,5 @@ export class SearchBar extends Component {
         </div>
     </div>
     `
+    }
 }

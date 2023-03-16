@@ -200,10 +200,34 @@ export function popItem(lst, f){
     if (index !== -1) lst.splice(index, 1)
 }
 
+export function popItems(lst, f){
+
+}
+
 export function updateItem(lst, f, data){
     let index = lst.findIndex(f)
     if (index !== -1){
         let item = lst[index]
         lst[index] = concat(item, data)
+    }
+}
+
+export function updateItems(lst, f, datas){
+    if (lst.length != datas.length){
+        throw RangeError("The range of updating data and to be updated data must be same")
+    }
+    for (let i = 0; i < lst.length; i++){
+        let index = lst.findIndex(f)
+        if (index !== -1){
+            lst[index] = concat(lst[index], datas[index])
+        }
+    }
+}
+
+export function updateItemsByKey(lst, datas, key){
+    for (let i = 0; i < lst.length; i++){
+        if (lst[i][key]){
+            lst[i] = concat(lst[i], datas[lst[i][key]] || {} )
+        }
     }
 }

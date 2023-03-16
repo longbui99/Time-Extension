@@ -8,43 +8,43 @@ export class CheckList extends Component {
         super(...arguments);
     }
 
-    makeChecklistComponent(_id, ac, content){
-        return `<div class="ac-container ${(ac.is_header?'header': '')} ${(ac.initial?'initial': '')}" checklistID="${ac.id}"  sequence=${ac.sequence} header=${ac.is_header}>
+    makeChecklistComponent(_id, ac, content) {
+        return `<div class="ac-container ${(ac.is_header ? 'header' : '')} ${(ac.initial ? 'initial' : '')}" checklistID="${ac.id}"  sequence=${ac.sequence} header=${ac.is_header}>
             <div class="ac-segment justify-content-between">
-            ${(ac.initial?'': `<span class="drag-object"><span class="tm-icon-svg"><svg class="svg-inline--fa fa-sort drag-icon" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="sort" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 512" data-fa-i2svg=""><path fill="currentColor" d="M27.66 224h264.7c24.6 0 36.89-29.78 19.54-47.12l-132.3-136.8c-5.406-5.406-12.47-8.107-19.53-8.107c-7.055 0-14.09 2.701-19.45 8.107L8.119 176.9C-9.229 194.2 3.055 224 27.66 224zM292.3 288H27.66c-24.6 0-36.89 29.77-19.54 47.12l132.5 136.8C145.9 477.3 152.1 480 160 480c7.053 0 14.12-2.703 19.53-8.109l132.3-136.8C329.2 317.8 316.9 288 292.3 288z"></path></svg></span>
+            ${(ac.initial ? '' : `<span class="drag-object"><span class="tm-icon-svg"><svg class="svg-inline--fa fa-sort drag-icon" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="sort" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 512" data-fa-i2svg=""><path fill="currentColor" d="M27.66 224h264.7c24.6 0 36.89-29.78 19.54-47.12l-132.3-136.8c-5.406-5.406-12.47-8.107-19.53-8.107c-7.055 0-14.09 2.701-19.45 8.107L8.119 176.9C-9.229 194.2 3.055 224 27.66 224zM292.3 288H27.66c-24.6 0-36.89 29.77-19.54 47.12l132.5 136.8C145.9 477.3 152.1 480 160 480c7.053 0 14.12-2.703 19.53-8.109l132.3-136.8C329.2 317.8 316.9 288 292.3 288z"></path></svg></span>
             </span>`)}
             <div class="tm-form-check">
-                <input class="tm-form-check-input" type="checkbox" value="${ac.id}" id="${_id}" ${ac.checked?'checked': ''}>
+                <input class="tm-form-check-input" type="checkbox" value="${ac.id}" id="${_id}" ${ac.checked ? 'checked' : ''}>
                 <p class="tm-form-check-label" contenteditable="true">${content}</p>
                 <span class="original-value" style="display:none">${content}</span>
                 </div>
             </div>
         </div>`
     }
-    insertCheckGroup(payload){
+    insertCheckGroup(payload) {
         let newChecklist = ""
-        if (!payload.params.id){
+        if (!payload.params.id) {
             newChecklist = new DOMParser().parseFromString(this.makeChecklistComponent('', payload.params, ''), 'text/html').body.firstChild;
-        } else{
+        } else {
             newChecklist = this.acContainerRef.el.querySelector(`[checklistID="${payload.params.id}"`);
         }
-        if (payload.previous){
+        if (payload.previous) {
             let element = this.acContainerRef.el.querySelector(`[sequence="${payload.previous}"`);
-            if (element){
+            if (element) {
                 this.acContainerRef.el.insertBefore(newChecklist, element.nextElementSibling);
             }
         }
-        else if (payload.after){
+        else if (payload.after) {
             let element = this.acContainerRef.el.querySelector(`[sequence="${payload.after}"`);
-            if (element){
+            if (element) {
                 this.acContainerRef.el.insertBefore(newChecklist, element);
             }
         }
-        if (!payload.params.id){
+        if (!payload.params.id) {
             this.initEditChecklistEvent(newChecklist, payload.params)
         }
     }
-    checkListChanged(params, previousID, afterID){
+    checkListChanged(params, previousID, afterID) {
         let data = {
             'params': params,
             'previous': previousID,
@@ -52,8 +52,8 @@ export class CheckList extends Component {
         }
         this.triggerUp('checklist-changed', data)
     }
-    async pushChecklist(el, params, parent, force=false){
-        if (force || parent.getAttribute('force') === 'true' || (el.innerText !== "" && el.innerHTML.trim() !== el.nextElementSibling.innerHTML.trim())){
+    async pushChecklist(el, params, parent, force = false) {
+        if (force || parent.getAttribute('force') === 'true' || (el.innerText !== "" && el.innerHTML.trim() !== el.nextElementSibling.innerHTML.trim())) {
             let payload = {};
             let element = parent.querySelector('.tm-form-check-label');
             payload.checked = element.previousElementSibling.checked || false;
@@ -75,27 +75,27 @@ export class CheckList extends Component {
 
         // this.checkListChanged(params, parent.previousElementSibling?.getAttribute('sequence'), parent.nextElementSibling?.getAttribute('sequence'))
     }
-    initEditChecklistEvent(element, params){
+    initEditChecklistEvent(element, params) {
         let self = this;
         let baseParent = element;
         element._checkListData = params;
         while (!baseParent.classList.contains('ac-container')) baseParent = baseParent.parentNode;
-        function resetSequence(){
-            for (let index = 0; index < baseParent.parentNode.childNodes.length; index++){
+        function resetSequence() {
+            for (let index = 0; index < baseParent.parentNode.childNodes.length; index++) {
                 baseParent.parentNode.childNodes[index].setAttribute("sequence", index)
             }
         }
-        element.previousElementSibling.addEventListener('change', event=>{
+        element.previousElementSibling.addEventListener('change', event => {
             self.pushChecklist(element, params, baseParent, true)
         })
         element.addEventListener('click', (event) => {
-            if (element != window.selectedElement 
+            if (element != window.selectedElement
                 && (element.innerText !== "" && element.innerHTML.trim() !== element.nextElementSibling.innerHTML.trim())
-                ){
+            ) {
                 let clickedElement = self.acContainerRef.el.querySelector('.editing');
                 clickedElement?.classList.remove('editing');
                 element.classList.add('editing');
-                if (window.selectedElement){
+                if (window.selectedElement) {
                     let basePushElement = window.selectedElement;
                     while (!basePushElement.classList.contains('ac-container')) basePushElement = basePushElement.parentNode;
                     self.pushChecklist(window.selectedElement, params, basePushElement)
@@ -111,8 +111,8 @@ export class CheckList extends Component {
                 el.focus();
                 window.selectedElement = el;
                 baseParent.remove();
-                if (parseInt(element.previousElementSibling.value)){
-                    self.do_invisible_request('POST', `${self.env.serverURL}/management/ac/delete`, {acID:parseInt(element.previousElementSibling.value), jwt: self.env.jwt})
+                if (parseInt(element.previousElementSibling.value)) {
+                    self.do_invisible_request('POST', `${self.env.serverURL}/management/ac/delete`, { acID: parseInt(element.previousElementSibling.value), jwt: self.env.jwt })
                 }
             }
             else if (event.keyCode === 13 && !window.event.shiftKey) {
@@ -120,8 +120,8 @@ export class CheckList extends Component {
                 let data = {
                     'is_header': (baseParent.getAttribute('header') === "true")
                 }
-                let fromInitial =  baseParent.classList.contains('initial');
-                let sequencePivot = (fromInitial?baseParent.previousElementSibling: baseParent)
+                let fromInitial = baseParent.classList.contains('initial');
+                let sequencePivot = (fromInitial ? baseParent.previousElementSibling : baseParent)
                 data.sequence = (parseInt(sequencePivot?.getAttribute("sequence")) + 1) || 0;
                 let newChecklist = new DOMParser().parseFromString(self.makeChecklistComponent('', data, ''), 'text/html').body.firstChild;
                 newChecklist.classList.add("unsaved");
@@ -138,7 +138,7 @@ export class CheckList extends Component {
                     self.pushChecklist(element, params, HandlingElement);
                     resetSequence();
                 } else {
-                    if (!window.event.ctrlKey){
+                    if (!window.event.ctrlKey) {
                         baseParent.parentNode.insertBefore(newChecklist, baseParent.nextSibling);
                         newChecklist.querySelector('.tm-form-check-label').focus();
                         newChecklist.querySelector('.tm-form-check-label').classList.add('editing');
@@ -147,11 +147,11 @@ export class CheckList extends Component {
                     self.pushChecklist(element, params, baseParent);
                     resetSequence();
                 }
-                if (!window.event.ctrlKey || baseParent.classList.contains('initial')){
+                if (!window.event.ctrlKey || baseParent.classList.contains('initial')) {
                     self.initEditChecklistEvent(newChecklist.querySelector('.tm-form-check-label'), params);
                     setTimeout(() => {
                         newChecklist.querySelector('.tm-form-check-label').innerHTML = content;
-                        while (newChecklist.nextElementSibling){
+                        while (newChecklist.nextElementSibling) {
                             newChecklist = newChecklist.nextElementSibling;
                             newChecklist.setAttribute("sequence", parseInt(newChecklist.getAttribute("sequence")) + 1)
                         }
@@ -159,32 +159,32 @@ export class CheckList extends Component {
                 }
                 event.stopPropagation();
             }
-            else if (window.event.ctrlKey && event.keyCode === 191){
+            else if (window.event.ctrlKey && event.keyCode === 191) {
                 let isHeader = !(baseParent.getAttribute("header", false) == "true");
                 baseParent.setAttribute("header", isHeader);
                 baseParent.classList.remove('header');
                 baseParent.setAttribute('force', 'true');
-                isHeader && baseParent.classList.add(isHeader?'header':'base');
+                isHeader && baseParent.classList.add(isHeader ? 'header' : 'base');
             }
-            else if (event.keyCode === 38){
+            else if (event.keyCode === 38) {
                 let el = baseParent.previousElementSibling?.querySelector('.tm-form-check-label');
                 window.selectedElement = el;
-                if (!parseInt(element.previousElementSibling.value)){
+                if (!parseInt(element.previousElementSibling.value)) {
                     self.pushChecklist(element, params, baseParent);
                 }
-                if (el){
+                if (el) {
                     el.click();
                     el.focus();
                 }
                 event.stopPropagation();
             }
-            else if (event.keyCode === 40){
+            else if (event.keyCode === 40) {
                 let el = baseParent.nextElementSibling?.querySelector('.tm-form-check-label');
                 window.selectedElement = el;
-                if (!parseInt(element.previousElementSibling.value)){
+                if (!parseInt(element.previousElementSibling.value)) {
                     self.pushChecklist(element, params, baseParent);
                 }
-                if (el){
+                if (el) {
                     el.click();
                     el.focus();
                 }
@@ -196,40 +196,40 @@ export class CheckList extends Component {
             event.stopImmediatePropagation();
         })
         element.addEventListener('keyup', (event) => {
-            if ((element.innerHTML.trim() != element.nextElementSibling.innerHTML.trim()) || baseParent.getAttribute('force') === 'true'){
+            if ((element.innerHTML.trim() != element.nextElementSibling.innerHTML.trim()) || baseParent.getAttribute('force') === 'true') {
                 baseParent.classList.add("unsaved");
             } else {
                 baseParent.classList.remove("unsaved");
             }
             event.stopImmediatePropagation();
         })
-        function recursiveRemoveAttribute(element, isRoot=false){
-            if (!isRoot){
+        function recursiveRemoveAttribute(element, isRoot = false) {
+            if (!isRoot) {
                 let isBold = element.style.fontWeight;
-                if (isBold == "bold" || parseInt(isBold) > 600){
+                if (isBold == "bold" || parseInt(isBold) > 600) {
                     let p = document.createElement('p');
                     p.innerHTML = element.innerHTML;
                     element.parentNode.insertBefore(p, element);
                     element.remove()
                     element = p;
                 }
-                while(element.attributes?.length > 0) {
+                while (element.attributes?.length > 0) {
                     element.removeAttribute(element.attributes[0].name)
                 };
             }
-            for (let node of element.children){
+            for (let node of element.children) {
                 recursiveRemoveAttribute(node)
             }
         }
-        element.addEventListener("paste", event=>{
+        element.addEventListener("paste", event => {
             setTimeout(() => {
                 recursiveRemoveAttribute(element, true)
             }, 1);
             event.stopImmediatePropagation();
         })
     }
-    
-    initDragEvent(parentElement, element, event){
+
+    initDragEvent(parentElement, element, event) {
         let acElement = element, self = this;
         while (!acElement.classList.contains('ac-container')) acElement = acElement.parentNode;
         let clonedElement = acElement.cloneNode();
@@ -249,30 +249,30 @@ export class CheckList extends Component {
         // Move element with the position of mouse
         let mouseX = event.pageX, mouseY = event.pageY;
         // Fetch all visible tags
-        function getBoundary(element, res){
+        function getBoundary(element, res) {
             let boundary = element.getBoundingClientRect();
-            res.center = boundary.top + boundary.height/2;
+            res.center = boundary.top + boundary.height / 2;
             res.top = boundary.top;
             res.bottom = boundary.bottom;
             res.height = boundary.height;
         }
         let clientTags = [], currentPosition = -1, index = 0;
-        for (let el of acElement.parentNode.childNodes){
-            if (el != acElement){
-                let res = {el: el}
+        for (let el of acElement.parentNode.childNodes) {
+            if (el != acElement) {
+                let res = { el: el }
                 clientTags.push(res);
                 getBoundary(el, res);
-                if (el == clonedElement){
+                if (el == clonedElement) {
                     currentPosition = index;
                 }
-            } 
+            }
             index++
         }
         clientTags.pop();
         let startScroll = window.scrollY;
-        function swap(i, j){
+        function swap(i, j) {
             let res1 = clientTags[i], res2 = clientTags[j], t = res1.el;
-            if (i > j){
+            if (i > j) {
                 res2.el.parentNode.insertBefore(res1.el, res2.el);
             } else {
                 res2.el.parentNode.insertBefore(res1.el, res2.el.nextElementSibling);
@@ -286,24 +286,24 @@ export class CheckList extends Component {
         }
         let areaRect = {
             'top': clientTags[0].top,
-            'bottom': clientTags[clientTags.length-1].bottom,
+            'bottom': clientTags[clientTags.length - 1].bottom,
         }
-        function mouseMoveEvent(event){
-            if (event.pageY >= areaRect.top){
+        function mouseMoveEvent(event) {
+            if (event.pageY >= areaRect.top) {
                 let position = (rect.top + event.pageY - mouseY)
                 acElement.style.top = (position + startScroll - window.scrollY).toFixed(2) + "px";
                 acElement.style.left = (rect.left + event.pageX - mouseX).toFixed(2) + "px";
-                if (currentPosition > 0 && position < clientTags[currentPosition-1].center && (position < clientTags[currentPosition].center)){
-                    swap(currentPosition, currentPosition-1)
+                if (currentPosition > 0 && position < clientTags[currentPosition - 1].center && (position < clientTags[currentPosition].center)) {
+                    swap(currentPosition, currentPosition - 1)
                     currentPosition--;
-                } else 
-                if (currentPosition < clientTags.length-1 && position > clientTags[currentPosition+1].top && position > clientTags[currentPosition].top){
-                    swap(currentPosition, currentPosition+1)
-                    currentPosition++;
-                }
+                } else
+                    if (currentPosition < clientTags.length - 1 && position > clientTags[currentPosition + 1].top && position > clientTags[currentPosition].top) {
+                        swap(currentPosition, currentPosition + 1)
+                        currentPosition++;
+                    }
             }
         }
-        function mouseUpEvent(event){
+        function mouseUpEvent(event) {
             window.removeEventListener("mousemove", mouseMoveEvent);
             window.removeEventListener("mouseup", mouseUpEvent);
             acElement.classList.remove("dragging");
@@ -315,26 +315,26 @@ export class CheckList extends Component {
                 "jwt": self.env.jwt
             }
             let payload = {};
-            payload.sequence = parseInt(clientTags[currentPosition-1]?.el.getAttribute("sequence")) || -1;
+            payload.sequence = parseInt(clientTags[currentPosition - 1]?.el.getAttribute("sequence")) || -1;
             payload.float_sequence = 1;
             params.id = util.parseInt(acElement.querySelector('.tm-form-check-input').value) || 0
             params.payload = payload
             self.do_invisible_request('POST', `${self.env.serverURL}/management/ac?`, params);
-            for (let index = 0; index < clientTags.length; index++){
+            for (let index = 0; index < clientTags.length; index++) {
                 clientTags[index].el.setAttribute("sequence", index)
             }
         }
         window.addEventListener("mousemove", mouseMoveEvent)
         window.addEventListener("mouseup", mouseUpEvent)
     }
-    initDragEventRoot(element, event){
+    initDragEventRoot(element, event) {
         element.removeEventListener("mousedown", self.initDragEventRoot);
         this.initDragEvent(element, event.srcElement, event)
     }
     async initChecklists() {
         let element = this.acContainerRef.el, self = this;
         element.innerHTML = "";
-        if (this.env.issueData){
+        if (this.env.issueData) {
             let payload = {
                 'source': 'Extension'
             }
@@ -344,47 +344,47 @@ export class CheckList extends Component {
                 "payload": payload
             }
             let result = [];
-            if (this.env.issueData.broardcast && this.env.issueData.acs){
+            if (this.env.issueData.broardcast && this.env.issueData.acs) {
                 result = this.env.issueData.acs;
-            } else{
-                if (this.env.contentState.showLog){
+            } else {
+                if (this.env.contentState.showLog) {
                     result = (await this.do_invisible_request('GET', `${this.env.serverURL}/management/issue/ac?${new URLSearchParams(params)}`));
-                } else{
+                } else {
                     result = (await this.do_invisible_request('GET', `${this.env.serverURL}/management/issue/ac?${new URLSearchParams(params)}`));
                 }
                 result = (await result.json())
                 this.env.issueData.acs = result;
             }
             let default_data = {
-                'id':false,
+                'id': false,
                 'content': '',
                 'is_header': true,
                 'initial': true,
             }
             result.push(default_data)
             let string = ""
-            for (let ac of result){
+            for (let ac of result) {
                 let _id = util.uniqueID(ac.id)
                 let parsedData = util.parseChecklist(ac.content)
                 string += this.makeChecklistComponent(_id, ac, parsedData)
             }
             element.innerHTML = string
-            for (let ac of element.querySelectorAll('.tm-form-check-label')){
+            for (let ac of element.querySelectorAll('.tm-form-check-label')) {
                 this.initEditChecklistEvent(ac, params)
             }
-            window.addEventListener('click', event=>{
+            window.addEventListener('click', event => {
                 let selectedElement = element.querySelector('.editing')
-                if (selectedElement){
+                if (selectedElement) {
                     selectedElement.classList.remove('editing');
                     let baseParent = selectedElement
                     while (!baseParent.classList.contains('ac-container')) baseParent = baseParent.parentNode;
                     self.pushChecklist(selectedElement, params, baseParent)
                 }
             })
-            element.addEventListener('mousedown', event=>{
-                if (event.srcElement.classList.contains('drag-object') || 
-                event.srcElement.classList.contains('drag-icon') || 
-                event.srcElement.nodeName === "path"){
+            element.addEventListener('mousedown', event => {
+                if (event.srcElement.classList.contains('drag-object') ||
+                    event.srcElement.classList.contains('drag-icon') ||
+                    event.srcElement.nodeName === "path") {
                     this.initDragEventRoot(element, event)
                     event.stopImmediatePropagation();
                 }
@@ -393,12 +393,13 @@ export class CheckList extends Component {
     }
     mounted() {
         let res = super.mounted();
-        return new Promise(async (resolve, reject)=>{
+        return new Promise(async (resolve, reject) => {
             await this.initChecklists();
             resolve(true)
         });
     }
-    template = `
+    getTemplate() {
+        return `
         <div class="acceptance-criteria" l-ref="tm-ac-section">
             <div class="space-segment">
                 <div l-ref="ac-content" class="ac-content">
@@ -407,4 +408,5 @@ export class CheckList extends Component {
             </div>
         </div>
     `
+    }
 }

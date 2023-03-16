@@ -1,11 +1,11 @@
 
-import {Component} from "./base.js"
+import { Component } from "./base.js"
 import * as util from "./utils/utils.js"
-import {SearchBar} from "./search/search.js"
-import {Clock} from "./clock/clock.js"
-import {LogReport} from "./history/history.js"
-import {CheckList} from "./checklists/checklist.js"
-import {Favorite} from "./favorite/favorite.js"
+import { SearchBar } from "./search/search.js"
+import { Clock } from "./clock/clock.js"
+import { LogReport } from "./history/history.js"
+import { CheckList } from "./checklists/checklist.js"
+import { Favorite } from "./favorite/favorite.js"
 export class Main extends Component {
 
     searchBarSegment = this.useRef('search-bar-segment')
@@ -28,7 +28,7 @@ export class Main extends Component {
     custom_events = {
         'action-export': this.actionExportToOriginalServer
     }
-    async relativeAdd(data){
+    async relativeAdd(data) {
         let params = {
             "id": data.id,
             "jwt": this.env.jwt,
@@ -45,7 +45,7 @@ export class Main extends Component {
         for (let record of this.relatedActiveIssues) {
             template += `
                 <div class="active-item">
-                    <span class="issue-key" tabindex="${1100+i}">
+                    <span class="issue-key" tabindex="${1100 + i}">
                         ${record.key}   
                     </span>
                     <span class="issue-name" title="${record.name}">
@@ -56,39 +56,39 @@ export class Main extends Component {
                     </span>
                 </div>`
             i++;
-        }   
+        }
         this.relatedActiveRef.el.innerHTML = template;
         let elements = this.relatedActiveRef.el.querySelectorAll('.issue-key')
         let self = this;
         let progressLog = []
         for (let index = 0; index < elements.length; index++) {
-            elements[index].addEventListener('click', function(event){
+            elements[index].addEventListener('click', function (event) {
                 self.env.issueData = self.relatedActiveIssues[index];
                 self.update('loadIssueData', null);
                 // self.env.update('issueData', self.env.issueData)
             })
-            if (self.relatedActiveIssues[index].last_start){
-                progressLog.push({el:elements[index].parentNode.querySelector('.duration'), active_duration: self.relatedActiveIssues[index].active_duration})
+            if (self.relatedActiveIssues[index].last_start) {
+                progressLog.push({ el: elements[index].parentNode.querySelector('.duration'), active_duration: self.relatedActiveIssues[index].active_duration })
             }
         }
-        if (this.relatedCurrentInterval){
+        if (this.relatedCurrentInterval) {
             clearInterval(this.relatedCurrentInterval)
         }
-        if (progressLog.length){
+        if (progressLog.length) {
             let pivotTime = new Date().getTime();
             this.relatedCurrentInterval = setInterval(() => {
-                for (let progress of progressLog){
-                    progress.el.innerText =this.secondToString(parseInt(progress.active_duration + (new Date().getTime() - pivotTime) / 1000));
+                for (let progress of progressLog) {
+                    progress.el.innerText = this.secondToString(parseInt(progress.active_duration + (new Date().getTime() - pivotTime) / 1000));
                 }
             }, 500)
         }
-        if (this.relatedActiveIssues.length){
+        if (this.relatedActiveIssues.length) {
             this.relatedActiveRef.el.parentNode.style.display = "block";
         }
     }
-    async fetchRelativeActive(){
+    async fetchRelativeActive() {
         this.relatedActiveRef.el.parentNode.style.display = "none";
-        if (!this.env.issueData?.broardcast){
+        if (!this.env.issueData?.broardcast) {
             let params = JSON.stringify({
                 "except": this.env.issueData?.id,
                 "limit": 6,
@@ -97,20 +97,20 @@ export class Main extends Component {
             let response = (await this.do_invisible_request('GET', `${this.env.serverURL}/management/issue/my-active?jwt=${this.env.jwt}&payload=${params}`))
             let result = (await response.json());
             this.relatedActiveIssues = result;
-            setTimeout(()=>{
+            setTimeout(() => {
                 self.triggerUp('relative-updated', result);
-            },200)
+            }, 200)
         }
         this.renderRelatedActiveData()
     }
-    issueDataChange(){
+    issueDataChange() {
         this.fetchRelativeActive();
-        if (!this.env.contentState){
+        if (!this.env.contentState) {
             this.initContentState();
         }
     }
 
-    async actionExportToOriginalServer(){
+    async actionExportToOriginalServer() {
         this.env.issueData.timeStatus = null;
         let payload = {
             'source': 'Extension',
@@ -126,8 +126,8 @@ export class Main extends Component {
         }
         await this.do_request('POST', `${this.env.serverURL}/management/issue/export?`, params);
     }
-    
-    toggleDatetimeSelection(configs, mode, callback){
+
+    toggleDatetimeSelection(configs, mode, callback) {
         let tmpl = `
             <div class="page">
                 <div class="loading-layer"></div>
@@ -140,13 +140,13 @@ export class Main extends Component {
         `
         let element = new DOMParser().parseFromString(tmpl, 'text/html').body.firstChild;
         let date1 = element.querySelector('.date1');
-        let date1pickr = flatpickr(date1,{ enableTime: true, defaultDate: configs[0], altInput: true});
-        if (mode === 'range'){
+        let date1pickr = flatpickr(date1, { enableTime: true, defaultDate: configs[0], altInput: true });
+        if (mode === 'range') {
             element.querySelector('.date2').classList.remove('d-none');
             let date2 = element.querySelector('.date2');
-            let date2pickr = flatpickr(date2,{ enableTime: true, defaultDate: configs[1], altInput: true});
+            let date2pickr = flatpickr(date2, { enableTime: true, defaultDate: configs[1], altInput: true });
         }
-        element.querySelector('.btn').addEventListener('click', event=>{
+        element.querySelector('.btn').addEventListener('click', event => {
             let res = {
                 date1: new Date(date1.value),
                 date2: new Date(date2.value)
@@ -156,8 +156,8 @@ export class Main extends Component {
         })
         document.querySelector('.main-page').append(element);
     }
-    renderContentByState(contentClass){
-        if (this.contentSegment.el.activeComponent){
+    renderContentByState(contentClass) {
+        if (this.contentSegment.el.activeComponent) {
             this.contentSegment.el.activeComponent.destroy();
         }
         let component = new contentClass(this);
@@ -165,27 +165,27 @@ export class Main extends Component {
         this.contentSegment.el.activeComponent = component;
         return component;
     }
-    contentStateChange(){
-        for (let key in this.env.contentState){
-            if (this.env.contentState[key]){
+    contentStateChange() {
+        for (let key in this.env.contentState) {
+            if (this.env.contentState[key]) {
                 this.tabAtionElements[key][0].classList.add('tm-active');
                 let parent = this.tabAtionElements[key][0].parentElement;
                 parent.classList.remove('right', 'left', 'middle');
-                setTimeout(()=>{
+                setTimeout(() => {
                     parent.classList.add(this.tabAtionElements[key][0].getAttribute('data-action'));
                 }, 1)
                 this.renderContentByState(this.tabAtionElements[key][1])
             }
-            else{
+            else {
                 this.tabAtionElements[key][0].classList.remove('tm-active');
             }
         }
     }
-    initContentState(){
-        if (this.env.issueData){
-            if (this.env.contentState){
+    initContentState() {
+        if (this.env.issueData) {
+            if (this.env.contentState) {
                 this.contentStateChange();
-            } else{
+            } else {
                 this.env.contentState = {
                     showLog: true,
                     showLogReport: false,
@@ -200,72 +200,72 @@ export class Main extends Component {
             this.env.syncOne('contentState', null)
         }
     }
-    triggerContentType(){
+    triggerContentType() {
         this.initContentState();
         this.update('contentState', this.env.contentState)
     }
-    initContentEvent(){
+    initContentEvent() {
         let self = this;
-        function resetContentState(){
-            for (let key in self.env.contentState){
+        function resetContentState() {
+            for (let key in self.env.contentState) {
                 self.env.contentState[key] = false;
             }
         }
-        this.timeLogHeadingRef.el.addEventListener('click', ()=>{
-            if (!self.env.contentState.showLog){
+        this.timeLogHeadingRef.el.addEventListener('click', () => {
+            if (!self.env.contentState.showLog) {
                 resetContentState();
                 self.env.contentState.showLog = true;
                 self.triggerContentType()
             }
         })
-        this.logReportHeadingRef.el.addEventListener('click', ()=>{
-            if (!self.env.contentState?.showLogReport){
+        this.logReportHeadingRef.el.addEventListener('click', () => {
+            if (!self.env.contentState?.showLogReport) {
                 resetContentState();
                 self.env.contentState.showLogReport = true;
                 self.triggerContentType()
             }
         })
-        this.acHeadingRef.el.addEventListener('click', ()=>{
-            if (!self.env.contentState.showChecklist){
+        this.acHeadingRef.el.addEventListener('click', () => {
+            if (!self.env.contentState.showChecklist) {
                 resetContentState();
                 self.env.contentState.showChecklist = true;
                 self.triggerContentType()
             }
         })
-        this.favoriteHeadingRef.el.addEventListener('click', ()=>{
-            if (!self.env.contentState.showFavorite){
+        this.favoriteHeadingRef.el.addEventListener('click', () => {
+            if (!self.env.contentState.showFavorite) {
                 resetContentState();
                 self.env.contentState.showFavorite = true;
                 self.triggerContentType()
             }
         })
     }
-    
+
     initEvent() {
         let self = this;
-        window.addEventListener('keydown', event=>{
-            if (event.keyCode === 13){
-                document.activeElement.click()               
+        window.addEventListener('keydown', event => {
+            if (event.keyCode === 13) {
+                document.activeElement.click()
             }
-            if (event.code === 'Digit1' && window.event.ctrlKey && window.event.shiftKey){
+            if (event.code === 'Digit1' && window.event.ctrlKey && window.event.shiftKey) {
                 self.timeLogHeadingRef.el.click();
                 event.stopImmediatePropagation();
             }
-            if (event.code === 'Digit2' && window.event.ctrlKey && window.event.shiftKey){
+            if (event.code === 'Digit2' && window.event.ctrlKey && window.event.shiftKey) {
                 self.logReportHeadingRef.el.click();
             }
-            if (event.code === 'Digit3' && window.event.ctrlKey && window.event.shiftKey){
+            if (event.code === 'Digit3' && window.event.ctrlKey && window.event.shiftKey) {
                 self.acHeadingRef.el.click();
             }
-            if (event.code === 'Digit4' && window.event.ctrlKey && window.event.shiftKey){
+            if (event.code === 'Digit4' && window.event.ctrlKey && window.event.shiftKey) {
                 self.favoriteHeadingRef.el.click();
             }
-            if (event.code === 'KeyE' && window.event.ctrlKey && window.event.shiftKey){
+            if (event.code === 'KeyE' && window.event.ctrlKey && window.event.shiftKey) {
                 self.actionExportToOriginalServer();
             }
         })
     }
-    initGeneral(){
+    initGeneral() {
         this.tabAtionElements = {
             'showLog': [this.timeLogHeadingRef.el, Clock],
             'showLogReport': [this.logReportHeadingRef.el, LogReport],
@@ -283,7 +283,8 @@ export class Main extends Component {
         this.fetchRelativeActive();
         return res;
     }
-    template = `<div class="main-action-page show">
+    getTemplate() {
+        return `<div class="main-action-page show">
         <div l-ref="search-bar-segment" style="width:100%">
 
         </div>
@@ -311,4 +312,5 @@ export class Main extends Component {
             
         </div>
     </div>`
+    }
 }

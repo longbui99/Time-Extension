@@ -1,5 +1,5 @@
 
-import {Component} from "./base.js"
+import { Component } from "./base.js"
 export class Login extends Component {
     constructor() {
         super(...arguments);
@@ -10,7 +10,7 @@ export class Login extends Component {
         this.signInRef = this.useRef('actionSignIn');
 
         this.actionSignIn = this.actionSignIn.bind(this);
-        
+
     }
     _prepareValues() {
         let data = {
@@ -48,7 +48,8 @@ export class Login extends Component {
         return res
     }
 
-    template = `
+    getTemplate() {
+        return `
     <div class="login-page">
         <div class="sign-in-tooltip">
             <div class="text-danger">
@@ -80,4 +81,5 @@ export class Login extends Component {
         </div>
     </div>
 `
+    }
 }
