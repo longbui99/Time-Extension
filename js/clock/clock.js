@@ -66,9 +66,6 @@ export class Clock extends Component {
         }
     }
     async renderClockData(refresh = false) {
-        if (this.env.issueData.timeStatus === "active") {
-            this._pauseWorkLog()
-        }
         if (this.currentInterval) {
             clearInterval(this.currentInterval)
         }
