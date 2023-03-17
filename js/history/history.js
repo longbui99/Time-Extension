@@ -75,7 +75,7 @@ export class LogReport extends Component {
         let response = (await this.do_invisible_request('GET', `${this.env.serverURL}/management/issue/work-log/history?from_unix=${from_unix}&unix=${unix}&tracking=${this.env.issueData.trackingMode}&jwt=${this.env.jwt}`));
         let result = (await response.json());
         this.result = result;
-        this.renderHistory(result)
+        this.searchChange()
     }
     async renderHistory(result){
         this.logHistoryRef.el.innerHTML = '';
