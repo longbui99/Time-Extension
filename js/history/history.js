@@ -38,8 +38,8 @@ export class LogReport extends Component {
             this.resetDuration()
         }
     }
-    resetDuration() {
-        let res = hUtil.getLogTypeDuration(this.result)
+    resetDuration(result) {
+        let res = hUtil.getLogTypeDuration(result || this.result)
         this.env.globalTotal = res[1];
         this.env.exportedTotal = res[0];
         this.setGlobalData();
@@ -110,7 +110,7 @@ export class LogReport extends Component {
                 return item['start_date'].toLocaleDateString("en-US", options)
             });
             this.env.historyByDate = historyByDate;
-            this.resetDuration();
+            this.resetDuration(result);
             this.renderLogByDate(historyByDate);
         }
     }
@@ -131,15 +131,14 @@ export class LogReport extends Component {
         this.loadHistory(this.unix[0], this.unix[1] + 1, false, true)
     }
     filterResults(){
-        let searches = this.logHistorySearchRef.el.value.trim();
+        let searches = this.logHistorySearchRef.el.value.trim().toLowerCase();
         if (searches){
             searches = searches.split(' ');
             if (searches.length){
                 let regex = new RegExp(`.*(${searches.map(e=>e.trim()).join("|")}).*`)
                 let result = []
                 for (let record of this.result){
-                    let testStr = `[${record.key}] ${record.description}`
-                    if (regex.test(testStr))
+                    if (regex.test(record.key.toLowerCase() + "|" + record.issueName.toLowerCase() + "|" + record.description.toLowerCase()))
                     result.push(record)
                 }
                 this.renderHistory(result)
