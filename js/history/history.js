@@ -10,6 +10,7 @@ export class LogReport extends Component {
     durationUnexportedRef = this.useRef('duration-unexpored')
     logHistoryDateRangeTotalRef = this.useRef('log-history-total-range')
     logHistoryRef = this.useRef('log-history')
+    logHistorySearchRef = this.useRef('history-search')
     logHistoryTypeRef = this.useRef('log-history-type')
     actionPinRef = this.useRef('action-pin-ref')
     foldConfigRef = this.useRef('fold-config')
@@ -74,6 +75,9 @@ export class LogReport extends Component {
         let response = (await this.do_invisible_request('GET', `${this.env.serverURL}/management/issue/work-log/history?from_unix=${from_unix}&unix=${unix}&tracking=${this.env.issueData.trackingMode}&jwt=${this.env.jwt}`));
         let result = (await response.json());
         this.result = result;
+        this.renderHistory(result)
+    }
+    async renderHistory(result){
         this.logHistoryRef.el.innerHTML = '';
         this.logHistoryDateRangeTotalRef.el.innerHTML = util.secondToHour(0)
         let options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
@@ -81,7 +85,10 @@ export class LogReport extends Component {
         if (result.length) {
             let maxDate = this.unix[1] || 0, minDate = this.unix[0] || new Date().getTime() / 1000;
             for (let record of result) {
-                let date = new Date(record['start_date'] + "Z");
+                let date = record['start_date'];
+                if (!(date instanceof Date)){
+                    date = new Date(record['start_date'] + "Z");
+                }
                 let groupUnix = date.getTime() / 1000;
                 if (groupUnix > maxDate) {
                     maxDate = groupUnix;
@@ -123,8 +130,40 @@ export class LogReport extends Component {
         this.update('issueData', this.env.issueData);
         this.loadHistory(this.unix[0], this.unix[1] + 1, false, true)
     }
+    filterResults(){
+        let searches = this.logHistorySearchRef.el.value.trim();
+        if (searches){
+            searches = searches.split(' ');
+            if (searches.length){
+                let regex = new RegExp(`.*(${searches.map(e=>e.trim()).join("|")}).*`)
+                let result = []
+                for (let record of this.result){
+                    let testStr = `[${record.key}] ${record.description}`
+                    if (regex.test(testStr))
+                    result.push(record)
+                }
+                this.renderHistory(result)
+            }
+        }
+
+    }
+    searchChange(){
+        if (this.logHistorySearchRef.el.value){
+            this.filterResults();
+        } else{
+            this.renderHistory(this.result);
+        }
+    }
+    searchKeyUp(event){
+        if ((event.keyCode || event.which) === 13){
+            this.searchChange();
+        }
+    }
     initEvent(){
+        let self = this;
         this.foldConfigRef.el.addEventListener('click', this.toggleFoldState.bind(this));
+        this.logHistorySearchRef.el.addEventListener('change', this.searchChange.bind(this));
+        // this.logHistorySearchRef.el.addEventListener('keyup', this.searchKeyUp.bind(this));
     }
     mounted() {
         let res = super.mounted();
@@ -189,6 +228,10 @@ export class LogReport extends Component {
                         <span class="unfold">Unfold</span>
                     </div>
                     <div style="margin-left:auto"></div>
+                    <div class="history-search">
+                        <svg class="svg-inline--fa fa-search history-search-icon fa-w-16" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="search" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" data-fa-i2svg=""><path fill="currentColor" d="M505 442.7L405.3 343c-4.5-4.5-10.6-7-17-7H372c27.6-35.3 44-79.7 44-128C416 93.1 322.9 0 208 0S0 93.1 0 208s93.1 208 208 208c48.3 0 92.7-16.4 128-44v16.3c0 6.4 2.5 12.5 7 17l99.7 99.7c9.4 9.4 24.6 9.4 33.9 0l28.3-28.3c9.4-9.4 9.4-24.6.1-34zM208 336c-70.7 0-128-57.2-128-128 0-70.7 57.2-128 128-128 70.7 0 128 57.2 128 128 0 70.7-57.2 128-128 128z"></path></svg>
+                        <input l-ref="history-search" class="log-history-navigator-input  tm-form-control" placeholder="Search ...">
+                    </div>
                     <div class="duration-description">
                         <span>    
                             <svg class="svg-inline--fa fa-circle" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="circle" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" data-fa-i2svg=""><path fill="currentColor" d="M512 256C512 397.4 397.4 512 256 512C114.6 512 0 397.4 0 256C0 114.6 114.6 0 256 0C397.4 0 512 114.6 512 256z"></path></svg>

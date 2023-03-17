@@ -265,15 +265,11 @@ class LogByProject extends Component {
         let self = this;
         this.projectLogRef.el.classList.remove(...['fold', 'unfold'])
         if (this.isFold){
-            setTimeout(() => {
                 self.projectLogRef.el.classList.add('fold')
                 this.projectLogRef.el.style.display = "none";
-            }, 1)
         } else{
-            setTimeout(() => {
                 self.projectLogRef.el.classList.add('unfold')
                 this.projectLogRef.el.style.display = "inline-block";
-            }, 1)
         }
     }
     forceFoldState(state){

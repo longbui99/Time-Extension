@@ -72,6 +72,7 @@ lbwt button {
     --primary: rgb(4, 105, 105);
     --secondary: rgb(133, 0, 0);
     --third: rgb(131, 133, 12);
+    --fourth: rgb(79, 97, 80);
     padding: 10px;
     font-size: 12px;
     max-width: 600px;
@@ -1060,6 +1061,20 @@ lbwt .log-report .space-segment.log-history-navigator .log-history-navigator-act
     justify-content: space-between;
 }
 
+lbwt .log-report .space-segment.log-history-navigator .log-history-navigator-action .history-search {
+    display: flex;
+    align-items: center;
+    width: 30%;
+    border-left: solid 1px var(--fourth);
+}
+
+lbwt .log-report .space-segment.log-history-navigator .log-history-navigator-action .history-search .history-search-icon {
+    position: absolute;
+    color: var(--primary);
+    margin-left: 5px;
+}
+
+
 lbwt .log-report .space-segment.log-history-navigator .log-history-navigator-action .total {
     font-weight: 700;
 }
@@ -1126,6 +1141,19 @@ lbwt .log-report .space-segment.log-history-navigator .log-history-navigator-inp
 
 lbwt .log-report .space-segment.log-history-navigator .log-history-navigator-input:hover {
     border: solid 1px lightgray;
+}
+
+lbwt .log-report .space-segment.log-history-navigator .log-history-navigator-input.search {
+    width: 30%;
+    border: solid 1px transparent;
+    font-size: 1em;
+    padding-left: 25px;
+    margin-left: 10px;
+}
+
+lbwt .log-report .space-segment.log-history-navigator .log-history-navigator-action .history-search .log-history-navigator-input {
+    width: 100%;
+    padding-left: 20px;
 }
 
 lbwt .log-report .space-segment.log-history {
