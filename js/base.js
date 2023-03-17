@@ -218,7 +218,7 @@ export class Component {
         }     
     }
 
-    methodEvent(method, data, matchLevel, f){
+    methodEvent(method, data, matchLevel=1, f){
         if (this[method]) {
             this[method](data)
             matchLevel -= 1 ;
@@ -228,13 +228,13 @@ export class Component {
         }     
     }
 
-    triggerUp(event, data, matchLevel) {
+    triggerUp(event, data, matchLevel = 1) {
         if (this.parent) {
             this.parent.event(event, data, matchLevel, this.triggerUp.bind(this.parent))
         }
     }
 
-    triggerUpMethod(functionName, data, matchLevel){
+    triggerUpMethod(functionName, data, matchLevel = 1){
         if (this.parent) {
             this.parent.methodEvent(functionName, data, matchLevel, this.triggerUpMethod.bind(this.parent))
         }

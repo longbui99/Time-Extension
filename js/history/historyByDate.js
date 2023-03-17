@@ -393,9 +393,9 @@ export class LogByDate extends Component {
         this.logActionRef.el.addEventListener('click', event => {
             let datas = self.params.datas.values;
             let exports = datas.filter(e => e.exported == false);
-            let exportIds = exports.map(e => e.id && e.exported === false)
-            hUtil.exportLog.bind(this)(exportIds).then(function (response) {
-                this.patchDownMethod('updateExported', {})
+            let exportIds = exports.map(e => e.id)
+            hUtil.exportLog.bind(self)(exportIds).then(function (response) {
+                self.patchDownMethod('updateExported', {})
             });
         })
     }
