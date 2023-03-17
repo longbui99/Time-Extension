@@ -107,7 +107,8 @@ export class Favorite extends Component {
         this.initFavorites()
         return res
     }
-    template = `
+    getTemplate() {
+        return `
         <div class="favorite-issues" l-ref="tm-favorite-section">
             <div class="space-segment">
                 <div class="favorite-content">
@@ -117,4 +118,5 @@ export class Favorite extends Component {
             </div>
         </div>
     `
+    }
 }
