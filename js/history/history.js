@@ -3,6 +3,7 @@ import * as util from "../utils/utils.js"
 import * as hUtil from "./historyUtils.js"
 import { Component } from "../base.js"
 import { LogByDate } from "./historyByDate.js"
+import { historySearchPopup } from "./historySearchPopup.js"
 export class LogReport extends Component {
 
     logReportSectionRef = this.useRef('log-report-section')
@@ -14,11 +15,12 @@ export class LogReport extends Component {
     logHistoryTypeRef = this.useRef('log-history-type')
     actionPinRef = this.useRef('action-pin-ref')
     foldConfigRef = this.useRef('fold-config')
+    historySearchDetailRef = this.useRef('history-search-detail')
 
     constructor() {
         super(...arguments);
         this.subscribe('setGlobalData', this.setGlobalData.bind(this));
-        this.subscribe('reloadHistory', this.reloadHistory.bind(this));
+        this.subscribe('searchChange', this.searchChange.bind(this));
         this.adjustDuration = this.adjustDuration.bind(this);
         this.deletDuration = this.deletDuration.bind(this);
         this.isFold = this.env.historyData?.isFold || false;
@@ -77,10 +79,53 @@ export class LogReport extends Component {
         this.result = result;
         this.searchChange()
     }
+
+    getDateBreakdown(item){
+        let dailyOptions = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+        return (item)=>item['start_date'].toLocaleDateString("en-US", dailyOptions)
+    }
+    getWeekBreakdown(item){
+        let dailyOptions = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+        let today = new Date();
+        let firstDate = new Date(`${today.getFullYear()}/1/1`);
+        let startDateOfWeek = 1, firstWeekOfYearDate = firstDate;
+        let startYearWeekDay = firstDate.getDay();
+        let nameByWeekNum = {};
+        if (startYearWeekDay > startDateOfWeek){
+            firstWeekOfYearDate = firstDate.addDays(7-(1+startYearWeekDay));
+            let week = 0;
+            nameByWeekNum[0] = `Week ${week}, ${firstWeekOfYearDate.addDays(-7).toLocaleDateString("en-US", dailyOptions)} -> ${firstWeekOfYearDate.toLocaleDateString("en-US", dailyOptions)}`
+        }
+        let week = 1;
+        while (firstWeekOfYearDate.getFullYear() === today.getFullYear()){
+            nextDate = firstWeekOfYearDate.addDays(7)
+            nameByWeekNum[parseInt(firstWeekOfYearDate.getDate()/7)] = `Week ${week}, ${firstWeekOfYearDate.toLocaleDateString("en-US", dailyOptions)} -> ${nextDate.toLocaleDateString("en-US", dailyOptions)}`
+            week += 1;
+            firstWeekOfYearDate = nextDate
+        }
+        return (item)=>{
+            let balance = item['start_date'].getDay() - startYearWeekDay;
+            let week = parseInt(item['start_date'].getDate()/7)
+            if (balance < 0){
+                week-=1
+            }
+            return nameByWeekNum[week]
+        }
+
+    }
+    getMonthBreakdown(item){
+        item['start_date'].toLocaleDateString("en-US", options)
+    }
+    getYearBreakdown(item){
+
+    }
+    getBreakdown(){
+        return this.getDateBreakdown();
+    }
+
     async renderHistory(result){
         this.logHistoryRef.el.innerHTML = '';
         this.logHistoryDateRangeTotalRef.el.innerHTML = util.secondToHour(0)
-        let options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
         let detailOptions = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', hour: 'numeric', minute: 'numeric' };
         if (result.length) {
             let maxDate = this.unix[1] || 0, minDate = this.unix[0] || new Date().getTime() / 1000;
@@ -106,9 +151,7 @@ export class LogReport extends Component {
                 }))
             }
             this.unix = [minDate, maxDate];
-            let historyByDate = util.GroupBy(result, (item) => {
-                return item['start_date'].toLocaleDateString("en-US", options)
-            });
+            let historyByDate = util.GroupBy(result, this.getBreakdown());
             this.env.historyByDate = historyByDate;
             this.resetDuration(result);
             this.renderLogByDate(historyByDate);
@@ -162,7 +205,14 @@ export class LogReport extends Component {
         let self = this;
         this.foldConfigRef.el.addEventListener('click', this.toggleFoldState.bind(this));
         this.logHistorySearchRef.el.addEventListener('change', this.searchChange.bind(this));
-        // this.logHistorySearchRef.el.addEventListener('keyup', this.searchKeyUp.bind(this));
+        this.logHistorySearchRef.el.addEventListener('keyup', this.searchKeyUp.bind(this));
+    }
+    renderAdvanceSearchPopup(){
+        if (!this.popup){
+            new historySearchPopup(this, {
+                pointElement: this.historySearchDetailRef.el,
+            }).mount(document.body);
+        }
     }
     mounted() {
         let res = super.mounted();
@@ -184,6 +234,7 @@ export class LogReport extends Component {
         this.actionPinRef.el.addEventListener('click', self.pinFilterChange.bind(self));
         this.logHistoryDateRangeTotalRef.el.addEventListener('click', (e) => self.logTypeChange.bind(self)('all'))
         this.durationUnexportedRef.el.addEventListener('click', (e) => self.logTypeChange.bind(self)('unexported'))
+        this.historySearchDetailRef.el.addEventListener('click', this.renderAdvanceSearchPopup.bind(this))
         this.initEvent();
         this.updateFoldState();
         return res
@@ -213,23 +264,28 @@ export class LogReport extends Component {
         <div class="log-report" l-ref="log-report-section">
             <div class="space-segment log-history-navigator"> 
                 <div class="log-history-navigator-action" l-ref='log-history-type'>
-                    <span class="filter-icon">
-                        <svg class="svg-inline--fa fa-filter" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="filter" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" data-fa-i2svg=""><path fill="currentColor" d="M3.853 54.87C10.47 40.9 24.54 32 40 32H472C487.5 32 501.5 40.9 508.1 54.87C514.8 68.84 512.7 85.37 502.1 97.33L320 320.9V448C320 460.1 313.2 471.2 302.3 476.6C291.5 482 278.5 480.9 268.8 473.6L204.8 425.6C196.7 419.6 192 410.1 192 400V320.9L9.042 97.33C-.745 85.37-2.765 68.84 3.854 54.87L3.853 54.87z"></path></svg>
-                    </span>
-                    <input l-ref="history-date-range" class="log-history-navigator-input tm-form-control">
+                    <div class="history-search-detail" l-ref="history-search-detail">
+                        <i class="fas fa-sliders-h"></i>
+                    </div>
+                    <div class="history-date-range">
+                        <span class="filter-icon">
+                            <svg class="svg-inline--fa fa-filter" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="filter" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" data-fa-i2svg=""><path fill="currentColor" d="M3.853 54.87C10.47 40.9 24.54 32 40 32H472C487.5 32 501.5 40.9 508.1 54.87C514.8 68.84 512.7 85.37 502.1 97.33L320 320.9V448C320 460.1 313.2 471.2 302.3 476.6C291.5 482 278.5 480.9 268.8 473.6L204.8 425.6C196.7 419.6 192 410.1 192 400V320.9L9.042 97.33C-.745 85.37-2.765 68.84 3.854 54.87L3.853 54.87z"></path></svg>
+                        </span>
+                        <input l-ref="history-date-range" class="log-history-navigator-input tm-form-control">
+                    </div>
                     <div class="pin-action" l-ref="action-pin-ref" title="Pin Filter">
                         <span class="tm-icon-svg">
                             <svg class="tm-svg-inline--fa" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="map-pin" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 512" data-fa-i2svg=""><path fill="currentColor" d="M320 144C320 223.5 255.5 288 176 288C96.47 288 32 223.5 32 144C32 64.47 96.47 0 176 0C255.5 0 320 64.47 320 144zM192 64C192 55.16 184.8 48 176 48C122.1 48 80 90.98 80 144C80 152.8 87.16 160 96 160C104.8 160 112 152.8 112 144C112 108.7 140.7 80 176 80C184.8 80 192 72.84 192 64zM144 480V317.1C154.4 319 165.1 319.1 176 319.1C186.9 319.1 197.6 319 208 317.1V480C208 497.7 193.7 512 176 512C158.3 512 144 497.7 144 480z"></path></svg>
                         </span>
                     </div>
-                    <div class="fold-config" l-ref="fold-config">
-                        <span class="fold">Fold</span>
-                        <span class="unfold">Unfold</span>
-                    </div>
-                    <div style="margin-left:auto"></div>
                     <div class="history-search">
                         <svg class="svg-inline--fa fa-search history-search-icon fa-w-16" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="search" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" data-fa-i2svg=""><path fill="currentColor" d="M505 442.7L405.3 343c-4.5-4.5-10.6-7-17-7H372c27.6-35.3 44-79.7 44-128C416 93.1 322.9 0 208 0S0 93.1 0 208s93.1 208 208 208c48.3 0 92.7-16.4 128-44v16.3c0 6.4 2.5 12.5 7 17l99.7 99.7c9.4 9.4 24.6 9.4 33.9 0l28.3-28.3c9.4-9.4 9.4-24.6.1-34zM208 336c-70.7 0-128-57.2-128-128 0-70.7 57.2-128 128-128 70.7 0 128 57.2 128 128 0 70.7-57.2 128-128 128z"></path></svg>
                         <input l-ref="history-search" class="log-history-navigator-input  tm-form-control" placeholder="Search ...">
+                    </div>
+                    <div style="margin-left:auto"></div>
+                    <div class="fold-config" l-ref="fold-config">
+                        <span class="fold">Fold</span>
+                        <span class="unfold">Unfold</span>
                     </div>
                     <div class="duration-description">
                         <span>    

@@ -1,4 +1,9 @@
 import { secondToHour } from "../utils/utils.js";
+export function getDateString(target){
+    
+}
+
+
 export function getLogDataGroup(target) {
     let parentNode = target.parentNode;
     let group = parentNode.getAttribute('data-group');

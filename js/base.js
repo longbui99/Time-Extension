@@ -68,6 +68,14 @@ export function generateEnvironment() {
                 this.saveLocal();
             }
         },
+        notify(key, value){
+            this[key] = value;
+            if (this.channels[key]) {
+                for (let callback of this.channels[key]) {
+                    callback(value)
+                }
+            }
+        },
         subscribe(key, callback) {
             if (this.channels[key]) {
                 this.channels[key].push(callback)
@@ -146,6 +154,10 @@ export class Component {
 
     update(key, value) {
         this.env.update(key, value);
+    }
+
+    notify(key, value){
+        this.env.notify(key, value);
     }
 
     subscribe(key, callback) {
