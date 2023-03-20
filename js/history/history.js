@@ -41,7 +41,7 @@ export class LogReport extends Component {
         }
     }
     resetDuration(result) {
-        let res = hUtil.getLogTypeDuration(result || this.result)
+        let res = hUtil.getLogTypeDuration(this.result)
         this.env.globalTotal = res[1];
         this.env.exportedTotal = res[0];
         this.setGlobalData();
@@ -80,47 +80,66 @@ export class LogReport extends Component {
         this.searchChange()
     }
 
-    getDateBreakdown(item){
+    getDateBreakdown(){
         let dailyOptions = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
         return (item)=>item['start_date'].toLocaleDateString("en-US", dailyOptions)
     }
-    getWeekBreakdown(item){
-        let dailyOptions = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
-        let today = new Date();
-        let firstDate = new Date(`${today.getFullYear()}/1/1`);
-        let startDateOfWeek = 1, firstWeekOfYearDate = firstDate;
-        let startYearWeekDay = firstDate.getDay();
-        let nameByWeekNum = {};
-        if (startYearWeekDay > startDateOfWeek){
-            firstWeekOfYearDate = firstDate.addDays(7-(1+startYearWeekDay));
-            let week = 0;
-            nameByWeekNum[0] = `Week ${week}, ${firstWeekOfYearDate.addDays(-7).toLocaleDateString("en-US", dailyOptions)} -> ${firstWeekOfYearDate.toLocaleDateString("en-US", dailyOptions)}`
+    getWeekBreakdown(){
+        let dailyOptions = { weekday: 'short', year: 'numeric', month: 'long', day: 'numeric' };
+        let startDate = new Date(this.unix[0]*1000), endDate = new Date(this.unix[1]*1000), startDateOfWeek = parseInt(this.env.historyData.startWeekDay);
+        let year = startDate.getFullYear();
+        function getStartDateEndDate(date){
+            let baseDate = util.addDays(date, -startDateOfWeek+1)
+            let startDate = util.addDays(baseDate, -(baseDate.getDay() + (-startDateOfWeek)))
+            let endDate = util.addDays(startDate, 6)
+            return [startDate, endDate]
         }
-        let week = 1;
-        while (firstWeekOfYearDate.getFullYear() === today.getFullYear()){
-            nextDate = firstWeekOfYearDate.addDays(7)
-            nameByWeekNum[parseInt(firstWeekOfYearDate.getDate()/7)] = `Week ${week}, ${firstWeekOfYearDate.toLocaleDateString("en-US", dailyOptions)} -> ${nextDate.toLocaleDateString("en-US", dailyOptions)}`
-            week += 1;
-            firstWeekOfYearDate = nextDate
+        let weekStartDate = getStartDateEndDate(startDate)[0]
+
+        let firstDate = new Date(startDate.getFullYear(), 0, 1);
+        let firstYearTime = firstDate.getTime();
+        let nameByWeekNum = {};
+        let padding = 0 ;
+        if (weekStartDate.getDay() !== firstDate.getDay()){
+            padding = 1;
+            firstDate = getStartDateEndDate(util.addDays(firstDate, 7))[0];
+            firstYearTime = firstDate.getTime();
+        }
+        while (weekStartDate.getFullYear() <= year && weekStartDate <= endDate){
+            let nextDate = util.addDays(weekStartDate, 6)
+            let week = parseInt((weekStartDate.getTime() - firstYearTime)/(1000*24*60*60)/7)
+            nextDate = ((nextDate > endDate)? endDate : nextDate)
+            weekStartDate = ((weekStartDate < startDate)? startDate : weekStartDate)
+            nameByWeekNum[week] = `Week ${week}, ${weekStartDate.toLocaleDateString("en-US", dailyOptions)} -> ${nextDate.toLocaleDateString("en-US", dailyOptions)}`
+            weekStartDate = util.addDays(nextDate, 1)
         }
         return (item)=>{
-            let balance = item['start_date'].getDay() - startYearWeekDay;
-            let week = parseInt(item['start_date'].getDate()/7)
-            if (balance < 0){
-                week-=1
-            }
+            let DaysDifference = (item['start_date'].getTime() - firstYearTime)/(1000*24*60*60)
+            let week = parseInt(DaysDifference/7)
             return nameByWeekNum[week]
         }
 
     }
-    getMonthBreakdown(item){
-        item['start_date'].toLocaleDateString("en-US", options)
+    getMonthBreakdown(){
+        let monthlyOptions = {year: 'numeric', month: 'long'};
+        return (item)=>item['start_date'].toLocaleDateString("en-US", monthlyOptions)
     }
-    getYearBreakdown(item){
-
+    getYearBreakdown(){
+        let anuallyOptions = {year: 'numeric'};
+        return (item)=>item['start_date'].toLocaleDateString("en-US", anuallyOptions)
     }
     getBreakdown(){
-        return this.getDateBreakdown();
+        if (this.env.historyData.breakdown == "week"){
+            return this.getWeekBreakdown()
+        } else
+        if (this.env.historyData.breakdown == "month"){
+            return this.getMonthBreakdown()
+        } else 
+        if (this.env.historyData.breakdown == "year") {
+            return this.getYearBreakdown()
+        } else {
+            return this.getDateBreakdown();
+        }
     }
 
     async renderHistory(result){
@@ -153,9 +172,9 @@ export class LogReport extends Component {
             this.unix = [minDate, maxDate];
             let historyByDate = util.GroupBy(result, this.getBreakdown());
             this.env.historyByDate = historyByDate;
-            this.resetDuration(result);
             this.renderLogByDate(historyByDate);
         }
+        this.resetDuration(result);
     }
     setGlobalData() {
         this.logHistoryDateRangeTotalRef.el.innerHTML = util.secondToHour(this.env.globalTotal)
@@ -167,11 +186,19 @@ export class LogReport extends Component {
         this.update('issueData', this.env.issueData);
     }
     logTypeChange(type = 'all') {
+        let result = []
         this.logHistoryTypeRef.el.classList.remove(this.env.issueData.trackingMode)
         this.logHistoryTypeRef.el.classList.add(type)
         this.env.issueData.trackingMode = type;
-        this.update('issueData', this.env.issueData);
-        this.loadHistory(this.unix[0], this.unix[1] + 1, false, true)
+        if (type === 'all'){
+            result = this.result;
+        } else {
+            for (let record of this.result){
+                if (record.exported === false)
+                    result.push(record)
+            }
+        }
+        this.renderHistory(result)
     }
     filterResults(){
         let searches = this.logHistorySearchRef.el.value.trim().toLowerCase();
@@ -265,7 +292,7 @@ export class LogReport extends Component {
             <div class="space-segment log-history-navigator"> 
                 <div class="log-history-navigator-action" l-ref='log-history-type'>
                     <div class="history-search-detail" l-ref="history-search-detail">
-                        <i class="fas fa-sliders-h"></i>
+                        <svg class="svg-inline--fa fa-sliders-h fa-w-16" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="sliders-h" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" data-fa-i2svg=""><path fill="currentColor" d="M496 384H160v-16c0-8.8-7.2-16-16-16h-32c-8.8 0-16 7.2-16 16v16H16c-8.8 0-16 7.2-16 16v32c0 8.8 7.2 16 16 16h80v16c0 8.8 7.2 16 16 16h32c8.8 0 16-7.2 16-16v-16h336c8.8 0 16-7.2 16-16v-32c0-8.8-7.2-16-16-16zm0-160h-80v-16c0-8.8-7.2-16-16-16h-32c-8.8 0-16 7.2-16 16v16H16c-8.8 0-16 7.2-16 16v32c0 8.8 7.2 16 16 16h336v16c0 8.8 7.2 16 16 16h32c8.8 0 16-7.2 16-16v-16h80c8.8 0 16-7.2 16-16v-32c0-8.8-7.2-16-16-16zm0-160H288V48c0-8.8-7.2-16-16-16h-32c-8.8 0-16 7.2-16 16v16H16C7.2 64 0 71.2 0 80v32c0 8.8 7.2 16 16 16h208v16c0 8.8 7.2 16 16 16h32c8.8 0 16-7.2 16-16v-16h208c8.8 0 16-7.2 16-16V80c0-8.8-7.2-16-16-16z"></path></svg>
                     </div>
                     <div class="history-date-range">
                         <span class="filter-icon">
@@ -291,7 +318,7 @@ export class LogReport extends Component {
                         <span>    
                             <svg class="svg-inline--fa fa-circle" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="circle" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" data-fa-i2svg=""><path fill="currentColor" d="M512 256C512 397.4 397.4 512 256 512C114.6 512 0 397.4 0 256C0 114.6 114.6 0 256 0C397.4 0 512 114.6 512 256z"></path></svg>
                         </span>
-                        <span l-ref="duration-unexpored">
+                        <span class="duration-unexported" l-ref="duration-unexpored">
                             00:00
                         </span>
                     </div>

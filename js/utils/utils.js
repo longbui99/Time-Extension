@@ -231,3 +231,8 @@ export function updateItemsByKey(lst, datas, key){
         }
     }
 }
+export function addDays(date, days){
+    let newDate = new Date(date.getTime())
+    newDate.setDate(date.getDate() + days);
+    return newDate;
+}
