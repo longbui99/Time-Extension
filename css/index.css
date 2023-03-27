@@ -1051,7 +1051,8 @@ lbwt .log-report .space-segment.log-history-navigator .log-history-navigator-act
     margin-left: 2px;
     font-size: 1.5em;
     display: flex;
-    justify-content: space-between;
+    width: 8%;
+    justify-content: center;
 }
 
 lbwt .log-report .space-segment.log-history-navigator .log-history-navigator-action .history-search {

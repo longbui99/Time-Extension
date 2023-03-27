@@ -26,7 +26,7 @@ export class LogReport extends Component {
         this.isFold = this.env.historyData?.isFold || false;
         this.env.issueData.trackingMode = this.env.issueData.trackingMode || 'all';
         this.env.issueData.lastDatetimeSelection = this.env.issueData.lastDatetimeSelection || [0, 0];
-        this.secondToString = util.parseSecondToString(this.env.resource?.hrs_per_day || 8, this.env.resource?.days_per_week || 5)
+        this.secondToString = util.parseSecondToString(this.env.resource?.hrs_per_day || 8, this.env.resource?.days_per_week || 5);
     }
     adjustDuration(datas) {
         util.updateItemsByKey(this.result, datas, 'id');
@@ -74,7 +74,7 @@ export class LogReport extends Component {
             return
         }
         this.unix = [from_unix, unix]
-        let response = (await this.do_invisible_request('GET', `${this.env.serverURL}/management/issue/work-log/history?from_unix=${from_unix}&unix=${unix}&tracking=${this.env.issueData.trackingMode}&jwt=${this.env.jwt}`));
+        let response = (await this.do_invisible_request('GET', `${this.env.serverURL}/management/issue/work-log/history?from_unix=${from_unix}&unix=${unix}&tracking=all&jwt=${this.env.jwt}`));
         let result = (await response.json());
         this.result = result;
         this.searchChange()
@@ -89,7 +89,7 @@ export class LogReport extends Component {
         let startDate = new Date(this.unix[0]*1000), endDate = new Date(this.unix[1]*1000), startDateOfWeek = parseInt(this.env.historyData.startWeekDay);
         let year = startDate.getFullYear();
         function getStartDateEndDate(date){
-            let baseDate = util.addDays(date, -startDateOfWeek+1)
+            let baseDate = util.addDays(date, -startDateOfWeek)
             let startDate = util.addDays(baseDate, -(baseDate.getDay() + (-startDateOfWeek)))
             let endDate = util.addDays(startDate, 6)
             return [startDate, endDate]
@@ -99,9 +99,7 @@ export class LogReport extends Component {
         let firstDate = new Date(startDate.getFullYear(), 0, 1);
         let firstYearTime = firstDate.getTime();
         let nameByWeekNum = {};
-        let padding = 0 ;
         if (weekStartDate.getDay() !== firstDate.getDay()){
-            padding = 1;
             firstDate = getStartDateEndDate(util.addDays(firstDate, 7))[0];
             firstYearTime = firstDate.getTime();
         }
@@ -187,9 +185,8 @@ export class LogReport extends Component {
     }
     logTypeChange(type = 'all') {
         let result = []
-        this.logHistoryTypeRef.el.classList.remove(this.env.issueData.trackingMode)
-        this.logHistoryTypeRef.el.classList.add(type)
-        this.env.issueData.trackingMode = type;
+        this.logHistoryTypeRef.el.classList.remove(this.env.issueData.trackingMode);
+        this.logHistoryTypeRef.el.classList.add(type);
         if (type === 'all'){
             result = this.result;
         } else {
@@ -198,6 +195,7 @@ export class LogReport extends Component {
                     result.push(record)
             }
         }
+        this.env.issueData.trackingMode = type;
         this.renderHistory(result)
     }
     filterResults(){
@@ -250,14 +248,15 @@ export class LogReport extends Component {
             eUnix = this.env.issueData.lastDatetimeSelection[1];
             this.actionPinRef.el.classList.add('pinned')
         }
-        this.loadHistory(sUnix, eUnix);
+        this.loadHistory(sUnix, eUnix).then(e=>{
+            if (typeof self.env.issueData.trackingMode === 'string' || self.env.issueData.trackingMode instanceof String) {
+                self.logTypeChange(self.env.issueData.trackingMode)
+            }
+        });
         this.daterange = flatpickr(this.logHistoryDateRangeRef.el, {
             mode: "range", defaultDate: [new Date(), new Date()], altInput: true, altFormat: "M j, Y",
             onClose: self.onChangeRangeHistoryFilter.bind(self)
         });
-        if (typeof this.env.issueData.trackingMode === 'string' || this.env.issueData.trackingMode instanceof String) {
-            // this.logTypeChange(this.env.issueData.trackingMode)
-        }
         this.actionPinRef.el.addEventListener('click', self.pinFilterChange.bind(self));
         this.logHistoryDateRangeTotalRef.el.addEventListener('click', (e) => self.logTypeChange.bind(self)('all'))
         this.durationUnexportedRef.el.addEventListener('click', (e) => self.logTypeChange.bind(self)('unexported'))
