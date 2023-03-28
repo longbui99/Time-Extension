@@ -19,33 +19,44 @@ class Log extends Component {
     }
 
     updateExported(data) {
-        this.data.exported = true;
+        this.data.exported = 1;
         this.toggleExported()
     }
 
-    __getSyncValue() {
-        return {
+    __getSyncValue(key="all") {
+        let res = {
             id: this.data.id,
             time: this.logDurationRef.el.value,
             description: this.logDescriptionRef.el.value,
             jwt: this.env.jwt
         }
+        if (key != "description"){
+            delete res['description']
+        }  
+        if (key != "time") {
+            delete res['time']
+        }
+        return res
     }
 
     toggleExported() {
-        this.el.classList.remove('unexported')
+        for (let elClass of this.el.classList){
+            if (elClass.startsWith('export-state')){
+                this.el.classList.remove(elClass)
+            }
+        }
         if (!this.data.exported) {
-            this.el.classList.add('unexported')
+            this.el.classList.add('export-state-' + this.data.exported)
         }
     }
 
-    async _onchangeLogContent() {
+    async _onchangeLogContent(key="time") {
         if (this.data.exported) {
-            this.data.exported = false;
+            this.data.exported = 0;
             this.toggleExported();
         }
-        if (this.data.exported === false) {
-            let values = this.__getSyncValue();
+        if (this.data.exported === 0) {
+            let values = this.__getSyncValue(key);
             let result = {}
             try {
                 let response = (await this.do_invisible_request('POST', `${this.env.serverURL}/management/issue/work-log/update`, values));
@@ -78,17 +89,19 @@ class Log extends Component {
         this.do_invisible_request('POST', `${this.env.serverURL}/management/issue/work-log/delete/${values.id}`, values);
         this.triggerUpMethod("deletDuration", {
             'duration': this.data.duration,
-            'mode': (this.data.exported ? 'exported' : 'unexported'),
+            'mode': (this.data.exported == 1 ? 'exported' : 'unexported'),
             'logID': this.data.id
         }, 5)
     }
 
-    checkUnexported(element, origin) {
-        if (element.value !== origin) {
-            this.data.exported = false;
-        } else if (this.data.exported) {
-            this.data.exported = true;
-        }
+    checkUnexported() {
+        let a = false, b = false;
+        if (this.logDescriptionRef.el.value != this.description) a = 2
+        if (this.logDescriptionRef.el.value != this.duration) b = 3
+        let op1 = a && b;
+        let op2 = a || b;
+        if (op1) this.data.exported = 7 
+        else this.data.exported = op2
         this.toggleExported();
     }
     editLog() {
@@ -124,12 +137,12 @@ class Log extends Component {
     mounted() {
         let res = super.mounted();
         let self = this;
-        this.logDurationRef.el.addEventListener('change', self._onchangeLogContent.bind(this));
-        this.logDescriptionRef.el.addEventListener('change', self._onchangeLogContent.bind(this));
-        this.actionLogDeleteRef.el.addEventListener('click', self.__actionDeleteWorkLogs.bind(this));
-        this.logDurationRef.el.addEventListener('keyup', () => self.checkUnexported(self.logDurationRef.el, self.duration));
-        this.logDescriptionRef.el.addEventListener('keyup', () => self.checkUnexported(self.logDescriptionRef.el, self.description));
-        this.actionAdjustLogRef.el.addEventListener('click', self.editLog.bind(this));
+        this.logDurationRef.el.addEventListener('change', ()=>self._onchangeLogContent.bind(self)("time"));
+        this.logDescriptionRef.el.addEventListener('change', ()=>self._onchangeLogContent.bind(self)("description"));
+        this.actionLogDeleteRef.el.addEventListener('click', self.__actionDeleteWorkLogs.bind(self));
+        this.logDurationRef.el.addEventListener('keyup', self.checkUnexported.bind(self));
+        this.logDescriptionRef.el.addEventListener('keyup', self.checkUnexported.bind(self));
+        this.actionAdjustLogRef.el.addEventListener('click', self.editLog.bind(self));
         return res
     }
     destroy() {
@@ -138,7 +151,7 @@ class Log extends Component {
     }
     getTemplate() {
         return `
-        <div class="log-each ${this.params.datas.exported ? '' : 'unexported'}" l-ref="export-statement">
+        <div class="log-each export-state-${this.params.datas.exported}" l-ref="export-statement">
             <input class="log-duration tm-form-control" l-ref="log-duration" value="${this.secondToString(this.params.datas.duration)}">
             <span class="wl-circle-decorator" title="${this.params.datas.date || ''}" l-ref="wl-circle-decorator">
                 <svg class="svg-inline--fa fa-circle" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="circle" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" data-fa-i2svg=""><path fill="currentColor" d="M512 256C512 397.4 397.4 512 256 512C114.6 512 0 397.4 0 256C0 114.6 114.6 0 256 0C397.4 0 512 114.6 512 256z"></path></svg><!-- <i class="fas fa-circle"></i> Font Awesome fontawesome.com -->
@@ -170,7 +183,7 @@ class LogByIssue extends Component {
     }
     exportLogs(event) {
         let datas = this.params.datas.values;
-        let exports = datas.filter(e => e.exported == false);
+        let exports = datas.filter(e => e.exported != 1);
         let self = this;
         if (exports.length) {
             let total_duration = 0;
@@ -182,7 +195,7 @@ class LogByIssue extends Component {
             datas = {}
             let exportIds = exports.map(e => e.id)
             exports.map(function (element) {
-                datas[element.id] = { 'exported': true }
+                datas[element.id] = { 'exported': 1 }
             })
             hUtil.exportLog.bind(this)(exportIds).then(function (response) {
                 self.patchDownMethod('updateExported', {})
@@ -388,7 +401,7 @@ export class LogByDate extends Component {
         }
         this.logActionRef.el.addEventListener('click', event => {
             let datas = self.params.datas.values;
-            let exports = datas.filter(e => e.exported == false);
+            let exports = datas.filter(e => e.exported != 1);
             let exportIds = exports.map(e => e.id)
             hUtil.exportLog.bind(self)(exportIds).then(function (response) {
                 self.patchDownMethod('updateExported', {})

@@ -191,7 +191,7 @@ export class LogReport extends Component {
             result = this.result;
         } else {
             for (let record of this.result){
-                if (record.exported === false)
+                if (record.exported !== 1)
                     result.push(record)
             }
         }
