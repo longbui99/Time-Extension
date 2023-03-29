@@ -49,7 +49,7 @@ export async function exportLog(exportIds) {
 export function getLogTypeDuration(logs){
     let exportedTotal = 0, globalTotal = 0
     for (let record of logs){
-        if (record.exported) {
+        if (record.exported == 1) {
             exportedTotal += record.duration;
         }
         globalTotal += record.duration;

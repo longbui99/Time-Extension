@@ -3,11 +3,13 @@ import * as util from "../utils/utils.js"
 import * as hUtil from "./historyUtils.js"
 import { Component } from "../base.js"
 import { IssueSubsitution } from "../dialog/issueSubsitution.js"
+import { LogCompare } from "../dialog/logCompare.js"
 class Log extends Component {
     logDurationRef = this.useRef('log-duration')
     logDescriptionRef = this.useRef('log-description')
     actionLogDeleteRef = this.useRef('action-log-delete')
     actionAdjustLogRef = this.useRef('wl-circle-decorator')
+    actionViewDifference = this.useRef('question-mark')
     secondToString = util.parseSecondToString(this.env.resource?.hrs_per_day || 8, this.env.resource?.days_per_week || 5)
 
     constructor() {
@@ -19,7 +21,7 @@ class Log extends Component {
     }
 
     updateExported(data) {
-        this.data.exported = 1;
+        this.exported = 1;
         this.toggleExported()
     }
 
@@ -45,17 +47,15 @@ class Log extends Component {
                 this.el.classList.remove(elClass)
             }
         }
-        if (!this.data.exported) {
-            this.el.classList.add('export-state-' + this.data.exported)
-        }
+        this.el.classList.add('export-state-' + this.exported)
     }
 
     async _onchangeLogContent(key="time") {
-        if (this.data.exported) {
-            this.data.exported = 0;
+        if (this.exported) {
+            this.exported = 0;
             this.toggleExported();
         }
-        if (this.data.exported === 0) {
+        if (this.exported !== 1) {
             let values = this.__getSyncValue(key);
             let result = {}
             try {
@@ -89,19 +89,16 @@ class Log extends Component {
         this.do_invisible_request('POST', `${this.env.serverURL}/management/issue/work-log/delete/${values.id}`, values);
         this.triggerUpMethod("deletDuration", {
             'duration': this.data.duration,
-            'mode': (this.data.exported == 1 ? 'exported' : 'unexported'),
+            'mode': (this.exported == 1 ? 'exported' : 'unexported'),
             'logID': this.data.id
         }, 5)
     }
 
     checkUnexported() {
-        let a = false, b = false;
-        if (this.logDescriptionRef.el.value != this.description) a = 2
-        if (this.logDescriptionRef.el.value != this.duration) b = 3
-        let op1 = a && b;
-        let op2 = a || b;
-        if (op1) this.data.exported = 7 
-        else this.data.exported = op2
+        let a = 0, b = 0;
+        if (this.logDescriptionRef.el.value != this.description) a = 3
+        if (this.logDurationRef.el.value != this.duration) b = 5
+        this.exported = (a + b) || this.data.exported
         this.toggleExported();
     }
     editLog() {
@@ -133,6 +130,32 @@ class Log extends Component {
             successCallback: callback
         })
     }
+    async showCompareDifferent(){
+        let self = this;
+        let values = {
+            'ids': [self.data.id],
+            'jwt': self.env.jwt
+        }
+        async function callback(data) {
+            hUtil.exportLog.bind(this)([this.data.id]).then(function (response) {
+                self.updateExported();
+                let res = {};
+                res[self.data.id] = {'exported': 1}
+                self.triggerUpMethod('adjustDuration', res, 5)
+            });
+        }
+        self.do_request('POST', `${self.env.serverURL}/management/issue/work-log/compare`, values).then(function (response){
+            response.json().then(e=>{
+                self.showDialog(LogCompare, {
+                    title: "Compare Log",
+                    id: self.data.id,
+                    datas: e[self.data.id],
+                    successCallback: callback
+                })
+            })
+        });
+
+    }
 
     mounted() {
         let res = super.mounted();
@@ -143,6 +166,7 @@ class Log extends Component {
         this.logDurationRef.el.addEventListener('keyup', self.checkUnexported.bind(self));
         this.logDescriptionRef.el.addEventListener('keyup', self.checkUnexported.bind(self));
         this.actionAdjustLogRef.el.addEventListener('click', self.editLog.bind(self));
+        this.actionViewDifference.el.addEventListener('click', self.showCompareDifferent.bind(self))
         return res
     }
     destroy() {
@@ -152,6 +176,9 @@ class Log extends Component {
     getTemplate() {
         return `
         <div class="log-each export-state-${this.params.datas.exported}" l-ref="export-statement">
+            <span class="question-mark" l-ref="question-mark" title="Click to get more detail about exporting status">
+                <svg class="svg-inline--fa fa-question" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="question" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 512" data-fa-i2svg=""><path fill="currentColor" d="M80 160c0-35.3 28.7-64 64-64h32c35.3 0 64 28.7 64 64v3.6c0 21.8-11.1 42.1-29.4 53.8l-42.2 27.1c-25.2 16.2-40.4 44.1-40.4 74V320c0 17.7 14.3 32 32 32s32-14.3 32-32v-1.4c0-8.2 4.2-15.8 11-20.2l42.2-27.1c36.6-23.6 58.8-64.1 58.8-107.7V160c0-70.7-57.3-128-128-128H144C73.3 32 16 89.3 16 160c0 17.7 14.3 32 32 32s32-14.3 32-32zm80 320a40 40 0 1 0 0-80 40 40 0 1 0 0 80z"></path></svg>
+            </span>
             <input class="log-duration tm-form-control" l-ref="log-duration" value="${this.secondToString(this.params.datas.duration)}">
             <span class="wl-circle-decorator" title="${this.params.datas.date || ''}" l-ref="wl-circle-decorator">
                 <svg class="svg-inline--fa fa-circle" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="circle" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" data-fa-i2svg=""><path fill="currentColor" d="M512 256C512 397.4 397.4 512 256 512C114.6 512 0 397.4 0 256C0 114.6 114.6 0 256 0C397.4 0 512 114.6 512 256z"></path></svg><!-- <i class="fas fa-circle"></i> Font Awesome fontawesome.com -->

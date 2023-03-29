@@ -113,3 +113,34 @@ lbwt-dialog .dialog-main .dialog-content .dialog-issue-content textarea{
 lbwt-dialog button{
     font-weight: 500!important;
 }
+.dialog-log-compare {
+    display: flex;
+    flex-flow: column;
+    width: 100%;
+    padding: 3%;
+}
+.dialog-log-compare .item {
+    display: flex;
+    flex-flow: column;
+    width: 94%;
+}
+.dialog-log-compare .item h3{
+    font-size: 1.2em;
+    font-weight: 700;
+    color: var(--primary);
+    margin: 0px;
+}
+.dialog-log-compare .item .section{
+    display: flex;
+    flex-flow: row;
+    justify-content: space-between;
+    align-items: center;
+}
+.dialog-log-compare .item .section p{
+    width: 40%;
+    white-space: break-spaces;
+}
+.dialog-log-compare .item .section i,
+.dialog-log-compare .item .section svg{
+    width: 20%;
+}
