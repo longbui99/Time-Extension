@@ -119,8 +119,8 @@ class Log extends Component {
             title: "Edit Log",
             id: this.data.id,
             startDate: this.data.start_date,
-            endDate: new Date(this.data.start_date.getTime() + this.params.datas.duration * 1000),
-            comment: this.description,
+            endDate: new Date(this.data.start_date.getTime() + this.data.duration * 1000),
+            comment: this.data.description,
             issueData: {
                 id: this.data.issue,
                 name: this.data.issueName,
