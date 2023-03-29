@@ -285,6 +285,10 @@ export class LogReport extends Component {
         this.isFold = state;
         this.updateFoldState();
     }
+    destroy(){
+        this.daterange.destroy()
+        super.destroy()
+    }
     getTemplate() {
         return `
         <div class="log-report" l-ref="log-report-section">

@@ -471,8 +471,10 @@ lbwt .acceptance-criteria {
     width: 96%;
 }
 
-lbwt .acceptance-criteria.open .space-segment {
-    display: inline-block;
+lbwt .acceptance-criteria .checklist-segment {
+    display: flex;
+    flex-flow: column;
+    width: 100%;
 }
 
 /* lbwt .acceptance-criteria .space-segment {
@@ -486,6 +488,27 @@ lbwt .acceptance-criteria .heading {
     cursor: pointer;
     display: flex;
     justify-content: space-between;
+}
+
+lbwt .acceptance-criteria .ac-tools {
+    display: flex;
+    align-items: center;
+    width: 100%;
+}
+lbwt .acceptance-criteria .ac-tools .toggle-done{
+    display: flex;
+    align-items: center;
+    margin-left: auto;
+}
+lbwt .acceptance-criteria .ac-tools .toggle-done span{
+    font-style: oblique;
+    text-decoration: line-through;
+    font-weight: 700;
+    color: var(--primary);
+}
+lbwt .acceptance-criteria .ac-tools .toggle-done input{
+    cursor: pointer;
+    accent-color: var(--primary);
 }
 
 lbwt .acceptance-criteria .ac-content {

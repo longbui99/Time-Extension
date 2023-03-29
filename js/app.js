@@ -26,7 +26,7 @@ export class App extends Component {
     super(...arguments);
     this.subEnv = {};
     this.load = {};
-    this.env.syncChannel(['authentication', 'issueData', 'searchData', 'historyData']);
+    this.env.syncChannel(['authentication', 'issueData', 'searchData', 'historyData', 'checklistData']);
   }
   mountServerAction() {
     let self = this;

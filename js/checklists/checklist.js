@@ -4,8 +4,10 @@ import { Component } from "../base.js"
 export class CheckList extends Component {
     acSectionRef = this.useRef('tm-ac-section')
     acContainerRef = this.useRef("ac-content")
+    toggleDoneRef = this.useRef('toggle-done')
     constructor() {
         super(...arguments);
+        this.excludeDone = this.env.checklistData?.excludeDone || true;
     }
 
     makeChecklistComponent(_id, ac, content) {
@@ -87,6 +89,9 @@ export class CheckList extends Component {
         }
         element.previousElementSibling.addEventListener('change', event => {
             self.pushChecklist(element, params, baseParent, true)
+            if (element.previousElementSibling.checked && self.env.checklistData.excludeDone){
+                baseParent.remove()
+            }
         })
         element.addEventListener('click', (event) => {
             if (element != window.selectedElement
@@ -331,9 +336,79 @@ export class CheckList extends Component {
         element.removeEventListener("mousedown", self.initDragEventRoot);
         this.initDragEvent(element, event.srcElement, event)
     }
-    async initChecklists() {
+    async getChecklistData(params){
+        let result = [];
+        if (this.env.issueData.broardcast && this.env.issueData.acs) {
+            result = this.env.issueData.acs;
+        } else {
+            if (this.env.contentState.showLog) {
+                result = (await this.do_invisible_request('GET', `${this.env.serverURL}/management/issue/ac?${new URLSearchParams(params)}`));
+            } else {
+                result = (await this.do_invisible_request('GET', `${this.env.serverURL}/management/issue/ac?${new URLSearchParams(params)}`));
+            }
+            result = (await result.json())
+            this.env.issueData.acs = result;
+        }
+        let default_data = {
+            'id': false,
+            'content': '',
+            'is_header': true,
+            'initial': true,
+        }
+        result.push(default_data)
+        this.result = result;
+        return result
+    }
+    excludeDoneFilter(result){
+        let res = [];
+        for (let record of result){
+            if (record.initial){
+                res.push(record)
+            } else
+            if (!record.checked){
+                res.push(record)
+            } else 
+            if (record.is_header){
+                res.push(record)
+            }
+        }
+        return res
+    }
+    renderCheclistData(result, params){
+        if (this.env.checklistData.excludeDone){
+            result = this.excludeDoneFilter(result)
+        }
         let element = this.acContainerRef.el, self = this;
         element.innerHTML = "";
+        let string = ""
+        for (let ac of result) {
+            let _id = util.uniqueID(ac.id)
+            let parsedData = util.parseChecklist(ac.content)
+            string += this.makeChecklistComponent(_id, ac, parsedData)
+        }
+        element.innerHTML = string
+        for (let ac of element.querySelectorAll('.tm-form-check-label')) {
+            this.initEditChecklistEvent(ac, params)
+        }
+        window.addEventListener('click', event => {
+            let selectedElement = element.querySelector('.editing')
+            if (selectedElement) {
+                selectedElement.classList.remove('editing');
+                let baseParent = selectedElement
+                while (!baseParent.classList.contains('ac-container')) baseParent = baseParent.parentNode;
+                self.pushChecklist(selectedElement, params, baseParent)
+            }
+        })
+        element.addEventListener('mousedown', event => {
+            if (event.srcElement.classList.contains('drag-object') ||
+                event.srcElement.classList.contains('drag-icon') ||
+                event.srcElement.nodeName === "path") {
+                this.initDragEventRoot(element, event)
+                event.stopImmediatePropagation();
+            }
+        })
+    }
+    async initChecklists() {
         if (this.env.issueData) {
             let payload = {
                 'source': 'Extension'
@@ -343,67 +418,43 @@ export class CheckList extends Component {
                 "jwt": this.env.jwt,
                 "payload": payload
             }
-            let result = [];
-            if (this.env.issueData.broardcast && this.env.issueData.acs) {
-                result = this.env.issueData.acs;
-            } else {
-                if (this.env.contentState.showLog) {
-                    result = (await this.do_invisible_request('GET', `${this.env.serverURL}/management/issue/ac?${new URLSearchParams(params)}`));
-                } else {
-                    result = (await this.do_invisible_request('GET', `${this.env.serverURL}/management/issue/ac?${new URLSearchParams(params)}`));
-                }
-                result = (await result.json())
-                this.env.issueData.acs = result;
-            }
-            let default_data = {
-                'id': false,
-                'content': '',
-                'is_header': true,
-                'initial': true,
-            }
-            result.push(default_data)
-            let string = ""
-            for (let ac of result) {
-                let _id = util.uniqueID(ac.id)
-                let parsedData = util.parseChecklist(ac.content)
-                string += this.makeChecklistComponent(_id, ac, parsedData)
-            }
-            element.innerHTML = string
-            for (let ac of element.querySelectorAll('.tm-form-check-label')) {
-                this.initEditChecklistEvent(ac, params)
-            }
-            window.addEventListener('click', event => {
-                let selectedElement = element.querySelector('.editing')
-                if (selectedElement) {
-                    selectedElement.classList.remove('editing');
-                    let baseParent = selectedElement
-                    while (!baseParent.classList.contains('ac-container')) baseParent = baseParent.parentNode;
-                    self.pushChecklist(selectedElement, params, baseParent)
-                }
-            })
-            element.addEventListener('mousedown', event => {
-                if (event.srcElement.classList.contains('drag-object') ||
-                    event.srcElement.classList.contains('drag-icon') ||
-                    event.srcElement.nodeName === "path") {
-                    this.initDragEventRoot(element, event)
-                    event.stopImmediatePropagation();
-                }
-            })
+            this.params = params;
+            let result = await this.getChecklistData(params);
+            this.renderCheclistData(result, params);
         }
     }
+    toggleDone(){
+        this.env.checklistData.excludeDone = !this.env.checklistData.excludeDone;
+        this.update('checklistData', this.env.checklistData);
+        this.initChecklists()
+    }
     mounted() {
+        let self = this;
         let res = super.mounted();
+        if (this.env.checklistData.excludeDone){
+            this.toggleDoneRef.el.setAttribute("checked", "checked");
+        }
+        this.toggleDoneRef.el.addEventListener('click', self.toggleDone.bind(self))
         return new Promise(async (resolve, reject) => {
             await this.initChecklists();
             resolve(true)
         });
+        return res
     }
     getTemplate() {
         return `
         <div class="acceptance-criteria" l-ref="tm-ac-section">
             <div class="space-segment">
-                <div l-ref="ac-content" class="ac-content">
-                    
+                    <div class="checklist-segment">
+                    <div class="ac-tools">
+                        <div class="toggle-done">
+                            <span>Done</span>
+                            <input type="checkbox" class="tm-form-check-input" l-ref="toggle-done"/>
+                        </div>
+                    </div>
+                    <div l-ref="ac-content" class="ac-content">
+                        
+                    </div>
                 </div>
             </div>
         </div>
