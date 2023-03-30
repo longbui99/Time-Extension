@@ -431,7 +431,7 @@ export class CheckList extends Component {
     mounted() {
         let self = this;
         let res = super.mounted();
-        if (this.env.checklistData.excludeDone){
+        if (this.env.checklistData?.excludeDone){
             this.toggleDoneRef.el.setAttribute("checked", "checked");
         }
         this.toggleDoneRef.el.addEventListener('click', self.toggleDone.bind(self))
