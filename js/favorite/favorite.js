@@ -4,9 +4,13 @@ import { mount, Component } from "../base.js"
 export class Favorite extends Component {
     favoriteSectionRef = this.useRef('tm-favorite-section')
     favoriteListRef = this.useRef('favorite-list')
+    timerMovingRef = this.useRef('timer')
+    checklistMovingRef = this.useRef('checklist')
+    noneMovingRef = this.useRef('None')
     constructor() {
         super(...arguments);
         this.subscribe('issueData', this.initFavorites.bind(this));
+        this.env.favoriteData.movingMode = this.env.favoriteData.movingMode || null;
     }
     renderFavoriteIssues(){
         if (this.favoriteIssues){
@@ -75,6 +79,9 @@ export class Favorite extends Component {
                 elements[index].addEventListener('click', (event)=>{
                     self.env.issueData = findIssue(event.currentTarget.getAttribute('data-key'));
                     self.env.update('issueData', self.env.issueData);
+                    if (self.env.favoriteData.movingMode){
+                        self.moveToPage()
+                    }
                     event.stopPropagation();
                 })
             }
@@ -102,14 +109,63 @@ export class Favorite extends Component {
         this.favoriteIssues = result;
         this.renderFavoriteIssues();
     }
+    moveToPage(){
+        if (this.env.favoriteData.movingMode === "timer"){
+            this.triggerUp('page', "timer")
+        } else 
+        if (this.env.favoriteData.movingMode === "checklist"){
+            this.triggerUp('page', "checklist")
+        }
+    }
+    setMovingChange(){
+        if (this.timerMovingRef.el.checked){
+            this.env.favoriteData.movingMode = this.timerMovingRef.el.value
+        }
+        if (this.checklistMovingRef.el.checked){
+            this.env.favoriteData.movingMode = this.checklistMovingRef.el.value
+        }
+        if (this.noneMovingRef.el.checked){
+            this.env.favoriteData.movingMode = null;
+        }
+        this.update('favoriteData', this.env.favoriteData);
+    }
+    initMovingChange(){
+        this.timerMovingRef.el.addEventListener('change', this.setMovingChange.bind(this))
+        this.checklistMovingRef.el.addEventListener('change', this.setMovingChange.bind(this))
+        this.noneMovingRef.el.addEventListener('change', this.setMovingChange.bind(this))
+        if (this.env.favoriteData.movingMode === "timer"){
+            this.timerMovingRef.el.click()
+        } else 
+        if (this.env.favoriteData.movingMode === "checklist"){
+            this.checklistMovingRef.el.click()
+        } else 
+        if (!this.env.favoriteData.movingMode || this.env.favoriteData.movingMode === "null"){
+            this.noneMovingRef.el.click()
+        }
+    }
     mounted() {
         let res = super.mounted();
+        this.initMovingChange()
         this.initFavorites()
         return res
     }
     getTemplate() {
         return `
         <div class="favorite-issues" l-ref="tm-favorite-section">
+            <div class="favorite-moving">
+                Auto Move:
+                <div class="favorite-tools">
+                    <input name="favorite" type="radio" id="timer" l-ref="timer" value="timer">
+                    <label for="timer">Timer</label>
+                    <br/>
+                    <input name="favorite" type="radio" id="checklist" l-ref="checklist" value="checklist">
+                    <label for="checklist">Checklists</label>
+                    <br/>  
+                    <input name="favorite" type="radio" id="None" l-ref="None" value="null">
+                    <label for="None">None</label>
+                    <br/>  
+                </div>
+            </div>
             <div class="space-segment">
                 <div class="favorite-content">
                     <div class="favorite-list" l-ref="favorite-list">

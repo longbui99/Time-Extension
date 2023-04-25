@@ -26,7 +26,8 @@ export class Main extends Component {
         this.subscribe('relativeAdd', this.relativeAdd.bind(this))
     }
     custom_events = {
-        'action-export': this.actionExportToOriginalServer
+        'action-export': this.actionExportToOriginalServer.bind(this),
+        'page': this.actionChangePage.bind(this)
     }
     async relativeAdd(data) {
         let params = {
@@ -273,6 +274,20 @@ export class Main extends Component {
             'showFavorite': [this.favoriteHeadingRef.el, Favorite]
         };
         this.searchBar = new SearchBar(this).mount(this.searchBarSegment.el);
+    }
+    actionChangePage(data){
+        if (data === "timer"){
+            this.timeLogHeadingRef.el.click()
+        } else 
+        if (data === "history") {
+            this.logReportHeadingRef.el.click()
+        } else 
+        if (data === "checklist") {
+            this.acHeadingRef.el.click()
+        } else 
+        if (data === "favorite") {
+            this.favoriteHeadingRef.el.click()
+        }
     }
     mounted() {
         let res = super.mounted();

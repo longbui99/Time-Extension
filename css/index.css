@@ -1311,6 +1311,30 @@ lbwt .issue.time-log .time-action .start-date {
 lbwt .favorite-issues {
     width: 100%;
 }
+lbwt .favorite-issues .favorite-moving{
+    display: flex;
+    color: var(--primary);
+    font-weight: 700;
+    position: absolute;
+    right: 10px;
+    margin-top: 5px;
+}
+lbwt .favorite-issues .favorite-moving .favorite-tools{
+    margin-left: auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+lbwt .favorite-issues .favorite-moving .favorite-tools input{
+    margin: 0;
+    margin-left: 10px;
+    margin-right: 2px;
+    height: 0.8em;
+}
+lbwt .favorite-issues .favorite-moving .favorite-tools label{
+    height: 1em;
+}
+
 
 lbwt .favorite-content {
     display: flex;
