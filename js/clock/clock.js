@@ -175,7 +175,6 @@ export class Clock extends Component {
         this.commentRef.el.value = '';
         this.env.issueData.timeStatus = null;
         this.env.issueData.localManualLog = '';
-        this.env.issueData.localComment = '';
         this.env.syncOne('issueData', this.env.issueData)
     }
     _initDoneWorkLog() {
