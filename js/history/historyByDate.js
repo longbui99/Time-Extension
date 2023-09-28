@@ -352,12 +352,17 @@ class LogByProject extends Component {
         return `
         <div class="project">
             <div class="project-title" l-ref="project-title">
-                <span>
-                    ${this.params.projectGroup}
-                </span>
-                <span class="project-duration" l-ref="project-duration">
+                <div class="project-display">
+                    <span class="host-log">
+                        <img src="${this.params.hostURL}">
+                    </span>
+                    <span>
+                        ${this.params.projectGroup}
+                    </span>
+                </div>
+                <div class="project-duration" l-ref="project-duration">
                     00:00
-                </span>
+                </div>
             </div>
             <div class="project-logs" l-ref="project-logs">
                 
@@ -422,6 +427,7 @@ export class LogByDate extends Component {
             new LogByProject(this, {
                 'dateGroup': this.params.dateGroup,
                 'projectGroup': group,
+                'hostURL': dateLogbyProject[group].values[0]['host_image_url'],
                 'datas': dateLogbyProject[group],
                 'isFold': this.isFold
             }).mount(element)

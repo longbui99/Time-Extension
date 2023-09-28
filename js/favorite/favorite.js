@@ -57,9 +57,17 @@ export class Favorite extends Component {
                     </div>`
                 }
                 if (issues.length){
+                    let host = groupResult[groupKey][0]['host_image_url']
                     tmpl += `
                     <div class="favorite-group">
-                        <div class="favorite-group-title">${groupKey} </div>\
+                        <div class="favorite-group-title">
+                            <span>
+                                ${groupKey} 
+                            </span>
+                            <span>
+                                <img src="${host}">
+                            </span>
+                        </div>\
                         <div class="favorite-segment">
                             ${issues}
                         </div>  

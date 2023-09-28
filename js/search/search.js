@@ -9,6 +9,7 @@ export class SearchBar extends Component {
     addToFavoriteRef = this.useRef('add-to-favorite-ref')
     removeToFavoriteRef = this.useRef('remove-to-favorite-ref')
     typeRef = this.useRef("type-ref")
+    hostRef = this.useRef("host-ref")
     statusRef = this.useRef("status-ref")
     openIssueref = this.useRef("open-issue")
     searchResultRef = this.useRef('search-bar-result')
@@ -39,6 +40,21 @@ export class SearchBar extends Component {
     }
     renderIssueSearch(data) {
         this.typeRef.el.innerHTML = `<img src="${data.type_url}"/>`;
+        if (data.host_image_url) {
+            // if (!this.env.storage.imageURLs){
+            //     this.update('storage', {'imageURLs': {}})
+            // }
+            let url = data.host_image_url
+            this.hostRef.el.innerHTML = `<img src="${url}"/>`
+            // let self = this;
+            // setTimeout(()=>{
+            //     if (!(data.host_image_url in self.env.storage.imageURLs)){
+            //         let base64 = util.getBase64Image(self.hostRef.el.firstElementChild)
+            //         self.env.storage.imageURLs[data.host_image_url] =`data:image/png;base64, ${base64}`
+            //         self.update('storage', self.env.storage)
+            //     }
+            // }, 1)
+        }
         this.statusRef.el.innerText = data.status || '';
         this.searchRef.el.value = util._getDisplayName(data);
         this.el.querySelector('.issue-navigation').style.display = "inline-block";
@@ -237,6 +253,9 @@ export class SearchBar extends Component {
                     </div>
                 </div>
             </span>
+            <div class="host">
+                <span l-ref="host-ref"></span>
+            </div>
             <div class="issue-type">
                 <span l-ref="type-ref"></span>
             </div>

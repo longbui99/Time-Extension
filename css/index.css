@@ -370,11 +370,14 @@ svg:not(:root).tm-svg-inline--fa {
     position: relative;
 }
 
-lbwt .reload-issue {
+lbwt .reload-issue {    
     position: absolute;
-    top: -10px;
+    top: 30px;
+    background: transparent;
+    left: -2px;
     color: var(--primary);
     cursor: pointer;
+    z-index: 1000;
     visibility: hidden;
 }
 
@@ -701,13 +704,21 @@ lbwt .issue .input-group {
 lbwt .issue .input-group .icon-prepend {
     position: absolute;
     background-color: white;
-    margin-left: 2px;
-    margin-top: 1px;
+    margin-left: 1px;
+    margin-top: -20px;
 }
 
 lbwt .issue .input-group .icon-prepend button {
     outline: none;
     border: none;
+}
+
+lbwt .issue .input-group .host {
+    position: absolute;
+    left: 1px;
+    top: -17px;
+    width: auto;
+    height: 15px;
 }
 
 lbwt .issue .input-group .issue-type {
@@ -1421,7 +1432,17 @@ lbwt .favorite-list .favorite-group .favorite-group-title {
     font-weight: 900;
     color: var(--primary);
     margin-left: 5px;
+    display: flex;
+    align-items: center;
 }
+
+lbwt .favorite-list .favorite-group .favorite-group-title img{
+    max-width: 40px;
+    height: 10px;
+    width: auto;
+    margin-left: 5px;
+}
+
 
 lbwt .favorite-list .favorite-group .favorite-segment {
     display: flex;

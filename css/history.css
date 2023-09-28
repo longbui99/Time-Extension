@@ -237,9 +237,9 @@ lbwt .log-report .space-segment.log-history .log-group .log-segment .project-log
     display: inline-block;
 }
 lbwt .log-report .space-segment.log-history .log-group .log-segment .project-title{
-    width: 93%;
+    width: 97%;
     background-color: lightgray;
-    padding-left: 5%;
+    padding-left: 1%;
     font-size: 1.2em;
     font-style: italic;
     font-weight: 700;
@@ -253,6 +253,22 @@ lbwt .log-report .space-segment.log-history .log-group .log-segment .project-tit
 }
 lbwt .log-report .space-segment.log-history .log-group .log-segment .project-title:hover{
     color: orange;
+}
+
+lbwt .log-report .space-segment.log-history .log-group .log-segment .project-title .project-display{
+    display: flex;
+    width: 92%;
+    align-items: center;
+}
+
+lbwt .log-report .space-segment.log-history .log-group .log-segment .project-title .host-log{
+    height: 12px;
+    background-color: transparent;
+    width: auto;
+    margin-right: 2%;
+    min-width: 40px;
+    display: flex;
+    justify-content: center;
 }
 
 lbwt .log-report .space-segment.log-history .log-group .log-segment .log {
