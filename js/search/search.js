@@ -65,7 +65,13 @@ export class SearchBar extends Component {
     }
     async fetchSearchIssue(text) {
         let offset = this.searchData?.values?.length || 0;
-        let result = (await this.do_request('GET', `${this.env.serverURL}/management/issue/search/${text}?offset=${offset}&jwt=${this.env.jwt}`));
+        text = encodeURI(text)
+        let params = {
+            "query": text,
+            "jwt": this.env.jwt,
+            "offset": offset
+        }
+        let result = (await this.do_request('POST', `${this.env.serverURL}/management/issue/search`, params));
         return (await result.json());
     }
     loadSearchedIssues(data) {
