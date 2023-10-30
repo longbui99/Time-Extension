@@ -65,7 +65,6 @@ export class SearchBar extends Component {
     }
     async fetchSearchIssue(text) {
         let offset = this.searchData?.values?.length || 0;
-        text = encodeURI(text)
         let params = {
             "query": text,
             "jwt": this.env.jwt,
