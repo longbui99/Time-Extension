@@ -296,12 +296,12 @@ lbwt .log-report .space-segment.log-history .log-group .log-segment .log .log-ti
     justify-content: space-around;
 }
 
-lbwt .log-report .space-segment.log-history .log-group .log-segment .log .log-title .log-title-heading .issue-type-url {
+lbwt .log-report .space-segment.log-history .log-group .log-segment .log .log-title .log-title-heading .task-type-url {
     margin-left: 2px;
     margin-right: 2px;
 }
 
-lbwt .log-report .space-segment.log-history .log-group .log-segment .log .log-title .log-title-heading .log-issue-export {
+lbwt .log-report .space-segment.log-history .log-group .log-segment .log .log-title .log-title-heading .log-task-export {
     visibility: hidden;
     opacity: 0.7;
     transition: linear 0.2s;
@@ -309,12 +309,12 @@ lbwt .log-report .space-segment.log-history .log-group .log-segment .log .log-ti
     padding: 1px;
 }
 
-lbwt .log-report .space-segment.log-history .log-group .log-segment .log .log-title:hover .log-title-heading .log-issue-export {
+lbwt .log-report .space-segment.log-history .log-group .log-segment .log .log-title:hover .log-title-heading .log-task-export {
     visibility: visible;
     opacity: 1;
 }
 
-lbwt .log-report .space-segment.log-history .log-group .log-segment .log .log-title .log-issue {
+lbwt .log-report .space-segment.log-history .log-group .log-segment .log .log-title .log-task {
     text-align: left;
     padding-left: 5px;
     font-size: 1.1em;
@@ -335,7 +335,7 @@ lbwt .log-report .space-segment.log-history .log-group .log-segment .log .log-ti
     font-size: 1.15em;
 }
 
-lbwt .log-report .space-segment.log-history .log-group .log-segment .log .log-title .log-issue:hover {
+lbwt .log-report .space-segment.log-history .log-group .log-segment .log .log-title .log-task:hover {
     color: var(--secondary);
 }
 

@@ -48,7 +48,7 @@ export class LogCompare extends BaseDialog{
         `
     }
     renderDialog(){
-        this.env.issueData = this.params.issueData;
+        this.env.taskData = this.params.taskData;
         this.startDate = [0,0]
         this.startDateExist = null
         if (this.params.datas.start_date){

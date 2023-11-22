@@ -63,7 +63,7 @@ export class CheckList extends Component {
             payload.is_header = parent.getAttribute('header') == "true";
             payload.sequence = parseInt(parent.previousElementSibling?.getAttribute("sequence")) || 0;
             payload.float_sequence = 1;
-            payload.issue_id = this.env.issueData.id;
+            payload.task_id = this.env.taskData.id;
             params.id = parseInt(element.previousElementSibling.value) || 0
             params.payload = payload
             let res = (await this.do_invisible_request('POST', `${this.env.serverURL}/management/ac`, params));
@@ -316,7 +316,7 @@ export class CheckList extends Component {
             clientTags[currentPosition].el.remove();
             clientTags[currentPosition].el = acElement;
             let params = {
-                "id": self.env.issueData.id,
+                "id": self.env.taskData.id,
                 "jwt": self.env.jwt
             }
             let payload = {};
@@ -338,16 +338,16 @@ export class CheckList extends Component {
     }
     async getChecklistData(params){
         let result = [];
-        if (this.env.issueData.broardcast && this.env.issueData.acs) {
-            result = this.env.issueData.acs;
+        if (this.env.taskData.broardcast && this.env.taskData.acs) {
+            result = this.env.taskData.acs;
         } else {
             if (this.env.contentState.showLog) {
-                result = (await this.do_invisible_request('GET', `${this.env.serverURL}/management/issue/ac?${new URLSearchParams(params)}`));
+                result = (await this.do_invisible_request('GET', `${this.env.serverURL}/management/task/ac?${new URLSearchParams(params)}`));
             } else {
-                result = (await this.do_invisible_request('GET', `${this.env.serverURL}/management/issue/ac?${new URLSearchParams(params)}`));
+                result = (await this.do_invisible_request('GET', `${this.env.serverURL}/management/task/ac?${new URLSearchParams(params)}`));
             }
             result = (await result.json())
-            this.env.issueData.acs = result;
+            this.env.taskData.acs = result;
         }
         let default_data = {
             'id': false,
@@ -409,12 +409,12 @@ export class CheckList extends Component {
         })
     }
     async initChecklists() {
-        if (this.env.issueData) {
+        if (this.env.taskData) {
             let payload = {
                 'source': 'Extension'
             }
             let params = {
-                "id": this.env.issueData.id,
+                "id": this.env.taskData.id,
                 "jwt": this.env.jwt,
                 "payload": payload
             }

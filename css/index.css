@@ -370,7 +370,7 @@ svg:not(:root).tm-svg-inline--fa {
     position: relative;
 }
 
-lbwt .reload-issue {    
+lbwt .reload-task {    
     position: absolute;
     top: 30px;
     background: transparent;
@@ -381,28 +381,28 @@ lbwt .reload-issue {
     visibility: hidden;
 }
 
-lbwt .issue-active {
+lbwt .task-active {
     display: none;
     margin-bottom: 10px;
 }
 
-lbwt .issue-active .heading {
+lbwt .task-active .heading {
     padding: 2px 5px;
     font-size: 1.5em;
     color: var(--primary);
 }
 
-lbwt .issue-active .active-item-group {
+lbwt .task-active .active-item-group {
     padding: 2px;
     width: 100%;
 }
 
 
-lbwt .issue-active .active-item-group .active-item .icon-group {
+lbwt .task-active .active-item-group .active-item .icon-group {
     width: 10%;
 }
 
-lbwt .issue-active .active-item-group .active-item .icon-group .tm-icon svg {
+lbwt .task-active .active-item-group .active-item .icon-group .tm-icon svg {
     transform: rotate(30deg);
     border-radius: 50%;
     width: 20px;
@@ -411,7 +411,7 @@ lbwt .issue-active .active-item-group .active-item .icon-group .tm-icon svg {
     border-left: solid 4px var(--secondary);
 }
 
-lbwt .issue-active .active-item-group .active-item .issue-key {
+lbwt .task-active .active-item-group .active-item .task-key {
     display: inline-block;
     width: max-content;
     white-space: nowrap;
@@ -421,11 +421,11 @@ lbwt .issue-active .active-item-group .active-item .issue-key {
     cursor: pointer;
 }
 
-lbwt .issue-active .active-item-group .active-item .issue-key:hover {
+lbwt .task-active .active-item-group .active-item .task-key:hover {
     color: orange;
 }
 
-lbwt .issue-active .active-item-group .active-item .issue-name {
+lbwt .task-active .active-item-group .active-item .task-name {
     width: 100%;
     overflow-x: hidden;
     text-overflow: ellipsis;
@@ -434,14 +434,14 @@ lbwt .issue-active .active-item-group .active-item .issue-name {
     max-width: 500px;
 }
 
-lbwt .issue-active .active-item-group .active-item .duration {
+lbwt .task-active .active-item-group .active-item .duration {
     width: 25%;
     overflow-x: hidden;
     white-space: nowrap;
     text-overflow: ellipsis;
 }
 
-lbwt .issue-active .active-item-group .active-item {
+lbwt .task-active .active-item-group .active-item {
     display: flex;
     align-items: center;
     margin-left: 10px;
@@ -449,23 +449,23 @@ lbwt .issue-active .active-item-group .active-item {
     justify-content: space-between;
 }
 
-lbwt .issue-active .active-item-group .active-item .tm-icon {
+lbwt .task-active .active-item-group .active-item .tm-icon {
     cursor: pointer;
     font-size: 1.2em;
     color: var(--secondary);
 }
 
-lbwt .issue-active .active-item-group .active-item .tm-icon svg:hover {
+lbwt .task-active .active-item-group .active-item .tm-icon svg:hover {
     color: orange;
     border-top: solid 4px orange;
     border-left: solid 4px orange;
 }
 
-lbwt .issue-active .active-item-group .active-item .tm-icon.stop {
+lbwt .task-active .active-item-group .active-item .tm-icon.stop {
     color: var(--secondary) !important;
 }
 
-lbwt .issue-active .active-item-group .active-item.start .tm-icon {
+lbwt .task-active .active-item-group .active-item.start .tm-icon {
     color: var(--primary);
 }
 
@@ -682,16 +682,16 @@ lbwt .acceptance-criteria .ac-content .ac-container.initial .ac-segment .tm-form
     display: inline-block;
 }
 
-lbwt .issue {
+lbwt .task {
     padding: 5px 0px 10px 0px;
 }
 
-lbwt .issue input,
-lbwt .issue textarea {
+lbwt .task input,
+lbwt .task textarea {
     font-size: 12px;
 }
 
-lbwt .issue .input-group {
+lbwt .task .input-group {
     display: flex;
     flex-flow: row;
     margin-bottom: 0px;
@@ -701,19 +701,19 @@ lbwt .issue .input-group {
     width: 100%;
 }
 
-lbwt .issue .input-group .icon-prepend {
+lbwt .task .input-group .icon-prepend {
     position: absolute;
     background-color: white;
     margin-left: 1px;
     margin-top: -20px;
 }
 
-lbwt .issue .input-group .icon-prepend button {
+lbwt .task .input-group .icon-prepend button {
     outline: none;
     border: none;
 }
 
-lbwt .issue .input-group .host {
+lbwt .task .input-group .host {
     position: absolute;
     left: 1px;
     top: -17px;
@@ -721,12 +721,12 @@ lbwt .issue .input-group .host {
     height: 15px;
 }
 
-lbwt .issue .input-group .issue-type {
+lbwt .task .input-group .task-type {
     position: absolute;
     left: 25px;
 }
 
-lbwt .issue .input-group .input-s-issue {
+lbwt .task .input-group .input-s-task {
     font-size: 15px;
     padding-left: 45px;
     height: 30px;
@@ -734,11 +734,11 @@ lbwt .issue .input-group .input-s-issue {
     box-shadow: rgba(0, 0, 0, 0.2) 0px 3px 15px !important;
 }
 
-lbwt .issue .input-group .input-s-issue:focus {
+lbwt .task .input-group .input-s-task:focus {
     box-shadow: rgba(4, 146, 87, 0.4) 0px 3px 15px !important;
 }
 
-lbwt .issue .input-group .issue-navigation {
+lbwt .task .input-group .task-navigation {
     font-size: 2em;
     color: var(--primary);
     display: none;
@@ -748,13 +748,13 @@ lbwt .issue .input-group .issue-navigation {
     background-color: white;
 }
 
-lbwt .issue .input-group .issue-navigation .navigation-group {
+lbwt .task .input-group .task-navigation .navigation-group {
     display: flex;
     justify-content: space-between;
     align-items: center;
 }
 
-lbwt .issue .input-group .issue-navigation .navigation-group .issue-status {
+lbwt .task .input-group .task-navigation .navigation-group .task-status {
     font-size: 13px;
     font-weight: 600;
     text-align: center;
@@ -763,20 +763,20 @@ lbwt .issue .input-group .issue-navigation .navigation-group .issue-status {
     margin-right: 5px;
 }
 
-lbwt .issue .input-group .issue-navigation span {
+lbwt .task .input-group .task-navigation span {
     cursor: pointer;
 }
 
-lbwt .issue .input-group .issue-navigation span:hover {
+lbwt .task .input-group .task-navigation span:hover {
     color: orange;
 }
 
-lbwt .issue.search-bar {
+lbwt .task.search-bar {
     width: 100%;
     display: inline-block;
 }
 
-lbwt .issue.search-bar p {
+lbwt .task.search-bar p {
     margin-bottom: 2px;
     padding: 2px 10px;
     cursor: pointer;
@@ -784,13 +784,13 @@ lbwt .issue.search-bar p {
     font-size: 1.1em;
 }
 
-lbwt .issue.search-bar p:hover,
-lbwt .issue.search-bar p:focus-visible {
+lbwt .task.search-bar p:hover,
+lbwt .task.search-bar p:focus-visible {
     background-color: var(--primary);
     color: white;
 }
 
-lbwt .issue.search-bar .search-bar-result {
+lbwt .task.search-bar .search-bar-result {
     position: absolute;
     background-color: white;
     width: 100%;
@@ -802,16 +802,16 @@ lbwt .issue.search-bar .search-bar-result {
     display: none;
 }
 
-lbwt .issue.search-bar .search-bar-result p {
+lbwt .task.search-bar .search-bar-result p {
     display: flex;
     align-items: center;
 }
 
-lbwt .issue.search-bar .search-bar-result p img {
+lbwt .task.search-bar .search-bar-result p img {
     margin-right: 3px;
 }
 
-lbwt .issue.search-bar .search-bar-result p span {
+lbwt .task.search-bar .search-bar-result p span {
     overflow: hidden;
     white-space: nowrap;
     text-overflow: ellipsis;
@@ -819,7 +819,7 @@ lbwt .issue.search-bar .search-bar-result p span {
     display: inline-block;
 }
 
-lbwt .issue.search-bar .search-bar-result p em {
+lbwt .task.search-bar .search-bar-result p em {
     margin-left: auto;
     overflow-x: hidden;
     white-space: nowrap;
@@ -939,25 +939,25 @@ lbwt .tm-tab-content .clock-segment {
     width: 96%;
 }
 
-lbwt .issue.time-log {
+lbwt .task.time-log {
     width: 100%;
     margin-top: 10px;
     /* padding: 2% 2% 0px 2%; */
 }
 
-lbwt .issue.time-log .space-segment .comment {
+lbwt .task.time-log .space-segment .comment {
     width: 100%;
 }
 
-lbwt .issue.time-log .space-segment .comment textarea {
+lbwt .task.time-log .space-segment .comment textarea {
     width: 92%;
 }
 
-/* lbwt .issue.time-log .space-segment {
+/* lbwt .task.time-log .space-segment {
     display: none;
 } */
 
-lbwt .issue.time-log .space-segment .issue-content {
+lbwt .task.time-log .space-segment .task-content {
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -1060,7 +1060,7 @@ lbwt .log-report {
     display: inline-block;
 }
 
-lbwt .issue.time-log .heading {
+lbwt .task.time-log .heading {
     padding: 2px 5px;
     font-size: 1.5em;
     color: var(--primary);
@@ -1069,32 +1069,32 @@ lbwt .issue.time-log .heading {
     justify-content: space-between;
 }
 
-lbwt .issue.time-log .duration {
+lbwt .task.time-log .duration {
     padding: 10px 10px;
     display: flex;
     justify-content: space-between;
     align-items: center;
 }
 
-lbwt .issue.time-log .duration div {
+lbwt .task.time-log .duration div {
     display: flex;
     align-items: center;
 }
 
-lbwt .issue.time-log .duration div p {
+lbwt .task.time-log .duration div p {
     margin-bottom: 0px;
 }
 
-lbwt .issue.time-log .duration img {
+lbwt .task.time-log .duration img {
     width: 50px;
     height: 50px;
 }
 
-lbwt .issue.time-log .duration .active-duration {
+lbwt .task.time-log .duration .active-duration {
     font-style: italic;
 }
 
-lbwt .issue.time-log .duration .active-duration .action-tracking-delete {
+lbwt .task.time-log .duration .active-duration .action-tracking-delete {
     visibility: hidden;
     font-size: 0.8em;
     color: gray;
@@ -1102,34 +1102,34 @@ lbwt .issue.time-log .duration .active-duration .action-tracking-delete {
     cursor: pointer;
 }
 
-lbwt .issue.time-log .duration .active-duration:hover .action-tracking-delete {
+lbwt .task.time-log .duration .active-duration:hover .action-tracking-delete {
     visibility: visible;
     transition: linear 0.12s;
 }
 
-lbwt .issue.time-log .duration .active-duration .action-tracking-delete:hover {
+lbwt .task.time-log .duration .active-duration .action-tracking-delete:hover {
     color: red;
 }
 
-lbwt .issue.time-log .duration span {
+lbwt .task.time-log .duration span {
     font-size: 1.7em;
 }
 
-lbwt .issue.time-log .duration .duration-page {
+lbwt .task.time-log .duration .duration-page {
     display: flex;
     justify-content: space-between;
 }
 
-lbwt .issue.time-log .duration .total-duration {
+lbwt .task.time-log .duration .total-duration {
     width: max-content;
 }
 
-lbwt .issue.time-log .duration .active-duration {
+lbwt .task.time-log .duration .active-duration {
     width: max-content;
     margin-left: 5px;
 }
 
-lbwt .issue.time-log .duration .total-duration p {
+lbwt .task.time-log .duration .total-duration p {
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
@@ -1138,20 +1138,20 @@ lbwt .issue.time-log .duration .total-duration p {
     width: fit-content;
 }
 
-lbwt .issue.time-log .duration .total-duration small {
+lbwt .task.time-log .duration .total-duration small {
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
 }
 
-lbwt .issue.time-log .duration .avt {
+lbwt .task.time-log .duration .avt {
     font-size: 2.5em;
     color: var(--primary);
     padding-right: 5px;
     cursor: pointer;
 }
 
-lbwt .issue.time-log .time-action {
+lbwt .task.time-log .time-action {
     margin-bottom: 10px;
     font-size: 1.5em;
     display: flex;
@@ -1159,12 +1159,12 @@ lbwt .issue.time-log .time-action {
     align-items: center;
 }
 
-lbwt .issue.time-log .time-action .manual-log {
+lbwt .task.time-log .time-action .manual-log {
     width: 50%;
     display: flex;
 }
 
-lbwt .issue.time-log .time-action .action-group {
+lbwt .task.time-log .time-action .action-group {
     font-size: 1.5em;
     width: 50%;
     margin-left: 10px;
@@ -1176,7 +1176,7 @@ lbwt .issue.time-log .time-action .action-group {
     align-items: center;
 }
 
-lbwt .issue.time-log .time-action .action-group .action:hover {
+lbwt .task.time-log .time-action .action-group .action:hover {
     cursor: pointer;
     color: orange;
 }
@@ -1302,7 +1302,7 @@ lbwt .btn svg {
 
 
 
-lbwt .issue.time-log .time-action .start-date-label {
+lbwt .task.time-log .time-action .start-date-label {
     color: var(--primary);
     cursor: pointer;
     position: relative;
@@ -1314,15 +1314,15 @@ lbwt .issue.time-log .time-action .start-date-label {
     z-index: 20;
 }
 
-lbwt .issue.time-log .time-action .start-date {
+lbwt .task.time-log .time-action .start-date {
     display: none;
     font-size: 0.5em;
 }
 
-lbwt .favorite-issues {
+lbwt .favorite-tasks {
     width: 100%;
 }
-lbwt .favorite-issues .favorite-moving{
+lbwt .favorite-tasks .favorite-moving{
     display: flex;
     color: var(--primary);
     font-weight: 700;
@@ -1330,19 +1330,19 @@ lbwt .favorite-issues .favorite-moving{
     right: 10px;
     margin-top: 5px;
 }
-lbwt .favorite-issues .favorite-moving .favorite-tools{
+lbwt .favorite-tasks .favorite-moving .favorite-tools{
     margin-left: auto;
     display: flex;
     align-items: center;
     justify-content: center;
 }
-lbwt .favorite-issues .favorite-moving .favorite-tools input{
+lbwt .favorite-tasks .favorite-moving .favorite-tools input{
     margin: 0;
     margin-left: 10px;
     margin-right: 2px;
     height: 0.8em;
 }
-lbwt .favorite-issues .favorite-moving .favorite-tools label{
+lbwt .favorite-tasks .favorite-moving .favorite-tools label{
     height: 1em;
 }
 
@@ -1383,7 +1383,7 @@ lbwt .favorite-list {
     flex-flow: column;
 }
 
-lbwt .favorite-list .favorite-issue {
+lbwt .favorite-list .favorite-task {
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -1392,7 +1392,7 @@ lbwt .favorite-list .favorite-issue {
     border-bottom: solid 1px lightgray;
 }
 
-lbwt .favorite-list .favorite-issue .favorite-issue-key {
+lbwt .favorite-list .favorite-task .favorite-task-key {
     font-weight: 700;
     color: var(--primary);
     font-size: 1.1em;
@@ -1405,11 +1405,11 @@ lbwt .favorite-list .favorite-issue .favorite-issue-key {
     white-space: nowrap;
 }
 
-lbwt .favorite-list .favorite-issue .favorite-issue-key:hover {
+lbwt .favorite-list .favorite-task .favorite-task-key:hover {
     color: orange;
 }
 
-lbwt .favorite-list .favorite-issue .favorite-issue-name {
+lbwt .favorite-list .favorite-task .favorite-task-name {
     width: 80%;
     text-align: left;
     overflow-x: hidden;
@@ -1418,7 +1418,7 @@ lbwt .favorite-list .favorite-issue .favorite-issue-name {
     display: inline-block;
 }
 
-lbwt .favorite-list .favorite-issue .favorite-issue-action {
+lbwt .favorite-list .favorite-task .favorite-task-action {
     width: 5%;
 }
 

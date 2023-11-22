@@ -3,23 +3,23 @@ import * as util from "../utils/utils.js"
 import { Component } from "../base.js"
 export class SearchBar extends Component {
 
-    searchRef = this.useRef('search-bar-issue')
-    reloadIssueRef = this.useRef("reload-issue")
+    searchRef = this.useRef('search-bar-task')
+    reloadTaskRef = this.useRef("reload-task")
     favoriteNavigatorRef = this.useRef('favorite-segment-ref')
     addToFavoriteRef = this.useRef('add-to-favorite-ref')
     removeToFavoriteRef = this.useRef('remove-to-favorite-ref')
     typeRef = this.useRef("type-ref")
     hostRef = this.useRef("host-ref")
     statusRef = this.useRef("status-ref")
-    openIssueref = this.useRef("open-issue")
+    openTaskref = this.useRef("open-task")
     searchResultRef = this.useRef('search-bar-result')
 
     constructor() {
         super(...arguments);
-        this.subscribe('issueData', this.renderIssueSearch.bind(this));
-        this.subscribe('loadIssueData', this.loadIssue.bind(this));
+        this.subscribe('taskData', this.renderTaskSearch.bind(this));
+        this.subscribe('loadTaskData', this.loadTask.bind(this));
         this.subscribe('favorite', this.favoriteChanged.bind(this));
-        this.openIssueNaviagor = this.openIssueNaviagor.bind(this);
+        this.openTaskNaviagor = this.openTaskNaviagor.bind(this);
     }
     favoriteChanged(isFavorite) {
         if (isFavorite) {
@@ -28,17 +28,17 @@ export class SearchBar extends Component {
             this.favoriteNavigatorRef.el.classList.remove('favorite');
         }
     }
-    async loadIssue() {
-        if (!this.env.issueData?.broardcast) {
-            let response = (await this.do_invisible_request('GET', `${this.env.serverURL}/management/issue/get/${this.env.issueData.id}?jwt=${this.env.jwt}`));
+    async loadTask() {
+        if (!this.env.taskData?.broardcast) {
+            let response = (await this.do_invisible_request('GET', `${this.env.serverURL}/management/task/get/${this.env.taskData.id}?jwt=${this.env.jwt}`));
             let result = (await response.json());
-            let values = this.env.issueData;
-            this.env.issueData.timeStatus = false;
+            let values = this.env.taskData;
+            this.env.taskData.timeStatus = false;
             for (let key of Object.keys(result)) { values[key] = result[key]; }
-            this.update('issueData', this.env.issueData)
+            this.update('taskData', this.env.taskData)
         }
     }
-    renderIssueSearch(data) {
+    renderTaskSearch(data) {
         this.typeRef.el.innerHTML = `<img src="${data.type_url}"/>`;
         if (data.host_image_url) {
             // if (!this.env.storage.imageURLs){
@@ -57,23 +57,23 @@ export class SearchBar extends Component {
         }
         this.statusRef.el.innerText = data.status || '';
         this.searchRef.el.value = util._getDisplayName(data);
-        this.el.querySelector('.issue-navigation').style.display = "inline-block";
+        this.el.querySelector('.task-navigation').style.display = "inline-block";
     }
-    async chooseIssue(index) {
+    async chooseTask(index) {
         this.searchResultRef.el.style.display = 'none';
-        this.update('issueData', this.searchData.values[index]);
+        this.update('taskData', this.searchData.values[index]);
     }
-    async fetchSearchIssue(text) {
+    async fetchSearchTask(text) {
         let offset = this.searchData?.values?.length || 0;
         let params = {
             "query": text,
             "jwt": this.env.jwt,
             "offset": offset
         }
-        let result = (await this.do_request('POST', `${this.env.serverURL}/management/issue/search`, params));
+        let result = (await this.do_request('POST', `${this.env.serverURL}/management/task/search`, params));
         return (await result.json());
     }
-    loadSearchedIssues(data) {
+    loadSearchedTasks(data) {
         if (data === null || data === undefined) {
             return
         }
@@ -98,7 +98,7 @@ export class SearchBar extends Component {
             p.setAttribute('tabindex', 10 + i)
             p.setAttribute('title', data[i].displayName)
             p.addEventListener('click', () => {
-                self.chooseIssue(i);
+                self.chooseTask(i);
             })
             p.addEventListener('keydown', event => {
                 if (event.keyCode === 38) {
@@ -129,22 +129,22 @@ export class SearchBar extends Component {
             element.append(p);
             p.addEventListener('click', event => {
                 event.stopImmediatePropagation();
-                self.fetchSearchIssue(self.searchData.query).then(result => {
+                self.fetchSearchTask(self.searchData.query).then(result => {
                     self.searchData.values.push(...result);
                     element.innerHTML = '';
-                    self.loadSearchedIssues(self.searchData.values);
+                    self.loadSearchedTasks(self.searchData.values);
                     self.env.update('searchData', self.searchData);
                 });
             })
             element.style.display = 'inline-block';
         }
     }
-    async _searchIssue(text, invisible = false) {
+    async _searchTask(text, invisible = false) {
         this.searchData = {}
         this.searchData.query = text;
-        this.searchData.values = (await this.fetchSearchIssue(text));
+        this.searchData.values = (await this.fetchSearchTask(text));
         if (!invisible) {
-            this.loadSearchedIssues(this.searchData.values);
+            this.loadSearchedTasks(this.searchData.values);
         }
         this.update('searchData', this.searchData);
     }
@@ -157,14 +157,14 @@ export class SearchBar extends Component {
             self.searchResultRef.el.innerHTML = '';
             self.searchResultRef.el.style.display = 'none';
             if (this.searchRef.el.value.length > 0) {
-                self._searchIssue(this.searchRef.el.value)
+                self._searchTask(this.searchRef.el.value)
             }
         })
         this.searchRef.el.addEventListener('click', event => {
             if (self.searchData) {
                 self.searchResultRef.el.innerHTML = '';
                 self.searchResultRef.el.style.display = 'none';
-                self.loadSearchedIssues(self.searchData.values);
+                self.loadSearchedTasks(self.searchData.values);
                 event.stopImmediatePropagation();
             }
         })
@@ -172,47 +172,47 @@ export class SearchBar extends Component {
             self.searchResultRef.el.style.display = 'none';
         })
     }
-    openIssueNaviagor(event) {
-        if (window.event.ctrlKey && window.event.altKey && this.issueData) {
+    openTaskNaviagor(event) {
+        if (window.event.ctrlKey && window.event.altKey && this.taskData) {
             this.triggerUp('action-export');
         }
         else {
-            window.open(this.env.issueData.url, '_blank')
+            window.open(this.env.taskData.url, '_blank')
         }
     }
-    async fetchIssueFromServer() {
-        let response = (await this.do_request('GET', `${this.env.serverURL}/management/issue/fetch/${this.env.issueData.id}?jwt=${this.env.jwt}`));
+    async fetchTaskFromServer() {
+        let response = (await this.do_request('GET', `${this.env.serverURL}/management/task/fetch/${this.env.taskData.id}?jwt=${this.env.jwt}`));
         let data = (await response.json())
-        this.update('issueData', data);
+        this.update('taskData', data);
     }
     _initNavigator() {
         let self = this;
-        if (this.env.issueData) {
-            this.reloadIssueRef.el.style.visibility = 'visible';
+        if (this.env.taskData) {
+            this.reloadTaskRef.el.style.visibility = 'visible';
         }
-        this.openIssueref.el.addEventListener('click', this.openIssueNaviagor)
-        this.reloadIssueRef.el.addEventListener('click', (event) => {
-            self.fetchIssueFromServer()
+        this.openTaskref.el.addEventListener('click', this.openTaskNaviagor)
+        this.reloadTaskRef.el.addEventListener('click', (event) => {
+            self.fetchTaskFromServer()
         })
     }
     _initFavorite() {
         let self = this;
         this.addToFavoriteRef.el.addEventListener('click', event => {
-            if (self.env.issueData) {
-                self.do_request('POST', `${self.env.serverURL}/management/issue/favorite/add?jwt=${self.env.jwt}&id=${self.env.issueData.id}`);
+            if (self.env.taskData) {
+                self.do_request('POST', `${self.env.serverURL}/management/task/favorite/add?jwt=${self.env.jwt}&id=${self.env.taskData.id}`);
                 self.favoriteNavigatorRef.el.classList.add('favorite');
             }
         })
         this.removeToFavoriteRef.el.addEventListener('click', event => {
-            if (self.env.issueData) {
-                self.do_request('POST', `${self.env.serverURL}/management/issue/favorite/delete?jwt=${self.env.jwt}&id=${self.env.issueData.id}`);
+            if (self.env.taskData) {
+                self.do_request('POST', `${self.env.serverURL}/management/task/favorite/delete?jwt=${self.env.jwt}&id=${self.env.taskData.id}`);
                 self.favoriteNavigatorRef.el.classList.remove('favorite');
             }
         })
     }
     renderOverview() {
-        if (this.env.issueData) {
-            this.renderIssueSearch(this.env.issueData);
+        if (this.env.taskData) {
+            this.renderTaskSearch(this.env.taskData);
         }
         let self = this;
         window.addEventListener('keydown', event => {
@@ -237,8 +237,8 @@ export class SearchBar extends Component {
 
     getTemplate() {
         return `
-    <div class="issue search-bar">
-        <button type="button" class="reload-issue" l-ref="reload-issue" tabindex="999" title="Reload From The Original Server">
+    <div class="task search-bar">
+        <button type="button" class="reload-task" l-ref="reload-task" tabindex="999" title="Reload From The Original Server">
             <span class="tm-icon-svg">
                 <svg class="svg-inline--fa fa-arrow-rotate-right" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="arrow-rotate-right" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" data-fa-i2svg=""><path fill="currentColor" d="M496 48V192c0 17.69-14.31 32-32 32H320c-17.69 0-32-14.31-32-32s14.31-32 32-32h63.39c-29.97-39.7-77.25-63.78-127.6-63.78C167.7 96.22 96 167.9 96 256s71.69 159.8 159.8 159.8c34.88 0 68.03-11.03 95.88-31.94c14.22-10.53 34.22-7.75 44.81 6.375c10.59 14.16 7.75 34.22-6.375 44.81c-39.03 29.28-85.36 44.86-134.2 44.86C132.5 479.9 32 379.4 32 256s100.5-223.9 223.9-223.9c69.15 0 134 32.47 176.1 86.12V48c0-17.69 14.31-32 32-32S496 30.31 496 48z"></path></svg>                        
             </span>
@@ -261,14 +261,14 @@ export class SearchBar extends Component {
             <div class="host">
                 <span l-ref="host-ref"></span>
             </div>
-            <div class="issue-type">
+            <div class="task-type">
                 <span l-ref="type-ref"></span>
             </div>
-            <input type="text" class="tm-form-control input-s-issue" placeholder="Search Issues" l-ref="search-bar-issue" tabindex="1" title="Ctrl+Shift+F"/>
-            <div class="issue-navigation">
+            <input type="text" class="tm-form-control input-s-task" placeholder="Search Tasks" l-ref="search-bar-task" tabindex="1" title="Ctrl+Shift+F"/>
+            <div class="task-navigation">
                 <div class="navigation-group"> 
-                    <div class="issue-status" l-ref="status-ref"></div>
-                    <button type="button" l-ref="open-issue" tabindex="998" title="Ctrl+Shift+E or Ctrl+Alt+Click: Export To The Original Server">
+                    <div class="task-status" l-ref="status-ref"></div>
+                    <button type="button" l-ref="open-task" tabindex="998" title="Ctrl+Shift+E or Ctrl+Alt+Click: Export To The Original Server">
                         <span class="tm-icon-svg">
                             <svg class="tm-svg-inline--fa" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="square-arrow-up-right" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" data-fa-i2svg=""><path fill="currentColor" d="M384 32H64C28.65 32 0 60.66 0 96v320c0 35.34 28.65 64 64 64h320c35.35 0 64-28.66 64-64V96C448 60.66 419.3 32 384 32zM344 312c0 17.69-14.31 32-32 32s-32-14.31-32-32V245.3l-121.4 121.4C152.4 372.9 144.2 376 136 376s-16.38-3.125-22.62-9.375c-12.5-12.5-12.5-32.75 0-45.25L234.8 200H168c-17.69 0-32-14.31-32-32s14.31-32 32-32h144c17.69 0 32 14.31 32 32V312z"></path></svg>                            
                         </span>

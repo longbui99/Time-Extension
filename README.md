@@ -7,27 +7,27 @@ I am also provide a system for you to doing a time management tracking with so m
 ## Main Features
 ### General
 - Sign in to server (no matter that's cloud or not, but you probably need to use https:// domain for the server)
-- Search issues/issues that we would want to working on.
+- Search tasks/tasks that we would want to working on.
 ### Clock Traking
 ![Clock](./readme/clock1.png)
 ![Clock](./readme/clock2.png)
 - View the total duration of all people, view your total duration and your active duration so far.
-- View assignee, tester, status of the issue/issue
-- Add comment for issue
+- View assignee, tester, status of the task/task
+- Add comment for task
 - Manually log time if you don't want to track or you didn't start tracking time.
 - Log to the specific date. (default is the noon of the user's browser timezone)
 - Start, Pause, Stop tracking time.
-- View all related active issues and navigate to related issue by clicking at their issue key.
+- View all related active tasks and navigate to related task by clicking at their task key.
 ### Checklists
 ![Clock](./readme/checklist.png)
-- Write checklist for the particular issue.
+- Write checklist for the particular task.
 - Reorder checklists.
 - Toggle between checklist header and checkbox.
 - Bold **(Ctrl + B)** and Italic **(Ctrl + I)** is acceptable. 
 ### Favorites
 ![Clock](./readme/favorite.png)
 - Add/Remove from favorite/todo list.
-- Navigate to favorite issue by clicking on their issue-key
+- Navigate to favorite task by clicking on their task-key
 
 ## Keyboard Shortcuts
 - **Ctrl + Shift + Digit[1,3]**: To navigate to the particular tab.

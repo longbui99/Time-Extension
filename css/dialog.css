@@ -83,31 +83,31 @@ lbwt-dialog .dialog-main .error-content{
 lbwt-dialog .dialog-main .dialog-content{
     margin-bottom: 25px;
 }
-lbwt-dialog .dialog-main .dialog-content .dialog-issue-content{
+lbwt-dialog .dialog-main .dialog-content .dialog-task-content{
     display: flex;
     flex-flow: column;
     width: 100%;
     position: relative;
 }
-lbwt-dialog .dialog-main .dialog-content .dialog-issue-content h2{
+lbwt-dialog .dialog-main .dialog-content .dialog-task-content h2{
     font-size: 1.5em;
 }
-lbwt-dialog .dialog-main .dialog-content .dialog-issue-content .dialog-issue-search-bar{
+lbwt-dialog .dialog-main .dialog-content .dialog-task-content .dialog-task-search-bar{
     width: 100%;
 }
-lbwt-dialog .dialog-main .dialog-content .dialog-issue-content .log-range{
+lbwt-dialog .dialog-main .dialog-content .dialog-task-content .log-range{
     display: flex;
     justify-content: space-around;
     width: 100%;
     align-items: center;
     margin-bottom: 10px;
 }
-lbwt-dialog .dialog-main .dialog-content .dialog-issue-content .log-range svg{
+lbwt-dialog .dialog-main .dialog-content .dialog-task-content .log-range svg{
     font-size: 1.5em;
     color: var(--primary);
     margin: 0px 10px;
 }
-lbwt-dialog .dialog-main .dialog-content .dialog-issue-content textarea{
+lbwt-dialog .dialog-main .dialog-content .dialog-task-content textarea{
     font-size: 1.1em;
 }
 lbwt-dialog button{

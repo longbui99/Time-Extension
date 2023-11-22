@@ -15,31 +15,31 @@ export class Clock extends Component {
     actionResumeRef = this.useRef('action-resume')
     actionPauseRef = this.useRef('action-pause')
     actionStopRef = this.useRef('action-stop')
-    commentRef = this.useRef('comment-for-issue')
+    commentRef = this.useRef('comment-for-task')
     manualLogref = this.useRef('manual-log-text')
     loggedDate = this.useRef("start-date")
     trackingDelete = this.useRef('action-tracking-delete')
     constructor() {
         super(...arguments);
         this.secondToString = util.parseSecondToString(this.env.resource?.hrs_per_day || 8, this.env.resource?.days_per_week || 5);
-        this.subscribe('issueData', this.renderClockData.bind(this))
+        this.subscribe('taskData', this.renderClockData.bind(this))
     }
 
     async renderTimeActions() {
-        if (this.env.issueData) {
-            if (this.env.issueData.timeStatus === "active") {
+        if (this.env.taskData) {
+            if (this.env.taskData.timeStatus === "active") {
                 this.actionAddRef.el.style.display = "none";
                 this.actionResumeRef.el.style.display = "none";
                 this.actionPauseRef.el.style.display = "flex";
                 this.actionStopRef.el.style.display = "flex";
             }
-            else if (this.env.issueData.timeStatus === "pause") {
+            else if (this.env.taskData.timeStatus === "pause") {
                 this.actionAddRef.el.style.display = "none";
                 this.actionResumeRef.el.style.display = "flex";
                 this.actionPauseRef.el.style.display = "none";
                 this.actionStopRef.el.style.display = "flex";
             }
-            else if (this.env.issueData.timeStatus === "force") {
+            else if (this.env.taskData.timeStatus === "force") {
                 this.actionAddRef.el.style.display = "flex";
                 this.actionResumeRef.el.style.display = "none";
                 this.actionPauseRef.el.style.display = "none";
@@ -47,7 +47,7 @@ export class Clock extends Component {
             }
             else {
                 if (this.manualLogref.el.value) {
-                    this.env.issueData.timeStatus = "force";
+                    this.env.taskData.timeStatus = "force";
                     this.renderTimeActions();
                 }
                 else {
@@ -69,11 +69,11 @@ export class Clock extends Component {
         if (this.currentInterval) {
             clearInterval(this.currentInterval)
         }
-        if (this.env.issueData) {
+        if (this.env.taskData) {
             if (refresh === true) {
-                this.update('loadIssueData', null);
+                this.update('loadTaskData', null);
             }
-            let record = this.env.issueData;
+            let record = this.env.taskData;
             this.totalDurationRef.el.innerText = util.secondToHMSString(record.total_duration);
             this.myTotalDurationRef.el.innerText = util.secondToHMSString(record.my_total_duration);
             this.activeDurationRef.el.innerText = util.secondToHMS(record.active_duration);
@@ -84,62 +84,62 @@ export class Clock extends Component {
             this.manualLogref.el.value = record.localManualLog || '';
             this.commentRef.el.setAttribute("rows", ((record.comment !== "" && record.comment) ? record.comment.split("\n").length : 1));
             if (record.active_duration > 0) {
-                this.env.issueData.timeStatus = "pause";
+                this.env.taskData.timeStatus = "pause";
             }
             if (record.last_start) {
                 let pivotTime = new Date().getTime();
                 this.currentInterval = setInterval(() => {
                     this.activeDurationRef.el.innerText = util.secondToHMS(parseInt(record.active_duration + (new Date().getTime() - pivotTime) / 1000));
                 }, 500)
-                this.env.issueData.timeStatus = "active";
+                this.env.taskData.timeStatus = "active";
             }
         }
         this.renderTimeActions();
     }
     async _pauseWorkLog(id = false, refresh = true) {
         let params = {
-            "id": id || this.env.issueData.id,
+            "id": id || this.env.taskData.id,
             "jwt": this.env.jwt,
             "payload": {
                 'description': this.commentRef.el.value,
                 'source': 'Extension'
             }
         }
-        let result = (await this.do_invisible_request('POST', `${this.env.serverURL}/management/issue/work-log/pause`, params));
+        let result = (await this.do_invisible_request('POST', `${this.env.serverURL}/management/task/work-log/pause`, params));
         this.renderClockData(true);
     }
 
     _initPause() {
         let self = this;
         this.actionPauseRef.el.addEventListener('click', (event) => {
-            if (self.env.issueData.timeStatus === "active") {
-                self.env.issueData.timeStatus = "pause";
+            if (self.env.taskData.timeStatus === "active") {
+                self.env.taskData.timeStatus = "pause";
                 self._pauseWorkLog()
             }
         })
     }
     async _addWorkLog(refresh = true) {
         let params = {
-            "id": this.env.issueData.id,
+            "id": this.env.taskData.id,
             "jwt": this.env.jwt,
             "payload": {
                 'source': 'Extension'
             }
         }
-        let result = (await this.do_request('POST', `${this.env.serverURL}/management/issue/work-log/add`, params));
+        let result = (await this.do_request('POST', `${this.env.serverURL}/management/task/work-log/add`, params));
         this.renderClockData(refresh);
     }
     _initAddWorkLog() {
         let self = this;
         this.actionAddRef.el.addEventListener('click', (event) => {
-            if (self.env.issueData.timeStatus !== "active") {
-                self.env.issueData.timeStatus = "active";
+            if (self.env.taskData.timeStatus !== "active") {
+                self.env.taskData.timeStatus = "active";
                 self._addWorkLog()
             }
         })
         this.actionResumeRef.el.addEventListener('click', (event) => {
-            if (self.env.issueData.timeStatus !== "active") {
-                self.env.issueData.timeStatus = "active";
+            if (self.env.taskData.timeStatus !== "active") {
+                self.env.taskData.timeStatus = "active";
                 self._addWorkLog()
             }
         })
@@ -158,24 +158,24 @@ export class Clock extends Component {
             payload['time'] = this.manualLogref.el.value;
         }
         let params = {
-            "id": this.env.issueData.id,
+            "id": this.env.taskData.id,
             "jwt": this.env.jwt,
             "payload": payload
         }
 
         if (triggerServer) {
-            this.env.issueData.timeStatus = false;
-            (await this.do_request('POST', `${this.env.serverURL}/management/issue/work-log/done`, params));
+            this.env.taskData.timeStatus = false;
+            (await this.do_request('POST', `${this.env.serverURL}/management/task/work-log/done`, params));
         }
         else {
-            (await this.do_request('POST', `${this.env.serverURL}/management/issue/work-log/manual`, params));
+            (await this.do_request('POST', `${this.env.serverURL}/management/task/work-log/manual`, params));
             this.manualLogref.el.value = '';
         }
         this.renderClockData(refresh);
         this.commentRef.el.value = '';
-        this.env.issueData.timeStatus = null;
-        this.env.issueData.localManualLog = '';
-        this.env.syncOne('issueData', this.env.issueData)
+        this.env.taskData.timeStatus = null;
+        this.env.taskData.localManualLog = '';
+        this.env.syncOne('taskData', this.env.taskData)
     }
     _initDoneWorkLog() {
         let self = this;
@@ -186,10 +186,10 @@ export class Clock extends Component {
     _initManualChange() {
         let self = this;
         this.manualLogref.el.addEventListener('keyup', function (event) {
-            if (!['pause', 'active'].includes(self.env.issueData?.timeStatus)) {
-                self.env.issueData.timeStatus = "force";
-                self.env.issueData.localManualLog = self.manualLogref.el.value;
-                self.env.syncOne('issueData', self.env.issueData);
+            if (!['pause', 'active'].includes(self.env.taskData?.timeStatus)) {
+                self.env.taskData.timeStatus = "force";
+                self.env.taskData.localManualLog = self.manualLogref.el.value;
+                self.env.syncOne('taskData', self.env.taskData);
                 self.renderTimeActions();
             }
         })
@@ -205,26 +205,26 @@ export class Clock extends Component {
                 let value = self.commentRef.el.value;
                 self.commentRef.el.setAttribute("rows", ((value !== "") ? value.split("\n").length : 1));
             }
-            self.env.issueData.localComment = self.commentRef.el.value;
-            self.env.syncOne('issueData', self.env.issueData)
+            self.env.taskData.localComment = self.commentRef.el.value;
+            self.env.syncOne('taskData', self.env.taskData)
         })
     }
     async _initIconRef() {
         let self = this;
         this.trackingDelete.el.addEventListener("click", async (event) => {
-            if (['pause', 'active'].includes(self.env.issueData.timeStatus)) {
+            if (['pause', 'active'].includes(self.env.taskData.timeStatus)) {
                 let payload = {
                     'source': 'Extension'
                 }
                 let params = {
-                    "id": self.env.issueData.id,
+                    "id": self.env.taskData.id,
                     "jwt": self.env.jwt,
                     "payload": payload
                 }
                 if (!self.manualLogref.el.value) {
-                    self.env.issueData.timeStatus = "normal";
+                    self.env.taskData.timeStatus = "normal";
                 }
-                await self.do_request('POST', `${self.env.serverURL}/management/issue/work-log/cancel`, params);
+                await self.do_request('POST', `${self.env.serverURL}/management/task/work-log/cancel`, params);
                 self.renderClockData(true);
             }
         })
@@ -258,10 +258,10 @@ export class Clock extends Component {
     }
     getTemplate() {
         return `
-        <div class="issue time-log" l-ref="time-log-section">
+        <div class="task time-log" l-ref="time-log-section">
             <div class="space-segment">
                 <div class="clock-segment">
-                    <div class="issue-content p-1">
+                    <div class="task-content p-1">
                         <div>
                             <span class="tm-icon-svg">
                                 <svg class="svg-inline--fa fa-arrow-right" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="arrow-right" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" data-fa-i2svg=""><path fill="currentColor" d="M438.6 278.6l-160 160C272.4 444.9 264.2 448 256 448s-16.38-3.125-22.62-9.375c-12.5-12.5-12.5-32.75 0-45.25L338.8 288H32C14.33 288 .0016 273.7 .0016 256S14.33 224 32 224h306.8l-105.4-105.4c-12.5-12.5-12.5-32.75 0-45.25s32.75-12.5 45.25 0l160 160C451.1 245.9 451.1 266.1 438.6 278.6z"></path></svg>
@@ -315,7 +315,7 @@ export class Clock extends Component {
                         </div>
                     </div>
                     <div class="comment">
-                        <textarea rows="1" type="text" class="tm-form-control" placeholder="What are you doing?" l-ref="comment-for-issue" tabindex="1002"></textarea>
+                        <textarea rows="1" type="text" class="tm-form-control" placeholder="What are you doing?" l-ref="comment-for-task" tabindex="1002"></textarea>
                     </div>
                 </div>
             </div>

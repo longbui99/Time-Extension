@@ -26,7 +26,7 @@ export class App extends Component {
     super(...arguments);
     this.subEnv = {};
     this.load = {};
-    this.env.syncChannel(['authentication', 'storage', 'issueData', 'searchData', 'historyData', 'checklistData', 'favoriteData']);
+    this.env.syncChannel(['authentication', 'storage', 'taskData', 'searchData', 'historyData', 'checklistData', 'favoriteData']);
   }
   mountServerAction() {
     let self = this;
@@ -109,7 +109,7 @@ export class App extends Component {
   }
   async onAuthentication(data, authenticated = true) {
     if (this.env.serverURL !== data.serverURL) {
-      this.env.syncOne('issueData', null)
+      this.env.syncOne('taskData', null)
     }
     data['authenticated'] = authenticated;
     await this.env.syncAll(data);
@@ -129,15 +129,15 @@ export class App extends Component {
     this.showDialog(ErrorDialog, data)
     this.onAuthentication(this.env.raw, false);
   }
-  async onIssueChanged(issueData) {
+  async onTaskChanged(taskData) {
     if (chrome.storage) {
       let data = (await chrome.storage.local.get(["timeLogStorage"]))?.timeLogStorage
-      data.issueData = issueData;
+      data.taskData = taskData;
       chrome.storage.local.set({ 'timeLogStorage': data })
-      this.flushDataToExtension({ issueUpdate: data.issueData });
+      this.flushDataToExtension({ taskUpdate: data.taskData });
     } else {
       let data = JSON.parse(localStorage.getItem(storage) || "{}");
-      data.issueData = issueData;
+      data.taskData = taskData;
       localStorage.setItem(storage, JSON.stringify(data));
     }
   }
@@ -152,20 +152,20 @@ export class App extends Component {
   flushDataToExtension(data) {
     chrome.runtime.sendMessage(data);
   }
-  issueUpdate(issueData) {
+  taskUpdate(taskData) {
     if (this.subEnv.authenticated) {
-      issueData.broardcast = true;
-      this.component.issueData = issueData;
+      taskData.broardcast = true;
+      this.component.taskData = taskData;
       this.component.renderContent();
-      this.component.issueData.broardcast = false;
+      this.component.taskData.broardcast = false;
     }
   }
   relativeActiveUpdate(relativeActives) {
     if (this.subEnv.authenticated) {
-      this.component.issueData.broardcast = true;
-      this.component.relatedActiveIssues = relativeActives;
+      this.component.taskData.broardcast = true;
+      this.component.relatedActiveTasks = relativeActives;
       this.component.fetchRelativeActive();
-      this.component.issueData.broardcast = false;
+      this.component.taskData.broardcast = false;
     }
   }
   searchedUpdate(searchData) {

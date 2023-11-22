@@ -22,7 +22,7 @@ export class Main extends Component {
         this.secondToString = util.parseSecondToString(this.env.resource?.hrs_per_day || 8, this.env.resource?.days_per_week || 5);
         this.triggerUp("load_start", this.loadID)
         this.env.syncChannel(['contentState']);
-        this.subscribe('issueData', this.issueDataChange.bind(this))
+        this.subscribe('taskData', this.taskDataChange.bind(this))
         this.subscribe('relativeAdd', this.relativeAdd.bind(this))
     }
     custom_events = {
@@ -37,19 +37,19 @@ export class Main extends Component {
                 'source': 'Extension'
             }
         }
-        await this.do_request('POST', `${this.env.serverURL}/management/issue/work-log/add`, params);
+        await this.do_request('POST', `${this.env.serverURL}/management/task/work-log/add`, params);
         this.fetchRelativeActive();
     }
     renderRelatedActiveData() {
         let template = ""
         let i = 0;
-        for (let record of this.relatedActiveIssues) {
+        for (let record of this.relatedActiveTasks) {
             template += `
                 <div class="active-item">
-                    <span class="issue-key" tabindex="${1100 + i}">
+                    <span class="task-key" tabindex="${1100 + i}">
                         ${record.key}   
                     </span>
-                    <span class="issue-name" title="${record.name}">
+                    <span class="task-name" title="${record.name}">
                         ${record.name}
                     </span>
                     <span class="duration">
@@ -59,17 +59,17 @@ export class Main extends Component {
             i++;
         }
         this.relatedActiveRef.el.innerHTML = template;
-        let elements = this.relatedActiveRef.el.querySelectorAll('.issue-key')
+        let elements = this.relatedActiveRef.el.querySelectorAll('.task-key')
         let self = this;
         let progressLog = []
         for (let index = 0; index < elements.length; index++) {
             elements[index].addEventListener('click', function (event) {
-                self.env.issueData = self.relatedActiveIssues[index];
-                self.update('loadIssueData', null);
-                // self.env.update('issueData', self.env.issueData)
+                self.env.taskData = self.relatedActiveTasks[index];
+                self.update('loadTaskData', null);
+                // self.env.update('taskData', self.env.taskData)
             })
-            if (self.relatedActiveIssues[index].last_start) {
-                progressLog.push({ el: elements[index].parentNode.querySelector('.duration'), active_duration: self.relatedActiveIssues[index].active_duration })
+            if (self.relatedActiveTasks[index].last_start) {
+                progressLog.push({ el: elements[index].parentNode.querySelector('.duration'), active_duration: self.relatedActiveTasks[index].active_duration })
             }
         }
         if (this.relatedCurrentInterval) {
@@ -83,28 +83,28 @@ export class Main extends Component {
                 }
             }, 500)
         }
-        if (this.relatedActiveIssues.length) {
+        if (this.relatedActiveTasks.length) {
             this.relatedActiveRef.el.parentNode.style.display = "block";
         }
     }
     async fetchRelativeActive() {
         this.relatedActiveRef.el.parentNode.style.display = "none";
-        if (!this.env.issueData?.broardcast) {
+        if (!this.env.taskData?.broardcast) {
             let params = JSON.stringify({
-                "except": this.env.issueData?.id,
+                "except": this.env.taskData?.id,
                 "limit": 6,
                 "source": "Extension"
             }), self = this;
-            let response = (await this.do_invisible_request('GET', `${this.env.serverURL}/management/issue/my-active?jwt=${this.env.jwt}&payload=${params}`))
+            let response = (await this.do_invisible_request('GET', `${this.env.serverURL}/management/task/my-active?jwt=${this.env.jwt}&payload=${params}`))
             let result = (await response.json());
-            this.relatedActiveIssues = result;
+            this.relatedActiveTasks = result;
             setTimeout(() => {
                 self.triggerUp('relative-updated', result);
             }, 200)
         }
         this.renderRelatedActiveData()
     }
-    issueDataChange() {
+    taskDataChange() {
         this.fetchRelativeActive();
         if (!this.env.contentState) {
             this.initContentState();
@@ -112,7 +112,7 @@ export class Main extends Component {
     }
 
     async actionExportToOriginalServer() {
-        this.env.issueData.timeStatus = null;
+        this.env.taskData.timeStatus = null;
         let payload = {
             'source': 'Extension',
             'mode': {
@@ -121,11 +121,11 @@ export class Main extends Component {
             }
         }
         let params = {
-            "id": this.env.issueData.id,
+            "id": this.env.taskData.id,
             "jwt": this.env.jwt,
             "payload": payload
         }
-        await this.do_request('POST', `${this.env.serverURL}/management/issue/export?`, params);
+        await this.do_request('POST', `${this.env.serverURL}/management/task/export?`, params);
     }
 
     toggleDatetimeSelection(configs, mode, callback) {
@@ -183,7 +183,7 @@ export class Main extends Component {
         }
     }
     initContentState() {
-        if (this.env.issueData) {
+        if (this.env.taskData) {
             if (this.env.contentState) {
                 this.contentStateChange();
             } else {
@@ -303,7 +303,7 @@ export class Main extends Component {
         <div l-ref="search-bar-segment" style="width:100%">
 
         </div>
-        <div class="issue-active">
+        <div class="task-active">
             <div class="active-item-group" l-ref="related-active">
             </div>
         </div>

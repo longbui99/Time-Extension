@@ -3,17 +3,17 @@ import { CheckList } from "../checklists/checklist.js";
 
 export class dailyTasks extends BaseDialog{
     buttonConfirmRef = this.useRef('button-confirm')
-    commentRef = this.useRef('comment-for-issue')
+    commentRef = this.useRef('comment-for-task')
     dialogContent = this.useRef('dialog-content')
     applicableDate = this.useRef('applicable-date')
     applicableDateLabel = this.useRef('applicable-date-label')
     constructor(){
         super(...arguments);
-        this.env.issueData = this.params.issueData;
+        this.env.taskData = this.params.taskData;
     }
     renderDialogContent(){
         this.innerTemplate = `
-            <div class="dialog-issue-content daily-tasks" l-ref="dialog-content">
+            <div class="dialog-task-content daily-tasks" l-ref="dialog-content">
             </div>
         `;
         this.innerFooter = `
@@ -29,10 +29,10 @@ export class dailyTasks extends BaseDialog{
     }
     async initDailyTaskDialog(text='today'){
         let self = this;
-        let result = (await this.do_request('GET', `${this.env.serverURL}/management/issue/search/${text}?offset=0&jwt=${this.env.jwt}`));
+        let result = (await this.do_request('GET', `${this.env.serverURL}/management/task/search/${text}?offset=0&jwt=${this.env.jwt}`));
         let tasks = (await result.json());
-        this.env.issueData = tasks[0];
-        this.dialogTitle.el.textContent = `[${this.env.issueData.key}] ${this.env.issueData.name}`
+        this.env.taskData = tasks[0];
+        this.dialogTitle.el.textContent = `[${this.env.taskData.key}] ${this.env.taskData.name}`
         this.component = new CheckList(this);
         this.component.mount(this.dialogContent.el).then(e=>{
             self.postUpdateDialogContent();
@@ -47,7 +47,7 @@ export class dailyTasks extends BaseDialog{
         let self = this;
         this.initDailyTaskDialog().then(e=>{
             flatpickr(self.applicableDate.el, {
-                defaultDate: self.env.issueData.applicable_date, 
+                defaultDate: self.env.taskData.applicable_date, 
                 altInput: true,
                 onClose: self.onchangeDailyTaskFilter.bind(self)
             });

@@ -24,8 +24,8 @@ export class LogReport extends Component {
         this.adjustDuration = this.adjustDuration.bind(this);
         this.deletDuration = this.deletDuration.bind(this);
         this.isFold = this.env.historyData?.isFold || false;
-        this.env.issueData.trackingMode = this.env.issueData.trackingMode || 'all';
-        this.env.issueData.lastDatetimeSelection = this.env.issueData.lastDatetimeSelection || [0, 0];
+        this.env.taskData.trackingMode = this.env.taskData.trackingMode || 'all';
+        this.env.taskData.lastDatetimeSelection = this.env.taskData.lastDatetimeSelection || [0, 0];
         this.secondToString = util.parseSecondToString(this.env.resource?.hrs_per_day || 8, this.env.resource?.days_per_week || 5);
     }
     adjustDuration(datas) {
@@ -52,9 +52,9 @@ export class LogReport extends Component {
     onChangeRangeHistoryFilter(selectedDates, dateStr, instance) {
         let from_unix = selectedDates[0].getTime() / 1000;
         let to_unix = selectedDates[1].getTime() / 1000;
-        this.env.issueData.lastDatetimeSelection = [from_unix, to_unix];
+        this.env.taskData.lastDatetimeSelection = [from_unix, to_unix];
         this.loadHistory(from_unix, to_unix);
-        this.update('issueData', this.env.issueData);
+        this.update('taskData', this.env.taskData);
     }
     renderLogByDate(historyByDate) {
         for (let group in historyByDate) {
@@ -74,7 +74,7 @@ export class LogReport extends Component {
             return
         }
         this.unix = [from_unix, unix]
-        let response = (await this.do_invisible_request('GET', `${this.env.serverURL}/management/issue/work-log/history?from_unix=${from_unix}&unix=${unix}&tracking=all&jwt=${this.env.jwt}`));
+        let response = (await this.do_invisible_request('GET', `${this.env.serverURL}/management/task/work-log/history?from_unix=${from_unix}&unix=${unix}&tracking=all&jwt=${this.env.jwt}`));
         let result = (await response.json());
         this.result = result;
         this.searchChange()
@@ -180,12 +180,12 @@ export class LogReport extends Component {
     }
     pinFilterChange() {
         this.actionPinRef.el.classList.toggle('pinned');
-        this.env.issueData.pinFilter = !(this.env.issueData.pinFilter || false);
-        this.update('issueData', this.env.issueData);
+        this.env.taskData.pinFilter = !(this.env.taskData.pinFilter || false);
+        this.update('taskData', this.env.taskData);
     }
     logTypeChange(type = 'all') {
         let result = []
-        this.logHistoryTypeRef.el.classList.remove(this.env.issueData.trackingMode);
+        this.logHistoryTypeRef.el.classList.remove(this.env.taskData.trackingMode);
         this.logHistoryTypeRef.el.classList.add(type);
         if (type === 'all'){
             result = this.result;
@@ -195,7 +195,7 @@ export class LogReport extends Component {
                     result.push(record)
             }
         }
-        this.env.issueData.trackingMode = type;
+        this.env.taskData.trackingMode = type;
         this.renderHistory(result)
     }
     filterResults(){
@@ -206,7 +206,7 @@ export class LogReport extends Component {
                 let regex = new RegExp(`.*(${searches.map(e=>e.trim()).join("|")}).*`)
                 let result = []
                 for (let record of this.result){
-                    if (regex.test(record.key.toLowerCase() + "|" + record.issueName.toLowerCase() + "|" + record.description.toLowerCase()))
+                    if (regex.test(record.key.toLowerCase() + "|" + record.taskName.toLowerCase() + "|" + record.description.toLowerCase()))
                     result.push(record)
                 }
                 this.renderHistory(result)
@@ -243,14 +243,14 @@ export class LogReport extends Component {
         let res = super.mounted();
         let self = this;
         let sUnix = 0, eUnix = 0;
-        if (Array.isArray(this.env.issueData.lastDatetimeSelection) && this.env.issueData.lastDatetimeSelection.length >= 2 && this.env.issueData.pinFilter) {
-            sUnix = this.env.issueData.lastDatetimeSelection[0];
-            eUnix = this.env.issueData.lastDatetimeSelection[1];
+        if (Array.isArray(this.env.taskData.lastDatetimeSelection) && this.env.taskData.lastDatetimeSelection.length >= 2 && this.env.taskData.pinFilter) {
+            sUnix = this.env.taskData.lastDatetimeSelection[0];
+            eUnix = this.env.taskData.lastDatetimeSelection[1];
             this.actionPinRef.el.classList.add('pinned')
         }
         this.loadHistory(sUnix, eUnix).then(e=>{
-            if (typeof self.env.issueData.trackingMode === 'string' || self.env.issueData.trackingMode instanceof String) {
-                self.logTypeChange(self.env.issueData.trackingMode)
+            if (typeof self.env.taskData.trackingMode === 'string' || self.env.taskData.trackingMode instanceof String) {
+                self.logTypeChange(self.env.taskData.trackingMode)
             }
         });
         this.daterange = flatpickr(this.logHistoryDateRangeRef.el, {

@@ -312,9 +312,9 @@ export class Component {
             }
         } catch (erros) {
             let key = 'error';
-            if (method === "GET") {
-                key = 'session_errors'
-            }
+            // if (method === "GET") {
+            //     key = 'session_errors'
+            // }
             this.triggerUp(key, {
                 'message': erros.message
             })
@@ -348,9 +348,9 @@ export class Component {
             }
         } catch (erros) {
             let key = 'error';
-            if (method === "GET") {
-                key = 'session_errors'
-            }
+            // if (method === "GET") {
+            //     key = 'session_errors'
+            // }
             this.triggerUp(key, {
                 'message': erros.message
             })

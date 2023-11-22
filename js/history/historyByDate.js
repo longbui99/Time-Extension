@@ -2,7 +2,7 @@
 import * as util from "../utils/utils.js"
 import * as hUtil from "./historyUtils.js"
 import { Component } from "../base.js"
-import { IssueSubsitution } from "../dialog/issueSubsitution.js"
+import { TaskSubsitution } from "../dialog/taskSubsitution.js"
 import { LogCompare } from "../dialog/logCompare.js"
 class Log extends Component {
     logDurationRef = this.useRef('log-duration')
@@ -59,7 +59,7 @@ class Log extends Component {
             let values = this.__getSyncValue(key);
             let result = {}
             try {
-                let response = (await this.do_invisible_request('POST', `${this.env.serverURL}/management/issue/work-log/update`, values));
+                let response = (await this.do_invisible_request('POST', `${this.env.serverURL}/management/task/work-log/update`, values));
                 result = (await response.json());
             } catch {
                 result = this.data;
@@ -86,7 +86,7 @@ class Log extends Component {
     __actionDeleteWorkLogs() {
         let values = this.__getSyncValue();
         this.destroy();
-        this.do_invisible_request('POST', `${this.env.serverURL}/management/issue/work-log/delete/${values.id}`, values);
+        this.do_invisible_request('POST', `${this.env.serverURL}/management/task/work-log/delete/${values.id}`, values);
         this.triggerUpMethod("deletDuration", {
             'duration': this.data.duration,
             'mode': (this.exported == 1 ? 'exported' : 'unexported'),
@@ -106,24 +106,24 @@ class Log extends Component {
         async function callback(data) {
             let values = {
                 'id': data.id,
-                'issue_id': data.issue?.id,
+                'task_id': data.task?.id,
                 'duration': data.duration,
                 'start_date': data.start,
                 'description': data.comment,
                 'jwt': self.env.jwt
             }
-            await self.do_invisible_request('POST', `${self.env.serverURL}/management/issue/work-log/update`, values);
+            await self.do_invisible_request('POST', `${self.env.serverURL}/management/task/work-log/update`, values);
             self.parent.parent.parent.parent.reloadHistory()
         }
-        self.showDialog(IssueSubsitution, {
+        self.showDialog(TaskSubsitution, {
             title: "Edit Log",
             id: this.data.id,
             startDate: this.data.start_date,
             endDate: new Date(this.data.start_date.getTime() + this.data.duration * 1000),
             comment: this.data.description,
-            issueData: {
-                id: this.data.issue,
-                name: this.data.issueName,
+            taskData: {
+                id: this.data.task,
+                name: this.data.taskName,
                 key: this.data.key,
                 type_url: this.data.type_url,
             },
@@ -144,7 +144,7 @@ class Log extends Component {
                 self.triggerUpMethod('adjustDuration', res, 5)
             });
         }
-        self.do_request('POST', `${self.env.serverURL}/management/issue/work-log/compare`, values).then(function (response){
+        self.do_request('POST', `${self.env.serverURL}/management/task/work-log/compare`, values).then(function (response){
             response.json().then(e=>{
                 self.showDialog(LogCompare, {
                     title: "Compare Log",
@@ -192,9 +192,9 @@ class Log extends Component {
     `
     }
 }
-class LogByIssue extends Component {
-    LogByIssueBtnRef = this.useRef("log-issue-btn")
-    LogIssueExportBtnRef = this.useRef("log-issue-export")
+class LogByTask extends Component {
+    LogByTaskBtnRef = this.useRef("log-task-btn")
+    LogTaskExportBtnRef = this.useRef("log-task-export")
     constructor() {
         super(...arguments);
         this.deletDuration = this.deletDuration.bind(this);
@@ -244,15 +244,15 @@ class LogByIssue extends Component {
                 }
             )).mount(element)
         }
-        this.LogByIssueBtnRef.el.addEventListener('click', event => {
-            if (!self.env.issueData) {
-                self.env.issueData = {};
+        this.LogByTaskBtnRef.el.addEventListener('click', event => {
+            if (!self.env.taskData) {
+                self.env.taskData = {};
             }
-            self.env.issueData.id = self.params.datas.model.issueID;
-            self.env.update('loadIssueData', false)
+            self.env.taskData.id = self.params.datas.model.taskID;
+            self.env.update('loadTaskData', false)
             event.stopPropagation();
         })
-        this.LogIssueExportBtnRef.el.addEventListener('click', this.exportLogs.bind(this))
+        this.LogTaskExportBtnRef.el.addEventListener('click', this.exportLogs.bind(this))
         return res
     }
     getTemplate() {
@@ -260,17 +260,17 @@ class LogByIssue extends Component {
         <div class="log">
             <div class="log-title">
                 <div class="log-title-heading">
-                    <img class="issue-type-url" src="${this.params.datas.model.typeURL}"/>
-                    <button type="button" class="log-issue" l-ref="log-issue-btn">
-                        ${this.params.datas.model.issueKey}
+                    <img class="task-type-url" src="${this.params.datas.model.typeURL}"/>
+                    <button type="button" class="log-task" l-ref="log-task-btn">
+                        ${this.params.datas.model.taskKey}
                     </button>
-                    <button type="button" class="log-issue-export" l-ref="log-issue-export">
+                    <button type="button" class="log-task-export" l-ref="log-task-export">
                         <svg class="svg-inline--fa fa-square-up-right" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="square-up-right" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" data-fa-i2svg=""><path fill="currentColor" d="M384 32H64C28.65 32 0 60.65 0 96v320c0 35.34 28.65 64 64 64h320c35.35 0 64-28.66 64-64V96C448 60.65 419.3 32 384 32zM330.5 323.9c0 6.473-3.889 12.3-9.877 14.78c-5.979 2.484-12.86 1.105-17.44-3.469l-45.25-45.25l-67.92 67.92c-12.5 12.5-32.72 12.46-45.21-.0411l-22.63-22.63C109.7 322.7 109.6 302.5 122.1 289.1l67.92-67.92L144.8 176.8C140.2 172.2 138.8 165.3 141.3 159.4c2.477-5.984 8.309-9.875 14.78-9.875h158.4c8.835 0 15.1 7.163 15.1 15.1V323.9z"></path></svg>
                     </button>
                 </div>
                 
-                <span class="log-display-name" title="${this.params.datas.model.issueName}">
-                    ${this.params.datas.model.issueName}
+                <span class="log-display-name" title="${this.params.datas.model.taskName}">
+                    ${this.params.datas.model.taskName}
                 </span>
             </div>
         </div>
@@ -320,21 +320,21 @@ class LogByProject extends Component {
         this.isFold = !this.isFold;
         this.updateFoldState();
     }
-    loadIssueLogs(){
+    loadTaskLogs(){
         this.params.datas.values.sort(function (a, b) { return b.sequence - a.sequence })
-        let logByIssue = util.GroupBy(this.params.datas.values, "issueName")
+        let logByTask = util.GroupBy(this.params.datas.values, "taskName")
         let element = this.projectLogRef.el;
-        for (let issueName in logByIssue) {
-            logByIssue[issueName]['model'] = {
-                'issueID': logByIssue[issueName].values[0].issue,
-                'issueName': issueName,
-                'issueKey': logByIssue[issueName].values[0]['key'],
-                'typeURL': logByIssue[issueName].values[0]['type_url']
+        for (let taskName in logByTask) {
+            logByTask[taskName]['model'] = {
+                'taskID': logByTask[taskName].values[0].task,
+                'taskName': taskName,
+                'taskKey': logByTask[taskName].values[0]['key'],
+                'typeURL': logByTask[taskName].values[0]['type_url']
             }
             let newParams = util.concat(this.params, {
-                'datas': logByIssue[issueName]
+                'datas': logByTask[taskName]
             })
-            new LogByIssue(this, newParams).mount(element)
+            new LogByTask(this, newParams).mount(element)
         }
     }
     initEvent(){
@@ -345,7 +345,7 @@ class LogByProject extends Component {
         this.resetDuration();
         this.updateFoldState();
         this.initEvent();
-        this.loadIssueLogs();
+        this.loadTaskLogs();
         return res
     }
     getTemplate() {

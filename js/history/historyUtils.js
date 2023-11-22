@@ -27,7 +27,7 @@ export function exportLogData(target) {
 export function deleteLogData(target) {
     let data = getLogDataGroup.bind(this)(target)
     let values = exportLogData.bind(this)(target);
-    this.do_invisible_request('POST', `${this.env.serverURL}/management/issue/work-log/delete/${values.id}`, values);
+    this.do_invisible_request('POST', `${this.env.serverURL}/management/task/work-log/delete/${values.id}`, values);
     let group = target.parentNode.getAttribute('data-group');
     this.env.historyByDate[group].totalDuration -= data.duration;
     target.parentNode.parentNode.parentNode.parentNode.parentNode.querySelector('.total-duration').innerHTML = secondToHour(this.env.historyByDate[group].totalDuration);
@@ -43,7 +43,7 @@ export async function exportLog(exportIds) {
         exportIds: exportIds,
         jwt: this.env.jwt
     };
-    return this.do_request('POST', `${this.env.serverURL}/management/issue/work-log/export`, res);
+    return this.do_request('POST', `${this.env.serverURL}/management/task/work-log/export`, res);
 }
 
 export function getLogTypeDuration(logs){
