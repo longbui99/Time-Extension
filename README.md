@@ -4,6 +4,8 @@ In this project, I am proposing a feature for end-user lazying like me. Because 
 
 I am also provide a system for you to doing a time management tracking with so many impressive features. Contact me for futher information.
 
+Public on: [Chrome Web Store](https://chromewebstore.google.com/detail/work-tracking/hbdlfjpejllfdkialkdalibmhcehoflk)
+
 ## Main Features
 ### General
 - Sign in to server (no matter that's cloud or not, but you probably need to use https:// domain for the server)
